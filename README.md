@@ -14,6 +14,9 @@ YoctoDB is a database engine with the following features (unordered):
 
 See [Project Wiki][1] and [Getting Started Guide][2].
 
+Contact us through [YoctoDB User Group][3].
+
 [1]: https://bitbucket.org/yandex/yoctodb/wiki/Home
 [2]: https://bitbucket.org/yandex/yoctodb/wiki/GettingStarted
+[3]: https://groups.google.com/forum/#!forum/yoctodb
 
