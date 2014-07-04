@@ -35,8 +35,6 @@ public final class V1DatabaseFormat extends DatabaseFormat {
         FIXED_LENGTH_FILTER(1000),
         VARIABLE_LENGTH_FILTER(2000),
         TRIE_BASED_FILTER(2500),
-        FIXED_LENGTH_SORT(3000),
-        VARIABLE_LENGTH_SORT(4000),
         FIXED_LENGTH_FULL_INDEX(5000),
         VARIABLE_LENGTH_FULL_INDEX(6000);
 
