@@ -11,3 +11,9 @@ YoctoDB is a database engine with the following features (unordered):
  * Partitioned (a database is a set of partitions)
  * `mmap`'ed documents (to leverage disk cache)
  * Space-efficient (uses dictionaries for indexed values)
+
+See [Project Wiki][1] and [Getting Started Guide][2].
+
+[1]: https://bitbucket.org/yandex/yoctodb/wiki/Home
+[2]: https://bitbucket.org/yandex/yoctodb/wiki/GettingStarted
+
