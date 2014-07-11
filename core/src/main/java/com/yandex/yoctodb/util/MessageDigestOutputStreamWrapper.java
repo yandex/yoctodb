@@ -15,7 +15,7 @@ import java.io.OutputStream;
 import java.security.MessageDigest;
 
 /**
- * Wraps {@link OutputStream} and updates {@link } accordingly
+ * Wraps {@link OutputStream} and updates {@link MessageDigest} accordingly
  *
  * @author incubos
  */
