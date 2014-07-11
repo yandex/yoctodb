@@ -6,7 +6,7 @@
  * http://www.wtfpl.net/ for more details.
  */
 
-package ru.yandex.yoctodb.immutable;
+package com.yandex.yoctodb.immutable;
 
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;

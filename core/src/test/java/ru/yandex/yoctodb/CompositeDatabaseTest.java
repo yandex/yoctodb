@@ -6,26 +6,26 @@
  * http://www.wtfpl.net/ for more details.
  */
 
-package ru.yandex.yoctodb;
+package com.yandex.yoctodb;
 
 import org.jetbrains.annotations.NotNull;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Test;
-import ru.yandex.yoctodb.immutable.Database;
-import ru.yandex.yoctodb.immutable.DatabaseReader;
-import ru.yandex.yoctodb.mutable.DatabaseBuilder;
-import ru.yandex.yoctodb.mutable.DocumentBuilder;
-import ru.yandex.yoctodb.query.DocumentProcessor;
-import ru.yandex.yoctodb.query.Query;
-import ru.yandex.yoctodb.util.UnsignedByteArrays;
+import com.yandex.yoctodb.immutable.Database;
+import com.yandex.yoctodb.immutable.DatabaseReader;
+import com.yandex.yoctodb.mutable.DatabaseBuilder;
+import com.yandex.yoctodb.mutable.DocumentBuilder;
+import com.yandex.yoctodb.query.DocumentProcessor;
+import com.yandex.yoctodb.query.Query;
+import com.yandex.yoctodb.util.UnsignedByteArrays;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.util.*;
 
-import static ru.yandex.yoctodb.query.QueryBuilder.*;
+import static com.yandex.yoctodb.query.QueryBuilder.*;
 
 /**
  * Tests for a composite database

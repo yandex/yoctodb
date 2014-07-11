@@ -6,16 +6,16 @@
  * http://www.wtfpl.net/ for more details.
  */
 
-package ru.yandex.yoctodb.v1.immutable;
+package com.yandex.yoctodb.v1.immutable;
 
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.yandex.yoctodb.immutable.*;
-import ru.yandex.yoctodb.v1.V1DatabaseFormat;
-import ru.yandex.yoctodb.v1.immutable.segment.Segment;
-import ru.yandex.yoctodb.v1.immutable.segment.SegmentRegistry;
+import com.yandex.yoctodb.immutable.*;
+import com.yandex.yoctodb.v1.V1DatabaseFormat;
+import com.yandex.yoctodb.v1.immutable.segment.Segment;
+import com.yandex.yoctodb.v1.immutable.segment.SegmentRegistry;
 
 import java.io.File;
 import java.io.IOException;

@@ -6,13 +6,13 @@
  * http://www.wtfpl.net/ for more details.
  */
 
-package ru.yandex.yoctodb.mutable.util;
+package com.yandex.yoctodb.mutable.util;
 
 import com.google.common.primitives.Longs;
 import org.junit.Assert;
 import org.junit.Test;
-import ru.yandex.yoctodb.util.mutable.BitSet;
-import ru.yandex.yoctodb.util.mutable.impl.LongArrayBitSet;
+import com.yandex.yoctodb.util.mutable.BitSet;
+import com.yandex.yoctodb.util.mutable.impl.LongArrayBitSet;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

@@ -6,15 +6,15 @@
  * http://www.wtfpl.net/ for more details.
  */
 
-package ru.yandex.yoctodb.immutable.util;
+package com.yandex.yoctodb.immutable.util;
 
 import org.junit.Assert;
 import org.junit.Test;
-import ru.yandex.yoctodb.util.UnsignedByteArray;
-import ru.yandex.yoctodb.util.UnsignedByteArrays;
-import ru.yandex.yoctodb.util.immutable.ByteArraySortedSet;
-import ru.yandex.yoctodb.util.immutable.impl.FixedLengthByteArraySortedSet;
-import ru.yandex.yoctodb.util.immutable.impl.VariableLengthByteArraySortedSet;
+import com.yandex.yoctodb.util.UnsignedByteArray;
+import com.yandex.yoctodb.util.UnsignedByteArrays;
+import com.yandex.yoctodb.util.immutable.ByteArraySortedSet;
+import com.yandex.yoctodb.util.immutable.impl.FixedLengthByteArraySortedSet;
+import com.yandex.yoctodb.util.immutable.impl.VariableLengthByteArraySortedSet;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -58,8 +58,8 @@ public class ByteArraySortedSetTest {
 
     private ByteBuffer prepareDataFromFixedLengthByteArraySortedSet(
             final Collection<UnsignedByteArray> elements) throws IOException {
-        final ru.yandex.yoctodb.util.mutable.impl.FixedLengthByteArraySortedSet fixedLengthByteArrayIndexedList =
-                new ru.yandex.yoctodb.util.mutable.impl.FixedLengthByteArraySortedSet();
+        final com.yandex.yoctodb.util.mutable.impl.FixedLengthByteArraySortedSet fixedLengthByteArrayIndexedList =
+                new com.yandex.yoctodb.util.mutable.impl.FixedLengthByteArraySortedSet();
         for (UnsignedByteArray element : elements) {
             fixedLengthByteArrayIndexedList.add(element);
         }
@@ -103,8 +103,8 @@ public class ByteArraySortedSetTest {
 
     private ByteBuffer prepareDataFromVariableLengthByteArraySortedSet(
             final Collection<UnsignedByteArray> elements) throws IOException {
-        final ru.yandex.yoctodb.util.mutable.impl.VariableLengthByteArraySortedSet fixedLengthByteArrayIndexedList =
-                new ru.yandex.yoctodb.util.mutable.impl.VariableLengthByteArraySortedSet();
+        final com.yandex.yoctodb.util.mutable.impl.VariableLengthByteArraySortedSet fixedLengthByteArrayIndexedList =
+                new com.yandex.yoctodb.util.mutable.impl.VariableLengthByteArraySortedSet();
         for (UnsignedByteArray element : elements) {
             fixedLengthByteArrayIndexedList.add(element);
         }

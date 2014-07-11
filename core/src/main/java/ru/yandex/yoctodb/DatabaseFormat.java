@@ -6,14 +6,14 @@
  * http://www.wtfpl.net/ for more details.
  */
 
-package ru.yandex.yoctodb;
+package com.yandex.yoctodb;
 
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.NotNull;
-import ru.yandex.yoctodb.immutable.DatabaseReader;
-import ru.yandex.yoctodb.mutable.DatabaseBuilder;
-import ru.yandex.yoctodb.mutable.DocumentBuilder;
-import ru.yandex.yoctodb.v1.V1DatabaseFormat;
+import com.yandex.yoctodb.immutable.DatabaseReader;
+import com.yandex.yoctodb.mutable.DatabaseBuilder;
+import com.yandex.yoctodb.mutable.DocumentBuilder;
+import com.yandex.yoctodb.v1.V1DatabaseFormat;
 
 /**
  * Provides facilities to build a database using current format

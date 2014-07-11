@@ -6,19 +6,19 @@
  * http://www.wtfpl.net/ for more details.
  */
 
-package ru.yandex.yoctodb.v1.immutable.segment;
+package com.yandex.yoctodb.v1.immutable.segment;
 
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
-import ru.yandex.yoctodb.immutable.FilterableIndex;
-import ru.yandex.yoctodb.util.immutable.IntToIntArray;
-import ru.yandex.yoctodb.immutable.SortableIndex;
-import ru.yandex.yoctodb.util.immutable.ByteArraySortedSet;
-import ru.yandex.yoctodb.util.immutable.IndexToIndexMap;
-import ru.yandex.yoctodb.util.immutable.IndexToIndexMultiMap;
-import ru.yandex.yoctodb.util.immutable.impl.*;
-import ru.yandex.yoctodb.util.mutable.BitSet;
-import ru.yandex.yoctodb.v1.V1DatabaseFormat;
+import com.yandex.yoctodb.immutable.FilterableIndex;
+import com.yandex.yoctodb.util.immutable.IntToIntArray;
+import com.yandex.yoctodb.immutable.SortableIndex;
+import com.yandex.yoctodb.util.immutable.ByteArraySortedSet;
+import com.yandex.yoctodb.util.immutable.IndexToIndexMap;
+import com.yandex.yoctodb.util.immutable.IndexToIndexMultiMap;
+import com.yandex.yoctodb.util.immutable.impl.*;
+import com.yandex.yoctodb.util.mutable.BitSet;
+import com.yandex.yoctodb.v1.V1DatabaseFormat;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

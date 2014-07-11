@@ -6,13 +6,13 @@
  * http://www.wtfpl.net/ for more details.
  */
 
-package ru.yandex.yoctodb.util.mutable.impl;
+package com.yandex.yoctodb.util.mutable.impl;
 
 import com.google.common.primitives.Ints;
 import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.NotNull;
-import ru.yandex.yoctodb.util.UnsignedByteArray;
-import ru.yandex.yoctodb.util.UnsignedByteArrays;
+import com.yandex.yoctodb.util.UnsignedByteArray;
+import com.yandex.yoctodb.util.UnsignedByteArrays;
 
 import java.io.IOException;
 import java.io.OutputStream;

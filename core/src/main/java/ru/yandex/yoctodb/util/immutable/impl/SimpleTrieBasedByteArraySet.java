@@ -6,12 +6,12 @@
  * http://www.wtfpl.net/ for more details.
  */
 
-package ru.yandex.yoctodb.util.immutable.impl;
+package com.yandex.yoctodb.util.immutable.impl;
 
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
-import ru.yandex.yoctodb.util.UnsignedByteArrays;
-import ru.yandex.yoctodb.util.immutable.TrieBasedByteArraySet;
+import com.yandex.yoctodb.util.UnsignedByteArrays;
+import com.yandex.yoctodb.util.immutable.TrieBasedByteArraySet;
 
 import java.nio.ByteBuffer;
 
