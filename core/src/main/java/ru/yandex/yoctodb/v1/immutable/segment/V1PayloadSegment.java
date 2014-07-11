@@ -6,14 +6,14 @@
  * http://www.wtfpl.net/ for more details.
  */
 
-package ru.yandex.yoctodb.v1.immutable.segment;
+package com.yandex.yoctodb.v1.immutable.segment;
 
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
-import ru.yandex.yoctodb.immutable.Payload;
-import ru.yandex.yoctodb.util.immutable.ByteArrayIndexedList;
-import ru.yandex.yoctodb.util.immutable.impl.VariableLengthByteArrayIndexedList;
-import ru.yandex.yoctodb.v1.V1DatabaseFormat;
+import com.yandex.yoctodb.immutable.Payload;
+import com.yandex.yoctodb.util.immutable.ByteArrayIndexedList;
+import com.yandex.yoctodb.util.immutable.impl.VariableLengthByteArrayIndexedList;
+import com.yandex.yoctodb.v1.V1DatabaseFormat;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

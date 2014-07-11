@@ -6,7 +6,7 @@
  * http://www.wtfpl.net/ for more details.
  */
 
-package ru.yandex.yoctodb.query;
+package com.yandex.yoctodb.query;
 
 import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.NotNull;

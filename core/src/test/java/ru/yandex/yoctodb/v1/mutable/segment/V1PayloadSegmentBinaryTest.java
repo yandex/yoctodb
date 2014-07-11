@@ -6,18 +6,18 @@
  * http://www.wtfpl.net/ for more details.
  */
 
-package ru.yandex.yoctodb.v1.mutable.segment;
+package com.yandex.yoctodb.v1.mutable.segment;
 
 import org.junit.Assert;
 import org.junit.Test;
-import ru.yandex.yoctodb.util.OutputStreamWritable;
-import ru.yandex.yoctodb.v1.V1DatabaseFormat;
+import com.yandex.yoctodb.util.OutputStreamWritable;
+import com.yandex.yoctodb.v1.V1DatabaseFormat;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import static ru.yandex.yoctodb.v1.mutable.segment.Utils.calculateDigest;
+import static com.yandex.yoctodb.v1.mutable.segment.Utils.calculateDigest;
 
 /**
  * @author svyatoslav

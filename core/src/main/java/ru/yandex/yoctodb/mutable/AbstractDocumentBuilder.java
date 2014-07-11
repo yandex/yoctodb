@@ -6,11 +6,11 @@
  * http://www.wtfpl.net/ for more details.
  */
 
-package ru.yandex.yoctodb.mutable;
+package com.yandex.yoctodb.mutable;
 
 import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.NotNull;
-import ru.yandex.yoctodb.util.UnsignedByteArrays;
+import com.yandex.yoctodb.util.UnsignedByteArrays;
 
 /**
  * Implements generic methods of {@link DocumentBuilder}

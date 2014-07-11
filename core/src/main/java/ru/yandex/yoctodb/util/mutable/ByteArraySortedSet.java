@@ -6,15 +6,15 @@
  * http://www.wtfpl.net/ for more details.
  */
 
-package ru.yandex.yoctodb.util.mutable;
+package com.yandex.yoctodb.util.mutable;
 
 import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.NotNull;
-import ru.yandex.yoctodb.util.UnsignedByteArray;
-import ru.yandex.yoctodb.util.OutputStreamWritable;
+import com.yandex.yoctodb.util.UnsignedByteArray;
+import com.yandex.yoctodb.util.OutputStreamWritable;
 
 /**
- * {@link ru.yandex.yoctodb.util.UnsignedByteArray} mutable sorted set with basic operations.
+ * {@link com.yandex.yoctodb.util.UnsignedByteArray} mutable sorted set with basic operations.
  *
  * The contract is to {@code add} some elements and then call
  * {@code indexOf} to extract their indexes.

@@ -6,11 +6,11 @@
  * http://www.wtfpl.net/ for more details.
  */
 
-package ru.yandex.yoctodb.util.mutable.impl;
+package com.yandex.yoctodb.util.mutable.impl;
 
 import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.NotNull;
-import ru.yandex.yoctodb.util.mutable.IndexToIndexMap;
+import com.yandex.yoctodb.util.mutable.IndexToIndexMap;
 
 import java.io.IOException;
 import java.io.OutputStream;

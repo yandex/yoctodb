@@ -6,12 +6,12 @@
  * http://www.wtfpl.net/ for more details.
  */
 
-package ru.yandex.yoctodb.immutable;
+package com.yandex.yoctodb.immutable;
 
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
-import ru.yandex.yoctodb.query.DocumentProcessor;
-import ru.yandex.yoctodb.query.Query;
+import com.yandex.yoctodb.query.DocumentProcessor;
+import com.yandex.yoctodb.query.Query;
 
 import java.nio.ByteBuffer;
 
@@ -40,7 +40,7 @@ public interface Database {
             DocumentProcessor processor);
 
     /**
-     * The same as {@link #execute(ru.yandex.yoctodb.query.Query, ru.yandex.yoctodb.query.DocumentProcessor)}
+     * The same as {@link #execute(com.yandex.yoctodb.query.Query, com.yandex.yoctodb.query.DocumentProcessor)}
      * but also returns count of unlimited documents (filtered documents
      * without {@code skip} and {@code limit})
      *

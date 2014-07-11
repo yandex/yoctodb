@@ -6,18 +6,18 @@
  * http://www.wtfpl.net/ for more details.
  */
 
-package ru.yandex.yoctodb.v1.immutable;
+package com.yandex.yoctodb.v1.immutable;
 
 import com.google.common.collect.Iterators;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
-import ru.yandex.yoctodb.immutable.Database;
-import ru.yandex.yoctodb.query.DocumentProcessor;
-import ru.yandex.yoctodb.query.Query;
-import ru.yandex.yoctodb.query.QueryContext;
-import ru.yandex.yoctodb.query.ScoredDocument;
-import ru.yandex.yoctodb.util.mutable.BitSet;
-import ru.yandex.yoctodb.util.mutable.impl.ReadOnlyOneBitSet;
+import com.yandex.yoctodb.immutable.Database;
+import com.yandex.yoctodb.query.DocumentProcessor;
+import com.yandex.yoctodb.query.Query;
+import com.yandex.yoctodb.query.QueryContext;
+import com.yandex.yoctodb.query.ScoredDocument;
+import com.yandex.yoctodb.util.mutable.BitSet;
+import com.yandex.yoctodb.util.mutable.impl.ReadOnlyOneBitSet;
 
 import java.nio.ByteBuffer;
 import java.util.*;

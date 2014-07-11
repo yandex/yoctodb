@@ -6,11 +6,11 @@
  * http://www.wtfpl.net/ for more details.
  */
 
-package ru.yandex.yoctodb.util.mutable.impl;
+package com.yandex.yoctodb.util.mutable.impl;
 
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.NotNull;
-import ru.yandex.yoctodb.util.mutable.BitSet;
+import com.yandex.yoctodb.util.mutable.BitSet;
 
 import java.nio.ByteBuffer;
 

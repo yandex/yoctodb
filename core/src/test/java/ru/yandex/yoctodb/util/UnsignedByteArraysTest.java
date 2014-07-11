@@ -6,12 +6,12 @@
  * http://www.wtfpl.net/ for more details.
  */
 
-package ru.yandex.yoctodb.util;
+package com.yandex.yoctodb.util;
 
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
-import static ru.yandex.yoctodb.util.UnsignedByteArrays.*;
+import static com.yandex.yoctodb.util.UnsignedByteArrays.*;
 
 /**
  * Tests for {@link UnsignedByteArrays}

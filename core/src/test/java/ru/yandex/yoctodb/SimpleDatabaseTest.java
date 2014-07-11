@@ -6,19 +6,19 @@
  * http://www.wtfpl.net/ for more details.
  */
 
-package ru.yandex.yoctodb;
+package com.yandex.yoctodb;
 
 import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Test;
-import ru.yandex.yoctodb.immutable.Database;
-import ru.yandex.yoctodb.mutable.DatabaseBuilder;
-import ru.yandex.yoctodb.mutable.DocumentBuilder;
-import ru.yandex.yoctodb.query.DocumentProcessor;
-import ru.yandex.yoctodb.query.Query;
-import ru.yandex.yoctodb.query.simple.SimpleDescendingOrder;
-import ru.yandex.yoctodb.query.simple.SimpleRangeCondition;
-import ru.yandex.yoctodb.util.UnsignedByteArrays;
+import com.yandex.yoctodb.immutable.Database;
+import com.yandex.yoctodb.mutable.DatabaseBuilder;
+import com.yandex.yoctodb.mutable.DocumentBuilder;
+import com.yandex.yoctodb.query.DocumentProcessor;
+import com.yandex.yoctodb.query.Query;
+import com.yandex.yoctodb.query.simple.SimpleDescendingOrder;
+import com.yandex.yoctodb.query.simple.SimpleRangeCondition;
+import com.yandex.yoctodb.util.UnsignedByteArrays;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -26,7 +26,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import static ru.yandex.yoctodb.query.QueryBuilder.*;
+import static com.yandex.yoctodb.query.QueryBuilder.*;
 
 /**
  * Tests for building and searching a simple database

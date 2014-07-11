@@ -6,7 +6,7 @@
  * http://www.wtfpl.net/ for more details.
  */
 
-package ru.yandex.yoctodb.util.immutable;
+package com.yandex.yoctodb.util.immutable;
 
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import java.nio.ByteBuffer;
 
 /**
- * {@link ru.yandex.yoctodb.util.UnsignedByteArray} immutable sorted set with basic operations
+ * {@link com.yandex.yoctodb.util.UnsignedByteArray} immutable sorted set with basic operations
  *
  * @author incubos
  */

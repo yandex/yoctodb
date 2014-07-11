@@ -6,15 +6,15 @@
  * http://www.wtfpl.net/ for more details.
  */
 
-package ru.yandex.yoctodb.util.immutable.impl;
+package com.yandex.yoctodb.util.immutable.impl;
 
 import com.google.common.primitives.Ints;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ru.yandex.yoctodb.util.immutable.IndexToIndexMultiMap;
-import ru.yandex.yoctodb.util.immutable.IntToIntArray;
-import ru.yandex.yoctodb.util.mutable.BitSet;
+import com.yandex.yoctodb.util.immutable.IndexToIndexMultiMap;
+import com.yandex.yoctodb.util.immutable.IntToIntArray;
+import com.yandex.yoctodb.util.mutable.BitSet;
 
 import java.nio.ByteBuffer;
 import java.util.Iterator;

@@ -6,12 +6,12 @@
  * http://www.wtfpl.net/ for more details.
  */
 
-package ru.yandex.yoctodb.query;
+package com.yandex.yoctodb.query;
 
 import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.NotNull;
-import ru.yandex.yoctodb.query.simple.*;
-import ru.yandex.yoctodb.util.UnsignedByteArray;
+import com.yandex.yoctodb.query.simple.*;
+import com.yandex.yoctodb.util.UnsignedByteArray;
 
 /**
  * Abstract {@link Query} builder

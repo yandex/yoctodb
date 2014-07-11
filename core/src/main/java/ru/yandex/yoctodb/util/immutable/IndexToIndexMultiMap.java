@@ -6,11 +6,11 @@
  * http://www.wtfpl.net/ for more details.
  */
 
-package ru.yandex.yoctodb.util.immutable;
+package com.yandex.yoctodb.util.immutable;
 
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
-import ru.yandex.yoctodb.util.mutable.BitSet;
+import com.yandex.yoctodb.util.mutable.BitSet;
 
 import java.util.Iterator;
 
