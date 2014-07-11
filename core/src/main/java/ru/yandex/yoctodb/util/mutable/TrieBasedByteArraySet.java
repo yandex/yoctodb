@@ -6,11 +6,11 @@
  * http://www.wtfpl.net/ for more details.
  */
 
-package ru.yandex.yoctodb.util.mutable;
+package com.yandex.yoctodb.util.mutable;
 
 import org.jetbrains.annotations.NotNull;
-import ru.yandex.yoctodb.util.UnsignedByteArray;
-import ru.yandex.yoctodb.util.OutputStreamWritable;
+import com.yandex.yoctodb.util.UnsignedByteArray;
+import com.yandex.yoctodb.util.OutputStreamWritable;
 
 /**
  * @author svyatoslav

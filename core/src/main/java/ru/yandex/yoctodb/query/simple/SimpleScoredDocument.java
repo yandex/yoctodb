@@ -6,13 +6,13 @@
  * http://www.wtfpl.net/ for more details.
  */
 
-package ru.yandex.yoctodb.query.simple;
+package com.yandex.yoctodb.query.simple;
 
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
-import ru.yandex.yoctodb.immutable.Database;
-import ru.yandex.yoctodb.query.DocumentScore;
-import ru.yandex.yoctodb.query.ScoredDocument;
+import com.yandex.yoctodb.immutable.Database;
+import com.yandex.yoctodb.query.DocumentScore;
+import com.yandex.yoctodb.query.ScoredDocument;
 
 /**
  * {@link ScoredDocument} implementation for simple queries

@@ -6,11 +6,11 @@
  * http://www.wtfpl.net/ for more details.
  */
 
-package ru.yandex.yoctodb.query.simple;
+package com.yandex.yoctodb.query.simple;
 
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
-import ru.yandex.yoctodb.query.Order;
+import com.yandex.yoctodb.query.Order;
 
 /**
  * Ascending order

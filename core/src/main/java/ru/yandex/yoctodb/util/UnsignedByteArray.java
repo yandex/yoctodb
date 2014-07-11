@@ -6,7 +6,7 @@
  * http://www.wtfpl.net/ for more details.
  */
 
-package ru.yandex.yoctodb.util;
+package com.yandex.yoctodb.util;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.UnsignedBytes;

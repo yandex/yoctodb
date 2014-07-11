@@ -6,11 +6,11 @@
  * http://www.wtfpl.net/ for more details.
  */
 
-package ru.yandex.yoctodb.query.simple;
+package com.yandex.yoctodb.query.simple;
 
 import org.jetbrains.annotations.NotNull;
-import ru.yandex.yoctodb.immutable.Database;
-import ru.yandex.yoctodb.util.mutable.BitSet;
+import com.yandex.yoctodb.immutable.Database;
+import com.yandex.yoctodb.util.mutable.BitSet;
 
 import java.util.Iterator;
 

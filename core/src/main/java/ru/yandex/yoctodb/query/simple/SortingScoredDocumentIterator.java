@@ -6,16 +6,16 @@
  * http://www.wtfpl.net/ for more details.
  */
 
-package ru.yandex.yoctodb.query.simple;
+package com.yandex.yoctodb.query.simple;
 
 import com.google.common.collect.Iterators;
 import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.NotNull;
-import ru.yandex.yoctodb.util.immutable.IntToIntArray;
-import ru.yandex.yoctodb.immutable.SortableIndex;
-import ru.yandex.yoctodb.query.Order;
-import ru.yandex.yoctodb.query.QueryContext;
-import ru.yandex.yoctodb.util.mutable.BitSet;
+import com.yandex.yoctodb.util.immutable.IntToIntArray;
+import com.yandex.yoctodb.immutable.SortableIndex;
+import com.yandex.yoctodb.query.Order;
+import com.yandex.yoctodb.query.QueryContext;
+import com.yandex.yoctodb.util.mutable.BitSet;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;

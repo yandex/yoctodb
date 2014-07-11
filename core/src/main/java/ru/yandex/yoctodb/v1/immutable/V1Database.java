@@ -6,22 +6,22 @@
  * http://www.wtfpl.net/ for more details.
  */
 
-package ru.yandex.yoctodb.v1.immutable;
+package com.yandex.yoctodb.v1.immutable;
 
 import com.google.common.collect.Iterators;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
-import ru.yandex.yoctodb.immutable.Database;
-import ru.yandex.yoctodb.immutable.FilterableIndex;
-import ru.yandex.yoctodb.immutable.Payload;
-import ru.yandex.yoctodb.immutable.SortableIndex;
-import ru.yandex.yoctodb.query.DocumentProcessor;
-import ru.yandex.yoctodb.query.Query;
-import ru.yandex.yoctodb.query.QueryContext;
-import ru.yandex.yoctodb.query.ScoredDocument;
-import ru.yandex.yoctodb.util.mutable.BitSet;
-import ru.yandex.yoctodb.util.mutable.impl.LongArrayBitSet;
-import ru.yandex.yoctodb.util.mutable.impl.ReadOnlyOneBitSet;
+import com.yandex.yoctodb.immutable.Database;
+import com.yandex.yoctodb.immutable.FilterableIndex;
+import com.yandex.yoctodb.immutable.Payload;
+import com.yandex.yoctodb.immutable.SortableIndex;
+import com.yandex.yoctodb.query.DocumentProcessor;
+import com.yandex.yoctodb.query.Query;
+import com.yandex.yoctodb.query.QueryContext;
+import com.yandex.yoctodb.query.ScoredDocument;
+import com.yandex.yoctodb.util.mutable.BitSet;
+import com.yandex.yoctodb.util.mutable.impl.LongArrayBitSet;
+import com.yandex.yoctodb.util.mutable.impl.ReadOnlyOneBitSet;
 
 import java.nio.ByteBuffer;
 import java.util.Collections;
@@ -139,8 +139,8 @@ public final class V1Database implements QueryContext {
     }
 
     /**
-     * The same as {@link #execute(ru.yandex.yoctodb.query.Query,
-     * ru.yandex.yoctodb.query.DocumentProcessor)}, but returns also unlimited
+     * The same as {@link #execute(com.yandex.yoctodb.query.Query,
+     * com.yandex.yoctodb.query.DocumentProcessor)}, but returns also unlimited
      * document count
      */
     @Override

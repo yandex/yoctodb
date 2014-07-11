@@ -6,7 +6,7 @@
  * http://www.wtfpl.net/ for more details.
  */
 
-package ru.yandex.yoctodb.v1.mutable.segment;
+package com.yandex.yoctodb.v1.mutable.segment;
 
 import org.jetbrains.annotations.NotNull;
 

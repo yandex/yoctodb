@@ -6,17 +6,17 @@
  * http://www.wtfpl.net/ for more details.
  */
 
-package ru.yandex.yoctodb.v1.mutable.segment;
+package com.yandex.yoctodb.v1.mutable.segment;
 
 import com.google.common.primitives.Ints;
 import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.NotNull;
-import ru.yandex.yoctodb.util.MessageDigestOutputStreamWrapper;
-import ru.yandex.yoctodb.util.OutputStreamWritable;
-import ru.yandex.yoctodb.util.UnsignedByteArrays;
-import ru.yandex.yoctodb.util.mutable.ByteArrayIndexedList;
-import ru.yandex.yoctodb.util.mutable.impl.VariableLengthByteArrayIndexedList;
-import ru.yandex.yoctodb.v1.V1DatabaseFormat;
+import com.yandex.yoctodb.util.MessageDigestOutputStreamWrapper;
+import com.yandex.yoctodb.util.OutputStreamWritable;
+import com.yandex.yoctodb.util.UnsignedByteArrays;
+import com.yandex.yoctodb.util.mutable.ByteArrayIndexedList;
+import com.yandex.yoctodb.util.mutable.impl.VariableLengthByteArrayIndexedList;
+import com.yandex.yoctodb.v1.V1DatabaseFormat;
 
 import java.io.IOException;
 import java.io.OutputStream;

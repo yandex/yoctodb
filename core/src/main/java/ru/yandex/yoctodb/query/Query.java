@@ -6,13 +6,13 @@
  * http://www.wtfpl.net/ for more details.
  */
 
-package ru.yandex.yoctodb.query;
+package com.yandex.yoctodb.query;
 
 import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ru.yandex.yoctodb.immutable.Database;
-import ru.yandex.yoctodb.util.mutable.BitSet;
+import com.yandex.yoctodb.immutable.Database;
+import com.yandex.yoctodb.util.mutable.BitSet;
 
 import java.util.Iterator;
 

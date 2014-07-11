@@ -6,12 +6,12 @@
  * http://www.wtfpl.net/ for more details.
  */
 
-package ru.yandex.yoctodb.immutable.util;
+package com.yandex.yoctodb.immutable.util;
 
 import org.junit.Assert;
 import org.junit.Test;
-import ru.yandex.yoctodb.util.immutable.IndexToIndexMap;
-import ru.yandex.yoctodb.util.immutable.impl.IntIndexToIndexMap;
+import com.yandex.yoctodb.util.immutable.IndexToIndexMap;
+import com.yandex.yoctodb.util.immutable.impl.IntIndexToIndexMap;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -36,8 +36,8 @@ public class IntIndexToIndexMapTest {
     }
 
     private ByteBuffer prepareData(final int size) throws IOException {
-        final ru.yandex.yoctodb.util.mutable.IndexToIndexMap indexToIndexMap =
-                new ru.yandex.yoctodb.util.mutable.impl.IntIndexToIndexMap();
+        final com.yandex.yoctodb.util.mutable.IndexToIndexMap indexToIndexMap =
+                new com.yandex.yoctodb.util.mutable.impl.IntIndexToIndexMap();
         for (int i = 0; i < size; i++) {
             indexToIndexMap.put(i, size - i);
         }

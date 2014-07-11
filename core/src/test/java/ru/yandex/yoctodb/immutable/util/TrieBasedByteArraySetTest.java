@@ -6,14 +6,14 @@
  * http://www.wtfpl.net/ for more details.
  */
 
-package ru.yandex.yoctodb.immutable.util;
+package com.yandex.yoctodb.immutable.util;
 
 import org.junit.Assert;
 import org.junit.Test;
-import ru.yandex.yoctodb.util.UnsignedByteArray;
-import ru.yandex.yoctodb.util.UnsignedByteArrays;
-import ru.yandex.yoctodb.util.mutable.TrieBasedByteArraySet;
-import ru.yandex.yoctodb.util.mutable.impl.SimpleTrieBasedByteArraySet;
+import com.yandex.yoctodb.util.UnsignedByteArray;
+import com.yandex.yoctodb.util.UnsignedByteArrays;
+import com.yandex.yoctodb.util.mutable.TrieBasedByteArraySet;
+import com.yandex.yoctodb.util.mutable.impl.SimpleTrieBasedByteArraySet;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -42,8 +42,8 @@ public class TrieBasedByteArraySetTest {
 
         final ByteBuffer bb =
                 prepareDataFromTrieBasedByteArraySet(elements);
-        final ru.yandex.yoctodb.util.immutable.TrieBasedByteArraySet ss =
-                ru.yandex.yoctodb.util.immutable.impl.SimpleTrieBasedByteArraySet.from(bb);
+        final com.yandex.yoctodb.util.immutable.TrieBasedByteArraySet ss =
+                com.yandex.yoctodb.util.immutable.impl.SimpleTrieBasedByteArraySet.from(bb);
 
         Assert.assertEquals(elements.size(), ss.size());
 

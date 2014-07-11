@@ -6,15 +6,15 @@
  * http://www.wtfpl.net/ for more details.
  */
 
-package ru.yandex.yoctodb.util.mutable;
+package com.yandex.yoctodb.util.mutable;
 
 import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.NotNull;
-import ru.yandex.yoctodb.util.UnsignedByteArray;
-import ru.yandex.yoctodb.util.OutputStreamWritable;
+import com.yandex.yoctodb.util.UnsignedByteArray;
+import com.yandex.yoctodb.util.OutputStreamWritable;
 
 /**
- * Indexed list of {@link ru.yandex.yoctodb.util.UnsignedByteArray}s
+ * Indexed list of {@link com.yandex.yoctodb.util.UnsignedByteArray}s
  *
  * @author incubos
  */

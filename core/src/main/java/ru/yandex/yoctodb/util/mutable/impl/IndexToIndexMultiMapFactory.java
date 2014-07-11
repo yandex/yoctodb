@@ -6,9 +6,9 @@
  * http://www.wtfpl.net/ for more details.
  */
 
-package ru.yandex.yoctodb.util.mutable.impl;
+package com.yandex.yoctodb.util.mutable.impl;
 
-import ru.yandex.yoctodb.util.mutable.IndexToIndexMultiMap;
+import com.yandex.yoctodb.util.mutable.IndexToIndexMultiMap;
 
 /**
  * @author svyatoslav

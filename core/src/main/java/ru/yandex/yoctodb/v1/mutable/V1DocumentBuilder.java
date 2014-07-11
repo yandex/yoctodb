@@ -6,14 +6,14 @@
  * http://www.wtfpl.net/ for more details.
  */
 
-package ru.yandex.yoctodb.v1.mutable;
+package com.yandex.yoctodb.v1.mutable;
 
 import com.google.common.collect.TreeMultimap;
 import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.NotNull;
-import ru.yandex.yoctodb.mutable.AbstractDocumentBuilder;
-import ru.yandex.yoctodb.mutable.DocumentBuilder;
-import ru.yandex.yoctodb.util.UnsignedByteArray;
+import com.yandex.yoctodb.mutable.AbstractDocumentBuilder;
+import com.yandex.yoctodb.mutable.DocumentBuilder;
+import com.yandex.yoctodb.util.UnsignedByteArray;
 
 import java.util.HashMap;
 import java.util.Map;

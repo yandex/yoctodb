@@ -6,10 +6,10 @@
  * http://www.wtfpl.net/ for more details.
  */
 
-package ru.yandex.yoctodb.util.immutable.impl;
+package com.yandex.yoctodb.util.immutable.impl;
 
-import ru.yandex.yoctodb.util.immutable.IndexToIndexMultiMap;
-import ru.yandex.yoctodb.v1.V1DatabaseFormat;
+import com.yandex.yoctodb.util.immutable.IndexToIndexMultiMap;
+import com.yandex.yoctodb.v1.V1DatabaseFormat;
 
 import java.nio.ByteBuffer;
 

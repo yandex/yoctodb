@@ -6,17 +6,17 @@
  * http://www.wtfpl.net/ for more details.
  */
 
-package ru.yandex.yoctodb.v1.immutable.segment;
+package com.yandex.yoctodb.v1.immutable.segment;
 
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
-import ru.yandex.yoctodb.immutable.FilterableIndex;
-import ru.yandex.yoctodb.util.immutable.IndexToIndexMultiMap;
-import ru.yandex.yoctodb.util.immutable.TrieBasedByteArraySet;
-import ru.yandex.yoctodb.util.immutable.impl.IndexToIndexMultiMapReader;
-import ru.yandex.yoctodb.util.immutable.impl.SimpleTrieBasedByteArraySet;
-import ru.yandex.yoctodb.util.mutable.BitSet;
-import ru.yandex.yoctodb.v1.V1DatabaseFormat;
+import com.yandex.yoctodb.immutable.FilterableIndex;
+import com.yandex.yoctodb.util.immutable.IndexToIndexMultiMap;
+import com.yandex.yoctodb.util.immutable.TrieBasedByteArraySet;
+import com.yandex.yoctodb.util.immutable.impl.IndexToIndexMultiMapReader;
+import com.yandex.yoctodb.util.immutable.impl.SimpleTrieBasedByteArraySet;
+import com.yandex.yoctodb.util.mutable.BitSet;
+import com.yandex.yoctodb.v1.V1DatabaseFormat;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

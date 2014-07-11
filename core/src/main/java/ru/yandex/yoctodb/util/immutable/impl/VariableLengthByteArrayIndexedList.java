@@ -6,17 +6,17 @@
  * http://www.wtfpl.net/ for more details.
  */
 
-package ru.yandex.yoctodb.util.immutable.impl;
+package com.yandex.yoctodb.util.immutable.impl;
 
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
-import ru.yandex.yoctodb.util.immutable.ByteArrayIndexedList;
+import com.yandex.yoctodb.util.immutable.ByteArrayIndexedList;
 
 import java.nio.ByteBuffer;
 
 /**
  * Variable length immutable implementation of
- * {@link ru.yandex.yoctodb.util.immutable.ByteArrayIndexedList}
+ * {@link com.yandex.yoctodb.util.immutable.ByteArrayIndexedList}
  *
  * @author svyatoslav
  */

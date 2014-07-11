@@ -6,12 +6,12 @@
  * http://www.wtfpl.net/ for more details.
  */
 
-package ru.yandex.yoctodb.v1.immutable.segment;
+package com.yandex.yoctodb.v1.immutable.segment;
 
 import org.junit.Assert;
 import org.junit.Test;
-import ru.yandex.yoctodb.immutable.Payload;
-import ru.yandex.yoctodb.util.OutputStreamWritable;
+import com.yandex.yoctodb.immutable.Payload;
+import com.yandex.yoctodb.util.OutputStreamWritable;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -49,8 +49,8 @@ public class V1PayloadSegmentBinaryTest {
 
 
     private ByteBuffer preparePayload() throws IOException {
-        final ru.yandex.yoctodb.v1.mutable.segment.V1PayloadSegment v1PayloadSegment =
-                new ru.yandex.yoctodb.v1.mutable.segment.V1PayloadSegment();
+        final com.yandex.yoctodb.v1.mutable.segment.V1PayloadSegment v1PayloadSegment =
+                new com.yandex.yoctodb.v1.mutable.segment.V1PayloadSegment();
 
         for (int i = 0; i < 15; i++) {
             final byte[] payload = ("payload" + i).getBytes();

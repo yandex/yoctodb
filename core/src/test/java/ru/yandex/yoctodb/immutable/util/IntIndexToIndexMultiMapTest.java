@@ -6,15 +6,15 @@
  * http://www.wtfpl.net/ for more details.
  */
 
-package ru.yandex.yoctodb.immutable.util;
+package com.yandex.yoctodb.immutable.util;
 
 import org.junit.Assert;
 import org.junit.Test;
-import ru.yandex.yoctodb.util.immutable.IndexToIndexMultiMap;
-import ru.yandex.yoctodb.util.immutable.impl.IntIndexToIndexMultiMap;
-import ru.yandex.yoctodb.util.mutable.BitSet;
-import ru.yandex.yoctodb.util.mutable.impl.LongArrayBitSet;
-import ru.yandex.yoctodb.v1.V1DatabaseFormat;
+import com.yandex.yoctodb.util.immutable.IndexToIndexMultiMap;
+import com.yandex.yoctodb.util.immutable.impl.IntIndexToIndexMultiMap;
+import com.yandex.yoctodb.util.mutable.BitSet;
+import com.yandex.yoctodb.util.mutable.impl.LongArrayBitSet;
+import com.yandex.yoctodb.v1.V1DatabaseFormat;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -56,8 +56,8 @@ public class IntIndexToIndexMultiMapTest {
     private ByteBuffer prepareData(
             final int keys,
             final int values) throws IOException {
-        final ru.yandex.yoctodb.util.mutable.IndexToIndexMultiMap indexToIndexMultiMap =
-                new ru.yandex.yoctodb.util.mutable.impl.IntIndexToIndexMultiMap();
+        final com.yandex.yoctodb.util.mutable.IndexToIndexMultiMap indexToIndexMultiMap =
+                new com.yandex.yoctodb.util.mutable.impl.IntIndexToIndexMultiMap();
         for (int i = 0; i < keys; i++) {
             //same elements
             indexToIndexMultiMap.add(i, (keys - i) % values);

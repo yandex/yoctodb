@@ -10,7 +10,7 @@
 
     <parent>
         <relativePath>../pom.xml</relativePath>
-        <groupId>ru.yandex.yoctodb</groupId>
+        <groupId>com.yandex.yoctodb</groupId>
         <artifactId>yoctodb-parent</artifactId>
         <version>0.1-SNAPSHOT</version>
     </parent>
