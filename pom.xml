@@ -3,12 +3,37 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <name>yoctodb-parent</name>
-
     <groupId>com.yandex.yoctodb</groupId>
     <artifactId>yoctodb-parent</artifactId>
     <version>0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
+
+    <name>YoctoDB parent</name>
+    <description>Embedded immutable database. Parent module containing dependencies.</description>
+    <url>https://bitbucket.org/yandex/yoctodb</url>
+    <licenses>
+        <license>
+            <name>Do What The Fuck You Want To Public License, Version 2</name>
+            <url>http://www.wtfpl.net</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <scm>
+        <url>https://bitbucket.org/yandex/yoctodb</url>
+        <connection>https://bitbucket.org/yandex/yoctodb</connection>
+    </scm>
+    <developers>
+        <developer>
+            <id>incubos</id>
+            <name>Vadim Tsesko</name>
+            <email>incubos@yandex.com</email>
+        </developer>
+        <developer>
+            <id>svyatoslav</id>
+            <name>Svyatoslav Demidov</name>
+            <email>demidov.svyatoslav@yandex.com</email>
+        </developer>
+    </developers>
 
     <modules>
         <module>core</module>
