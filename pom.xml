@@ -20,7 +20,8 @@
     </licenses>
     <scm>
         <url>https://bitbucket.org/yandex/yoctodb</url>
-        <connection>https://bitbucket.org/yandex/yoctodb</connection>
+        <connection>scm:hg:ssh://hg@bitbucket.org/yandex/yoctodb</connection>
+        <developerConnection>scm:hg:ssh://hg@bitbucket.org/yandex/yoctodb</developerConnection>
     </scm>
     <developers>
         <developer>
@@ -34,6 +35,12 @@
             <email>demidov.svyatoslav@yandex.com</email>
         </developer>
     </developers>
+
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
 
     <modules>
         <module>core</module>
@@ -57,6 +64,7 @@
         <maven-compiler-plugin.version>2.5.1</maven-compiler-plugin.version>
         <maven-enforcer-plugin.version>1.0</maven-enforcer-plugin.version>
         <maven-source-plugin.version>2.2.1</maven-source-plugin.version>
+        <maven-gpg-plugin.version>1.5</maven-gpg-plugin.version>
     </properties>
 
     <dependencyManagement>
@@ -143,4 +151,34 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>release-sign-artifacts</id>
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>${maven-gpg-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
