@@ -92,7 +92,7 @@ public final class SimpleSelect implements Select {
         } else if (conditions.size() == 1) {
             final AbstractSimpleCondition c = conditions.iterator().next();
             final BitSet result = ctx.getZeroBitSet();
-            FilterableIndex filter = ctx.getFilter(c.getFieldName());
+            final FilterableIndex filter = ctx.getFilter(c.getFieldName());
             if (filter != null && c.set(filter, result)) {
                 return result;
             } else {
@@ -106,7 +106,7 @@ public final class SimpleSelect implements Select {
                     conditions.iterator();
             while (iter.hasNext()) {
                 final AbstractSimpleCondition c = iter.next();
-                FilterableIndex filter = ctx.getFilter(c.getFieldName());
+                final FilterableIndex filter = ctx.getFilter(c.getFieldName());
                 if (filter == null || !c.set(filter, conditionResult)) {
                     return null;
                 }
