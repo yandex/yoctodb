@@ -14,6 +14,7 @@ import com.yandex.yoctodb.immutable.Database;
 import com.yandex.yoctodb.immutable.FilterableIndex;
 import com.yandex.yoctodb.immutable.SortableIndex;
 import com.yandex.yoctodb.util.mutable.BitSet;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Context for query execution
@@ -22,7 +23,7 @@ import com.yandex.yoctodb.util.mutable.BitSet;
  */
 @Immutable
 public interface QueryContext extends Database {
-    @NotNull
+    @Nullable
     FilterableIndex getFilter(
             @NotNull
             String fieldName);
