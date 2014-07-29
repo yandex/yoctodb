@@ -8,11 +8,6 @@
 
 package com.yandex.yoctodb;
 
-import org.jetbrains.annotations.NotNull;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.Test;
 import com.yandex.yoctodb.immutable.Database;
 import com.yandex.yoctodb.immutable.DatabaseReader;
 import com.yandex.yoctodb.mutable.DatabaseBuilder;
@@ -20,10 +15,18 @@ import com.yandex.yoctodb.mutable.DocumentBuilder;
 import com.yandex.yoctodb.query.DocumentProcessor;
 import com.yandex.yoctodb.query.Query;
 import com.yandex.yoctodb.util.UnsignedByteArrays;
+import org.jetbrains.annotations.NotNull;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 
 import static com.yandex.yoctodb.query.QueryBuilder.*;
 
@@ -90,42 +93,52 @@ public class CompositeDatabaseTest {
                 READER.composite(
                         Arrays.asList(
                                 READER.from(buildDatabase1("1.dat"), true),
-                                READER.from(buildDatabase2("2.dat"), true)));
+                                READER.from(buildDatabase2("2.dat"), true))
+                );
 
         for (int i = 0; i < DOCS; i++)
             Assert.assertEquals(
                     2,
                     db.count(select().where(eq("index", UnsignedByteArrays.from(
-                                                       i)))));
+                            i))))
+            );
 
         Assert.assertEquals(
                 DOCS,
                 db.count(
                         select()
                                 .where(eq("field1", UnsignedByteArrays.from(
-                                                  "1")))
-                                .and(eq("field2", UnsignedByteArrays.from("2")))));
+                                        "1")))
+                                .and(eq("field2", UnsignedByteArrays.from("2")))
+                )
+        );
         Assert.assertEquals(
                 DOCS,
                 db.count(
                         select()
                                 .where(eq("field1", UnsignedByteArrays.from(
-                                                  "2")))
-                                .and(eq("field2", UnsignedByteArrays.from("1")))));
+                                        "2")))
+                                .and(eq("field2", UnsignedByteArrays.from("1")))
+                )
+        );
         Assert.assertEquals(
                 0,
                 db.count(
                         select()
                                 .where(eq("field1", UnsignedByteArrays.from(
-                                                  "1")))
-                                .and(eq("field2", UnsignedByteArrays.from("1")))));
+                                        "1")))
+                                .and(eq("field2", UnsignedByteArrays.from("1")))
+                )
+        );
         Assert.assertEquals(
                 0,
                 db.count(
                         select()
                                 .where(eq("field1", UnsignedByteArrays.from(
-                                                  "2")))
-                                .and(eq("field2", UnsignedByteArrays.from("2")))));
+                                        "2")))
+                                .and(eq("field2", UnsignedByteArrays.from("2")))
+                )
+        );
     }
 
     @Test
@@ -134,7 +147,8 @@ public class CompositeDatabaseTest {
                 READER.composite(
                         Arrays.asList(
                                 READER.from(buildDatabase1("1.dat"), true),
-                                READER.from(buildDatabase2("2.dat"), true)));
+                                READER.from(buildDatabase2("2.dat"), true))
+                );
 
         final List<Integer> docs = new ArrayList<Integer>(2 * DOCS);
         db.execute(
@@ -185,7 +199,8 @@ public class CompositeDatabaseTest {
                             }
                             return true;
                         }
-                    });
+                    }
+            );
 
             Assert.assertEquals(2, docs.size());
             Assert.assertEquals(Arrays.asList(-i, i), docs);
@@ -208,7 +223,8 @@ public class CompositeDatabaseTest {
                                 UnsignedByteArrays.from(DOCS),
                                 true,
                                 UnsignedByteArrays.from(2 * DOCS),
-                                false))
+                                false)
+                )
                         .orderBy(desc("relevance")),
                 new DocumentProcessor() {
                     @Override
@@ -245,7 +261,46 @@ public class CompositeDatabaseTest {
                                 UnsignedByteArrays.from(-2 * DOCS),
                                 true,
                                 UnsignedByteArrays.from(-DOCS),
-                                false))
+                                false)
+                )
+                        .orderBy(desc("relevance")),
+                new DocumentProcessor() {
+                    @Override
+                    public boolean process(
+                            final int document,
+                            @NotNull
+                            final Database database) {
+                        if (database == db1) {
+                            docs.add(-document);
+                        } else {
+                            docs.add(document);
+                        }
+                        return true;
+                    }
+                }
+        );
+
+        Assert.assertEquals(0, docs.size());
+    }
+
+    @Test
+    public void unindexedFieldSearh() throws IOException {
+        final Database db1 = READER.from(buildDatabase1("1.dat"), true);
+        final Database db2 = READER.from(buildDatabase2("2.dat"), true);
+
+        final Database db = READER.composite(Arrays.asList(db1, db2));
+
+        final List<Integer> docs = new ArrayList<Integer>();
+
+        db.execute(
+                select().where(
+                        in(
+                                "unindexed_field",
+                                UnsignedByteArrays.from(-2 * DOCS),
+                                true,
+                                UnsignedByteArrays.from(-DOCS),
+                                false)
+                )
                         .orderBy(desc("relevance")),
                 new DocumentProcessor() {
                     @Override
@@ -274,23 +329,24 @@ public class CompositeDatabaseTest {
         for (int i = 0; i < DOCS; i++) {
             builder.merge(
                     FORMAT.newDocumentBuilder()
-                          .withField(
-                                  "field1",
-                                  "1",
-                                  DocumentBuilder.IndexOption.FILTERABLE)
-                          .withField(
-                                  "field2",
-                                  "2",
-                                  DocumentBuilder.IndexOption.FILTERABLE)
-                          .withField(
-                                  "index",
-                                  i,
-                                  DocumentBuilder.IndexOption.FULL)
-                          .withField(
-                                  "relevance",
-                                  -i,
-                                  DocumentBuilder.IndexOption.SORTABLE)
-                          .withPayload(("payload1=" + i).getBytes()));
+                            .withField(
+                                    "field1",
+                                    "1",
+                                    DocumentBuilder.IndexOption.FILTERABLE)
+                            .withField(
+                                    "field2",
+                                    "2",
+                                    DocumentBuilder.IndexOption.FILTERABLE)
+                            .withField(
+                                    "index",
+                                    i,
+                                    DocumentBuilder.IndexOption.FULL)
+                            .withField(
+                                    "relevance",
+                                    -i,
+                                    DocumentBuilder.IndexOption.SORTABLE)
+                            .withPayload(("payload1=" + i).getBytes())
+            );
         }
 
         final OutputStream os =
@@ -312,23 +368,24 @@ public class CompositeDatabaseTest {
         for (int i = 0; i < DOCS; i++) {
             builder.merge(
                     FORMAT.newDocumentBuilder()
-                          .withField(
-                                  "field1",
-                                  "2",
-                                  DocumentBuilder.IndexOption.FILTERABLE)
-                          .withField(
-                                  "field2",
-                                  "1",
-                                  DocumentBuilder.IndexOption.FILTERABLE)
-                          .withField(
-                                  "index",
-                                  i,
-                                  DocumentBuilder.IndexOption.FULL)
-                          .withField(
-                                  "relevance",
-                                  i,
-                                  DocumentBuilder.IndexOption.SORTABLE)
-                          .withPayload(("payload2=" + i).getBytes()));
+                            .withField(
+                                    "field1",
+                                    "2",
+                                    DocumentBuilder.IndexOption.FILTERABLE)
+                            .withField(
+                                    "field2",
+                                    "1",
+                                    DocumentBuilder.IndexOption.FILTERABLE)
+                            .withField(
+                                    "index",
+                                    i,
+                                    DocumentBuilder.IndexOption.FULL)
+                            .withField(
+                                    "relevance",
+                                    i,
+                                    DocumentBuilder.IndexOption.SORTABLE)
+                            .withPayload(("payload2=" + i).getBytes())
+            );
         }
 
         final OutputStream os =

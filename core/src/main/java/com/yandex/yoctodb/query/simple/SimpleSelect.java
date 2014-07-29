@@ -8,13 +8,13 @@
 
 package com.yandex.yoctodb.query.simple;
 
-import net.jcip.annotations.NotThreadSafe;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import com.yandex.yoctodb.immutable.FilterableIndex;
 import com.yandex.yoctodb.query.*;
 import com.yandex.yoctodb.util.mutable.BitSet;
 import com.yandex.yoctodb.util.mutable.impl.ReadOnlyOneBitSet;
-import com.yandex.yoctodb.util.mutable.impl.ReadOnlyZeroBitSet;
+import net.jcip.annotations.NotThreadSafe;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -92,7 +92,8 @@ public final class SimpleSelect implements Select {
         } else if (conditions.size() == 1) {
             final AbstractSimpleCondition c = conditions.iterator().next();
             final BitSet result = ctx.getZeroBitSet();
-            if (c.set(ctx.getFilter(c.getFieldName()), result)) {
+            FilterableIndex filter = ctx.getFilter(c.getFieldName());
+            if (filter != null && c.set(filter, result)) {
                 return result;
             } else {
                 return null;
@@ -105,7 +106,8 @@ public final class SimpleSelect implements Select {
                     conditions.iterator();
             while (iter.hasNext()) {
                 final AbstractSimpleCondition c = iter.next();
-                if (!c.set(ctx.getFilter(c.getFieldName()), conditionResult)) {
+                FilterableIndex filter = ctx.getFilter(c.getFieldName());
+                if (filter == null || !c.set(filter, conditionResult)) {
                     return null;
                 }
                 if (!result.and(conditionResult)) {

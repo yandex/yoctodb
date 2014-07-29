@@ -22,6 +22,7 @@ import com.yandex.yoctodb.query.ScoredDocument;
 import com.yandex.yoctodb.util.mutable.BitSet;
 import com.yandex.yoctodb.util.mutable.impl.LongArrayBitSet;
 import com.yandex.yoctodb.util.mutable.impl.ReadOnlyOneBitSet;
+import org.jetbrains.annotations.Nullable;
 
 import java.nio.ByteBuffer;
 import java.util.Collections;
@@ -86,13 +87,11 @@ public final class V1Database implements QueryContext {
         return payload.getSize();
     }
 
-    @NotNull
+    @Nullable
     @Override
     public FilterableIndex getFilter(
             @NotNull
             final String fieldName) {
-        assert filters.containsKey(fieldName);
-
         return filters.get(fieldName);
     }
 
