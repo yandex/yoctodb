@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.yandex.yoctodb</groupId>
     <artifactId>yoctodb-parent</artifactId>
-    <version>0.0.3-SNAPSHOT</version>
+    <version>0.0.3</version>
     <packaging>pom</packaging>
 
     <name>YoctoDB parent</name>
