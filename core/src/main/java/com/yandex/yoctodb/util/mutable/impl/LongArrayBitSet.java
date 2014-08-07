@@ -8,10 +8,10 @@
 
 package com.yandex.yoctodb.util.mutable.impl;
 
-import net.jcip.annotations.NotThreadSafe;
-import org.jetbrains.annotations.NotNull;
 import com.yandex.yoctodb.util.mutable.ArrayBitSet;
 import com.yandex.yoctodb.util.mutable.BitSet;
+import net.jcip.annotations.NotThreadSafe;
+import org.jetbrains.annotations.NotNull;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -166,7 +166,11 @@ public final class LongArrayBitSet implements ArrayBitSet {
      */
     @Override
     public int nextSetBit(final int fromIndexInclusive) {
-        assert 0 <= fromIndexInclusive && fromIndexInclusive < size;
+        assert 0 <= fromIndexInclusive;
+
+        if (fromIndexInclusive >= size){
+            return -1;
+        }
 
         int u = fromIndexInclusive >> 6;
         long word = words[u];
