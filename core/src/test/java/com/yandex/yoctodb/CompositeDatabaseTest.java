@@ -321,6 +321,37 @@ public class CompositeDatabaseTest {
         Assert.assertEquals(0, docs.size());
     }
 
+
+    @Test
+    public void noSortNoLimitSearch() throws IOException {
+        final Database db1 = READER.from(buildDatabase1("1.dat"), true);
+        final Database db2 = READER.from(buildDatabase2("2.dat"), true);
+
+        final Database db = READER.composite(Arrays.asList(db1, db2));
+
+        final List<Integer> docs = new ArrayList<Integer>();
+
+        db.execute(
+                select().where(gt("index", UnsignedByteArrays.from(-1))),
+                new DocumentProcessor() {
+                    @Override
+                    public boolean process(
+                            final int document,
+                            @NotNull
+                            final Database database) {
+                        if (database == db1) {
+                            docs.add(-document);
+                        } else {
+                            docs.add(document);
+                        }
+                        return true;
+                    }
+                }
+        );
+
+        Assert.assertEquals(DOCS * 2, docs.size());
+    }
+
     private File buildDatabase1(final String name) throws IOException {
         final File file = new File(BASE, name);
 
