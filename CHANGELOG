@@ -1,3 +1,6 @@
+0.0.3
+ * Removed wrong assertion in search without sorts and limits
+
 0.0.2
  * Skipping documents lacking queried fields
 
