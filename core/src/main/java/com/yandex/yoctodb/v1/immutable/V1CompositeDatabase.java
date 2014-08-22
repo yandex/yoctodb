@@ -44,8 +44,6 @@ public final class V1CompositeDatabase implements Database {
     public V1CompositeDatabase(
             @NotNull
             final Collection<V1Database> databases) {
-        assert !databases.isEmpty();
-
         this.databases = new ArrayList<V1Database>(databases);
     }
 
