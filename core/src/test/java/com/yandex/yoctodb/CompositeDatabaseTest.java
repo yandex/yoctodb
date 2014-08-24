@@ -323,6 +323,38 @@ public class CompositeDatabaseTest {
 
 
     @Test
+    public void emptyCompositeDatabaseFieldSearh() throws IOException {
+        final Database db = READER.composite(new ArrayList<Database>());
+
+        final List<Integer> docs = new ArrayList<Integer>();
+
+        db.execute(
+                select().where(
+                        in(
+                                "field1",
+                                UnsignedByteArrays.from(-2 * DOCS),
+                                true,
+                                UnsignedByteArrays.from(-DOCS),
+                                false)
+                )
+                        .orderBy(desc("relevance")),
+                new DocumentProcessor() {
+                    @Override
+                    public boolean process(
+                            final int document,
+                            @NotNull
+                            final Database database) {
+                        docs.add(document);
+                        return true;
+                    }
+                }
+        );
+
+        Assert.assertEquals(0, docs.size());
+    }
+
+
+    @Test
     public void noSortNoLimitSearch() throws IOException {
         final Database db1 = READER.from(buildDatabase1("1.dat"), true);
         final Database db2 = READER.from(buildDatabase2("2.dat"), true);
