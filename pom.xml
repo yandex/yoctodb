@@ -49,7 +49,7 @@
 
         <!-- External -->
         <annotations.version>9.0.4</annotations.version>
-        <guava.version>15.0</guava.version>
+        <guava.version>17.0</guava.version>
         <jcip-annotations.version>1.0</jcip-annotations.version>
         <junit.version>4.11</junit.version>
 
