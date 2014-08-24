@@ -52,7 +52,6 @@
         <guava.version>15.0</guava.version>
         <jcip-annotations.version>1.0</jcip-annotations.version>
         <junit.version>4.11</junit.version>
-        <slf4j.version>1.7.5</slf4j.version>
 
         <!-- Maven -->
         <maven-compiler-plugin.version>2.5.1</maven-compiler-plugin.version>
@@ -70,13 +69,6 @@
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>${guava.version}</version>
-            </dependency>
-
-            <!-- Logging -->
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>${slf4j.version}</version>
             </dependency>
 
             <!-- Annotations -->
