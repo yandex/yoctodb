@@ -10,8 +10,6 @@ package com.yandex.yoctodb.v1.immutable;
 
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import com.yandex.yoctodb.immutable.*;
 import com.yandex.yoctodb.v1.V1DatabaseFormat;
 import com.yandex.yoctodb.v1.immutable.segment.Segment;
@@ -36,9 +34,6 @@ import java.util.Map;
  */
 @ThreadSafe
 public class V1DatabaseReader implements DatabaseReader {
-    private static final Logger log =
-            LoggerFactory.getLogger(V1DatabaseReader.class);
-
     @NotNull
     @Override
     public Database from(
@@ -158,7 +153,8 @@ public class V1DatabaseReader implements DatabaseReader {
         if (forceToMemory) {
             buffer.load();
             if (!buffer.isLoaded())
-                log.warn("Couldn't force loading of file <{}> into memory", f);
+                System.err.println(
+                        "Couldn't force loading of file into memory: " + f);
         }
 
         // Setting byte order
