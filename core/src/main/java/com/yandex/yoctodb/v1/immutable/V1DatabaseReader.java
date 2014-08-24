@@ -119,8 +119,6 @@ public class V1DatabaseReader implements DatabaseReader {
     public Database composite(
             @NotNull
             final Collection<Database> databases) throws IOException {
-        assert !databases.isEmpty();
-
         final Collection<V1Database> dbs =
                 new ArrayList<V1Database>(databases.size());
 
