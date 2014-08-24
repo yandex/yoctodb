@@ -1,16 +1,15 @@
 # YoctoDB
 
-YoctoDB is a database engine with the following features (unordered):
+YoctoDB is a database engine with the following features:
 
- * Purely in Java (Java 7 actually)
- * Extremely simple
- * Flat document-oriented (a document is an opaque byte sequence)
- * Indexed fields (a field is an opaque comparable byte sequence)
- * Embedded (no network API or query languages, just some DSLs)
+ * Purely in Java 6 (only `guava` and annotation dependencies)
  * Read-only (concurrent by design)
- * Partitioned (a database is a set of partitions)
- * `mmap`'ed documents (to leverage disk cache)
- * Space-efficient (uses dictionaries for indexed values)
+ * Optionally partitioned (a composite database is a set of partition databases)
+ * Space-efficient (uses dictionaries for indexed values after building)
+ * Flat document-oriented (a document is an opaque byte sequence)
+ * Indexed fields for filtering/sorting (a field is an opaque comparable byte sequence)
+ * Embedded (no network API or query languages, just some DSL)
+ * `mmap`'ed (`ByteBuffer`'ed)
 
 See [Project Wiki][1] and [Getting Started Guide][2].
 
