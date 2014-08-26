@@ -1,9 +1,11 @@
 /*
- * Copyright © 2014 Yandex
- * This work is free. You can redistribute it and/or modify it under the
- * terms of the Do What The Fuck You Want To Public License, Version 2,
- * as published by Sam Hocevar. See the COPYING file or
- * http://www.wtfpl.net/ for more details.
+ * (C) YANDEX LLC, 2014
+ *
+ * The Source Code called "YoctoDB" available at
+ * https://bitbucket.org/yandex/yoctodb is subject to the terms of the
+ * Mozilla Public License, v. 2.0 (hereinafter - MPL).
+ *
+ * A copy of the MPL is available at http://mozilla.org/MPL/2.0/.
  */
 
 package com.yandex.yoctodb.v1.mutable;
