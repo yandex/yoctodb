@@ -1,0 +1,140 @@
+/*
+ * (C) YANDEX LLC, 2014
+ *
+ * The Source Code called "YoctoDB" available at
+ * https://bitbucket.org/yandex/yoctodb is subject to the terms of the
+ * Mozilla Public License, v. 2.0 (hereinafter - MPL).
+ *
+ * A copy of the MPL is available at http://mozilla.org/MPL/2.0/.
+ */
+
+package com.yandex.yoctodb.util.buf;
+
+import net.jcip.annotations.NotThreadSafe;
+import org.jetbrains.annotations.NotNull;
+
+import java.nio.ByteBuffer;
+
+/**
+ * {@link ByteBuffer} wrapper implementation of {@link Buffer}
+ *
+ * @author incubos
+ */
+@NotThreadSafe
+public final class ByteBufferWrapper extends Buffer {
+    @NotNull
+    private final ByteBuffer delegate;
+
+    public ByteBufferWrapper(
+            @NotNull
+            final ByteBuffer delegate) {
+        this.delegate = delegate;
+    }
+
+    @Override
+    public long position() {
+        return delegate.position();
+    }
+
+    @Override
+    public Buffer position(final long position) {
+        assert position <= Integer.MAX_VALUE;
+
+        delegate.position((int) position);
+
+        return this;
+    }
+
+    @Override
+    public Buffer advance(final long bytes) {
+        assert delegate.position() + bytes <= Integer.MAX_VALUE;
+
+        delegate.position((int) (delegate.position() + bytes));
+
+        return this;
+    }
+
+    @Override
+    public long limit() {
+        return delegate.limit();
+    }
+
+    @Override
+    public boolean hasRemaining() {
+        return delegate.hasRemaining();
+    }
+
+    @Override
+    public long remaining() {
+        return delegate.remaining();
+    }
+
+    @Override
+    public ByteBuffer get(final byte[] dst) {
+        return delegate.get(dst);
+    }
+
+    @Override
+    public byte get() {
+        return delegate.get();
+    }
+
+    @Override
+    public byte get(final long index) {
+        assert index <= Integer.MAX_VALUE;
+
+        return delegate.get((int) index);
+    }
+
+    @Override
+    public int getInt() {
+        return delegate.getInt();
+    }
+
+    @Override
+    public int getInt(final long index) {
+        assert index <= Integer.MAX_VALUE;
+
+        return delegate.getInt((int) index);
+    }
+
+    @Override
+    public long getLong() {
+        return delegate.getLong();
+    }
+
+    @Override
+    public long getLong(final long index) {
+        assert index <= Integer.MAX_VALUE;
+
+        return delegate.getLong((int) index);
+    }
+
+    @Override
+    public Buffer slice() {
+        return Buffer.wrap(delegate.slice());
+    }
+
+    @Override
+    public Buffer slice(final long length) {
+        assert length <= delegate.remaining();
+
+        final ByteBuffer slice = delegate.duplicate();
+        slice.limit((int) (slice.position() + length));
+
+        return Buffer.wrap(slice.slice());
+    }
+
+    @Override
+    public Buffer slice(final long from, final long size) {
+        assert size >= 0;
+        assert 0 <= from && from <= delegate.limit();
+        assert from + size <= delegate.limit();
+
+        final ByteBuffer slice = delegate.duplicate();
+        slice.position((int) from);
+        slice.limit((int) (from + size));
+
+        return Buffer.wrap(slice.slice());
+    }
+}

@@ -1,0 +1,9 @@
+syntax: glob
+
+atlassian-ide-plugin.xml
+target/
+*.ipr
+*.iml
+*.iws
+*.orig
+
