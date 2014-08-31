@@ -12,10 +12,10 @@ package com.yandex.yoctodb.util.mutable.impl;
 
 import com.yandex.yoctodb.util.mutable.ArrayBitSet;
 import com.yandex.yoctodb.util.mutable.BitSet;
+import com.yandex.yoctodb.util.buf.Buffer;
 import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.NotNull;
 
-import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 /**
@@ -130,7 +130,7 @@ public final class LongArrayBitSet implements ArrayBitSet {
     @Override
     public boolean or(
             @NotNull
-            final ByteBuffer longArrayBitSetInByteBuffer,
+            final Buffer longArrayBitSetInByteBuffer,
             final int startPosition,
             final int bitSetSizeInLongs) {
         boolean notEmpty = false;

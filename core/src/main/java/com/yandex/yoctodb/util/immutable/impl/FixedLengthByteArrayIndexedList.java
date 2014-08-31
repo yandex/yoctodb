@@ -10,11 +10,10 @@
 
 package com.yandex.yoctodb.util.immutable.impl;
 
+import com.yandex.yoctodb.util.buf.Buffer;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
 import com.yandex.yoctodb.util.immutable.ByteArrayIndexedList;
-
-import java.nio.ByteBuffer;
 
 /**
  * Fixed length immutable implementation of {@link ByteArrayIndexedList}
@@ -26,12 +25,12 @@ public class FixedLengthByteArrayIndexedList
         implements ByteArrayIndexedList {
     private final int elementSize;
     private final int elementCount;
-    private final ByteBuffer elements;
+    private final Buffer elements;
 
     @NotNull
     public static ByteArrayIndexedList from(
             @NotNull
-            final ByteBuffer buf) {
+            final Buffer buf) {
         final int elementSize = buf.getInt();
         final int elementCount = buf.getInt();
 
@@ -44,7 +43,7 @@ public class FixedLengthByteArrayIndexedList
     private FixedLengthByteArrayIndexedList(
             final int elementSize,
             final int elementCount,
-            final ByteBuffer elements) {
+            final Buffer elements) {
         assert elementSize > 0;
         assert elementCount > 0;
         assert elements.hasRemaining();
@@ -56,14 +55,10 @@ public class FixedLengthByteArrayIndexedList
 
     @NotNull
     @Override
-    public ByteBuffer get(final int i) {
+    public Buffer get(final int i) {
         assert 0 <= i && i < elementCount;
 
-        final ByteBuffer buf = elements.duplicate();
-        buf.position(i * elementSize);
-        buf.limit(buf.position() + elementSize);
-
-        return buf.slice();
+        return elements.slice(i * elementSize, elementSize);
     }
 
     @Override

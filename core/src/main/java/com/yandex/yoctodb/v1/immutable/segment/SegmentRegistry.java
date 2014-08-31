@@ -10,11 +10,11 @@
 
 package com.yandex.yoctodb.v1.immutable.segment;
 
+import com.yandex.yoctodb.util.buf.Buffer;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -49,7 +49,7 @@ public class SegmentRegistry {
     public static Segment read(
             final int type,
             @NotNull
-            final ByteBuffer buffer) throws IOException {
+            final Buffer buffer) throws IOException {
         final SegmentReader reader = readers.get(type);
         if (reader == null) {
             throw new NoSuchElementException(

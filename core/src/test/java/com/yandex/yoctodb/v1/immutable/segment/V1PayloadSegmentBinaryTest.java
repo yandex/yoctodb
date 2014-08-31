@@ -10,6 +10,7 @@
 
 package com.yandex.yoctodb.v1.immutable.segment;
 
+import com.yandex.yoctodb.util.buf.Buffer;
 import org.junit.Assert;
 import org.junit.Test;
 import com.yandex.yoctodb.immutable.Payload;
@@ -17,7 +18,6 @@ import com.yandex.yoctodb.util.OutputStreamWritable;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 
 /**
  * @author svyatoslav
@@ -28,16 +28,16 @@ public class V1PayloadSegmentBinaryTest {
 
     @Test
     public void readingWithSegmentRegistryTest() throws IOException {
-        final ByteBuffer byteBuffer = preparePayload();
+        final Buffer byteBuffer = preparePayload();
         int fullSize = byteBuffer.getInt();
         //full size without 8 bytes (without 4 bytes for full_size_value and 4 bytes for segment_code value)
-        Assert.assertEquals(fullSize + 8, byteBuffer.limit());
+        Assert.assertEquals(fullSize + 4, byteBuffer.remaining());
 
         int code = byteBuffer.getInt();
         Payload payloadSegment = (Payload) SegmentRegistry.read(code, byteBuffer);
 
         for (int i = 0; i < 15; i++) {
-            final ByteBuffer currentPayload = payloadSegment.getPayload(i);
+            final Buffer currentPayload = payloadSegment.getPayload(i);
             final byte[] expectedPayloadBytes = ("payload" + i).getBytes();
 
             for (byte expectedByte : expectedPayloadBytes) {
@@ -50,7 +50,7 @@ public class V1PayloadSegmentBinaryTest {
     }
 
 
-    private ByteBuffer preparePayload() throws IOException {
+    private Buffer preparePayload() throws IOException {
         final com.yandex.yoctodb.v1.mutable.segment.V1PayloadSegment v1PayloadSegment =
                 new com.yandex.yoctodb.v1.mutable.segment.V1PayloadSegment();
 
@@ -61,6 +61,6 @@ public class V1PayloadSegmentBinaryTest {
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
         final OutputStreamWritable outputStreamWritable = v1PayloadSegment.buildWritable();
         outputStreamWritable.writeTo(os);
-        return ByteBuffer.wrap(os.toByteArray());
+        return Buffer.wrap(os.toByteArray());
     }
 }

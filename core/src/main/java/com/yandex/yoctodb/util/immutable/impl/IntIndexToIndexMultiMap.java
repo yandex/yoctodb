@@ -10,7 +10,7 @@
 
 package com.yandex.yoctodb.util.immutable.impl;
 
-import com.google.common.primitives.Ints;
+import com.yandex.yoctodb.util.buf.Buffer;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -18,7 +18,6 @@ import com.yandex.yoctodb.util.immutable.IndexToIndexMultiMap;
 import com.yandex.yoctodb.util.immutable.IntToIntArray;
 import com.yandex.yoctodb.util.mutable.BitSet;
 
-import java.nio.ByteBuffer;
 import java.util.Iterator;
 
 /**
@@ -28,35 +27,34 @@ import java.util.Iterator;
 public final class IntIndexToIndexMultiMap implements IndexToIndexMultiMap {
     private final int keysCount;
     @NotNull
-    private final ByteBuffer offsets;
+    private final Buffer offsets;
     @NotNull
-    private final ByteBuffer elements;
+    private final Buffer elements;
 
     @NotNull
     public static IndexToIndexMultiMap from(
             @NotNull
-            final ByteBuffer buf) {
+            final Buffer buf) {
         final int keysCount = buf.getInt();
         assert keysCount > 0;
 
-        final ByteBuffer offsets = buf.slice();
-        offsets.limit(4 * keysCount);
+        final Buffer offsets = buf.slice(keysCount << 2);
 
-        final ByteBuffer elements = buf.slice();
-        elements.position(offsets.remaining());
+        final Buffer elements =
+                buf.slice().position(offsets.remaining()).slice();
 
         return new IntIndexToIndexMultiMap(
                 keysCount,
-                offsets.slice(),
-                elements.slice());
+                offsets,
+                elements);
     }
 
     private IntIndexToIndexMultiMap(
             final int keysCount,
             @NotNull
-            final ByteBuffer offsets,
+            final Buffer offsets,
             @NotNull
-            final ByteBuffer elements) {
+            final Buffer elements) {
         assert keysCount > 0;
         assert offsets.hasRemaining();
         assert elements.hasRemaining();
@@ -94,7 +92,9 @@ public final class IntIndexToIndexMultiMap implements IndexToIndexMultiMap {
         boolean result = false;
 
         int current = offsets.getInt(fromInclusive << 2);
-        int remaining = elements.remaining();
+        final long remaining = elements.remaining();
+
+        assert remaining <= Integer.MAX_VALUE;
 
         while (current < remaining) {
             int size = elements.getInt(current);

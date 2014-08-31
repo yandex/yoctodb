@@ -10,11 +10,10 @@
 
 package com.yandex.yoctodb.util.immutable.impl;
 
+import com.yandex.yoctodb.util.buf.Buffer;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
 import com.yandex.yoctodb.util.immutable.ByteArrayIndexedList;
-
-import java.nio.ByteBuffer;
 
 /**
  * Variable length immutable implementation of
@@ -27,35 +26,34 @@ public class VariableLengthByteArrayIndexedList
         implements ByteArrayIndexedList {
     private final int elementCount;
     @NotNull
-    private final ByteBuffer elements;
+    private final Buffer elements;
     @NotNull
-    private final ByteBuffer offsets;
+    private final Buffer offsets;
 
     @NotNull
     public static ByteArrayIndexedList from(
             @NotNull
-            final ByteBuffer buf) {
+            final Buffer buf) {
         final int elementsCount = buf.getInt();
         assert elementsCount > 0;
 
-        final ByteBuffer offsets = buf.slice();
-        offsets.limit(4 * (elementsCount + 1));
+        final Buffer offsets = buf.slice((elementsCount + 1) << 2);
 
-        final ByteBuffer elements = buf.slice();
-        elements.position(offsets.remaining());
+        final Buffer elements =
+                buf.slice().position(offsets.remaining()).slice();
 
         return new VariableLengthByteArrayIndexedList(
                 elementsCount,
-                offsets.slice(),
-                elements.slice());
+                offsets,
+                elements);
     }
 
     private VariableLengthByteArrayIndexedList(
             final int elementCount,
             @NotNull
-            final ByteBuffer offsets,
+            final Buffer offsets,
             @NotNull
-            final ByteBuffer elements) {
+            final Buffer elements) {
         assert elementCount > 0;
         assert offsets.hasRemaining();
         assert elements.hasRemaining();
@@ -67,7 +65,7 @@ public class VariableLengthByteArrayIndexedList
 
     @NotNull
     @Override
-    public ByteBuffer get(final int i) {
+    public Buffer get(final int i) {
         assert 0 <= i && i < elementCount;
 
         final int start = offsets.getInt(i << 2);
@@ -75,11 +73,7 @@ public class VariableLengthByteArrayIndexedList
 
         assert start < end;
 
-        final ByteBuffer copy = elements.duplicate();
-        copy.position(start);
-        copy.limit(end);
-
-        return copy.slice();
+        return elements.slice(start, end - start);
     }
 
     @Override

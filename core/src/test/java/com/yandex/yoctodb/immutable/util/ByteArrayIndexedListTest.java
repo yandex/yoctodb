@@ -10,6 +10,7 @@
 
 package com.yandex.yoctodb.immutable.util;
 
+import com.yandex.yoctodb.util.buf.Buffer;
 import org.junit.Assert;
 import org.junit.Test;
 import com.yandex.yoctodb.util.UnsignedByteArray;
@@ -20,7 +21,6 @@ import com.yandex.yoctodb.util.immutable.impl.VariableLengthByteArrayIndexedList
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -40,7 +40,7 @@ public class ByteArrayIndexedListTest {
         elements.add(UnsignedByteArrays.raw(new byte[]{12, 13, 14, 15}));
         elements.add(UnsignedByteArrays.raw(new byte[]{16, 17, 18, 19}));
 
-        final ByteBuffer bb =
+        final Buffer bb =
                 prepareDataFromFixedLengthByteArrayIndexedList(elements);
         final ByteArrayIndexedList list =
                 FixedLengthByteArrayIndexedList.from(bb);
@@ -54,7 +54,7 @@ public class ByteArrayIndexedListTest {
         }
     }
 
-    private ByteBuffer prepareDataFromFixedLengthByteArrayIndexedList(
+    private Buffer prepareDataFromFixedLengthByteArrayIndexedList(
             final Collection<UnsignedByteArray> elements) throws IOException {
         final com.yandex.yoctodb.util.mutable.impl.FixedLengthByteArrayIndexedList fixedLengthByteArrayIndexedList =
                 new com.yandex.yoctodb.util.mutable.impl.FixedLengthByteArrayIndexedList();
@@ -68,7 +68,7 @@ public class ByteArrayIndexedListTest {
                 os.size(),
                 fixedLengthByteArrayIndexedList.getSizeInBytes());
 
-        return ByteBuffer.wrap(os.toByteArray());
+        return Buffer.wrap(os.toByteArray());
     }
 
     @Test
@@ -82,7 +82,7 @@ public class ByteArrayIndexedListTest {
         elements.add(UnsignedByteArrays.raw(new byte[]{6, 7, 8, 9}));
         elements.add(UnsignedByteArrays.raw(new byte[]{10, 11, 12, 13, 14}));
 
-        final ByteBuffer bb =
+        final Buffer bb =
                 prepareDataFromVariableLengthByteArrayIndexedLength(elements);
         final ByteArrayIndexedList list =
                 VariableLengthByteArrayIndexedList.from(bb);
@@ -94,7 +94,7 @@ public class ByteArrayIndexedListTest {
         }
     }
 
-    private ByteBuffer prepareDataFromVariableLengthByteArrayIndexedLength(
+    private Buffer prepareDataFromVariableLengthByteArrayIndexedLength(
             final Collection<UnsignedByteArray> elements) throws IOException {
         final com.yandex.yoctodb.util.mutable.impl.VariableLengthByteArrayIndexedList variableLengthByteArrayIndexedList =
                 new com.yandex.yoctodb.util.mutable.impl.VariableLengthByteArrayIndexedList();
@@ -108,6 +108,6 @@ public class ByteArrayIndexedListTest {
                 os.size(),
                 variableLengthByteArrayIndexedList.getSizeInBytes());
 
-        return ByteBuffer.wrap(os.toByteArray());
+        return Buffer.wrap(os.toByteArray());
     }
 }

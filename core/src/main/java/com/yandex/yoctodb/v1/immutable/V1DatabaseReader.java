@@ -10,6 +10,7 @@
 
 package com.yandex.yoctodb.v1.immutable;
 
+import com.yandex.yoctodb.util.buf.Buffer;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.NotNull;
 import com.yandex.yoctodb.immutable.*;
@@ -20,7 +21,6 @@ import com.yandex.yoctodb.v1.immutable.segment.SegmentRegistry;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
@@ -40,7 +40,7 @@ public class V1DatabaseReader implements DatabaseReader {
     @Override
     public Database from(
             @NotNull
-            final ByteBuffer buffer) throws IOException {
+            final Buffer buffer) throws IOException {
         // Checking the magic
         for (int i = 0; i < V1DatabaseFormat.MAGIC.length; i++)
             if (buffer.get() != V1DatabaseFormat.MAGIC[i]) {
@@ -65,8 +65,7 @@ public class V1DatabaseReader implements DatabaseReader {
             final int size = buffer.getInt();
             final int type = buffer.getInt();
 
-            final ByteBuffer segmentBuffer = buffer.slice();
-            segmentBuffer.limit(size);
+            final Buffer segmentBuffer = buffer.slice(size);
 
             final Segment segment = SegmentRegistry.read(type, segmentBuffer);
 
@@ -131,7 +130,7 @@ public class V1DatabaseReader implements DatabaseReader {
     public Database from(
             @NotNull
             final File f,
-            boolean forceToMemory) throws IOException {
+            final boolean forceToMemory) throws IOException {
         if (!f.exists()) {
             throw new IllegalArgumentException(
                     "File doesn't exist: " + f);
@@ -162,6 +161,6 @@ public class V1DatabaseReader implements DatabaseReader {
         // Setting byte order
         buffer.order(ByteOrder.BIG_ENDIAN);
 
-        return from(buffer);
+        return from(Buffer.wrap(buffer));
     }
 }

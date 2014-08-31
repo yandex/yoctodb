@@ -10,6 +10,7 @@
 
 package com.yandex.yoctodb.immutable.util;
 
+import com.yandex.yoctodb.util.buf.Buffer;
 import org.junit.Assert;
 import org.junit.Test;
 import com.yandex.yoctodb.util.immutable.IndexToIndexMap;
@@ -17,7 +18,6 @@ import com.yandex.yoctodb.util.immutable.impl.IntIndexToIndexMap;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 
 /**
  * @author svyatoslav
@@ -28,7 +28,7 @@ public class IntIndexToIndexMapTest {
     public void simpleTest() throws IOException {
         for (int counter = 1; counter < 10000; counter++) {
             final int size = counter;
-            final ByteBuffer buf = prepareData(size);
+            final Buffer buf = prepareData(size);
             final IndexToIndexMap map = IntIndexToIndexMap.from(buf);
             Assert.assertEquals(size, map.size());
             for (int i = 0; i < size; i++) {
@@ -37,7 +37,7 @@ public class IntIndexToIndexMapTest {
         }
     }
 
-    private ByteBuffer prepareData(final int size) throws IOException {
+    private Buffer prepareData(final int size) throws IOException {
         final com.yandex.yoctodb.util.mutable.IndexToIndexMap indexToIndexMap =
                 new com.yandex.yoctodb.util.mutable.impl.IntIndexToIndexMap();
         for (int i = 0; i < size; i++) {
@@ -47,6 +47,6 @@ public class IntIndexToIndexMapTest {
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
         indexToIndexMap.writeTo(os);
         Assert.assertEquals(os.size(), indexToIndexMap.getSizeInBytes());
-        return ByteBuffer.wrap(os.toByteArray());
+        return Buffer.wrap(os.toByteArray());
     }
 }

@@ -10,9 +10,8 @@
 
 package com.yandex.yoctodb.util.immutable;
 
+import com.yandex.yoctodb.util.buf.Buffer;
 import org.jetbrains.annotations.NotNull;
-
-import java.nio.ByteBuffer;
 
 /**
  * @author svyatoslav
@@ -28,7 +27,7 @@ public interface TrieBasedByteArraySet {
      */
     int indexOf(
             @NotNull
-            ByteBuffer e);
+            Buffer e);
 
     /**
      * Index of element greater than {@code e} taking into account {@code
@@ -41,7 +40,7 @@ public interface TrieBasedByteArraySet {
      */
     int indexOfGreaterThan(
             @NotNull
-            ByteBuffer e,
+            Buffer e,
             boolean orEquals,
             int upToIndexInclusive);
 
@@ -56,7 +55,7 @@ public interface TrieBasedByteArraySet {
      */
     int indexOfLessThan(
             @NotNull
-            ByteBuffer e,
+            Buffer e,
             boolean orEquals,
             int fromIndexInclusive);
 

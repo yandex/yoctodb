@@ -10,6 +10,7 @@
 
 package com.yandex.yoctodb;
 
+import com.yandex.yoctodb.util.buf.Buffer;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Test;
@@ -24,7 +25,6 @@ import com.yandex.yoctodb.util.UnsignedByteArrays;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -79,7 +79,7 @@ public class SimpleDatabaseTest {
         final Database db =
                 DatabaseFormat.getCurrent()
                         .getDatabaseReader()
-                        .from(ByteBuffer.wrap(os.toByteArray()));
+                        .from(Buffer.wrap(os.toByteArray()));
         final Query q1 = select().where(eq("int", UnsignedByteArrays.from(1)));
         Assert.assertTrue(db.count(q1) == 1);
         final Query q2 = select().where(eq("int", UnsignedByteArrays.from(2)));
@@ -165,7 +165,7 @@ public class SimpleDatabaseTest {
         final Database db =
                 DatabaseFormat.getCurrent()
                         .getDatabaseReader()
-                        .from(ByteBuffer.wrap(os.toByteArray()));
+                        .from(Buffer.wrap(os.toByteArray()));
         final Query q1 = select().where(eq("int_field_full", UnsignedByteArrays
                                                    .from(1)));
         Assert.assertTrue(db.count(q1) == 1);
@@ -225,7 +225,7 @@ public class SimpleDatabaseTest {
         final Database db =
                 DatabaseFormat.getCurrent()
                         .getDatabaseReader()
-                        .from(ByteBuffer.wrap(os.toByteArray()));
+                        .from(Buffer.wrap(os.toByteArray()));
         final Query q2 = select().where(eq("int", UnsignedByteArrays.from(2)));
         Assert.assertTrue(db.count(q2) == 1);
 
@@ -262,7 +262,7 @@ public class SimpleDatabaseTest {
         final Database db =
                 DatabaseFormat.getCurrent()
                         .getDatabaseReader()
-                        .from(ByteBuffer.wrap(os.toByteArray()));
+                        .from(Buffer.wrap(os.toByteArray()));
 
         //less
         for (int i = 0; i < docs; i++) {
@@ -327,7 +327,7 @@ public class SimpleDatabaseTest {
         final Database db =
                 DatabaseFormat.getCurrent()
                         .getDatabaseReader()
-                        .from(ByteBuffer.wrap(os.toByteArray()));
+                        .from(Buffer.wrap(os.toByteArray()));
 
         final Query q1 =
                 select().where(gte("id", UnsignedByteArrays.from(0)))
@@ -340,8 +340,8 @@ public class SimpleDatabaseTest {
                     final int document,
                     @NotNull
                     final Database database) {
-                final ByteBuffer payload = database.getDocument(document);
-                final byte[] buf = new byte[payload.remaining()];
+                final Buffer payload = database.getDocument(document);
+                final byte[] buf = new byte[(int) payload.remaining()];
                 payload.get(buf);
                 results.add(new String(buf));
                 return true;
@@ -380,7 +380,7 @@ public class SimpleDatabaseTest {
         final Database db =
                 DatabaseFormat.getCurrent()
                         .getDatabaseReader()
-                        .from(ByteBuffer.wrap(os.toByteArray()));
+                        .from(Buffer.wrap(os.toByteArray()));
 
         final Query q1 =
                 select().where(
@@ -396,8 +396,8 @@ public class SimpleDatabaseTest {
                     final int document,
                     @NotNull
                     final Database database) {
-                final ByteBuffer payload = database.getDocument(document);
-                final byte[] buf = new byte[payload.remaining()];
+                final Buffer payload = database.getDocument(document);
+                final byte[] buf = new byte[(int) payload.remaining()];
                 payload.get(buf);
                 results.add(new String(buf));
                 return true;
@@ -423,8 +423,8 @@ public class SimpleDatabaseTest {
                     final int document,
                     @NotNull
                     final Database database) {
-                final ByteBuffer payload = database.getDocument(document);
-                final byte[] buf = new byte[payload.remaining()];
+                final Buffer payload = database.getDocument(document);
+                final byte[] buf = new byte[(int) payload.remaining()];
                 payload.get(buf);
                 results2.add(new String(buf));
                 return true;
@@ -477,7 +477,7 @@ public class SimpleDatabaseTest {
         final Database db =
                 DatabaseFormat.getCurrent()
                         .getDatabaseReader()
-                        .from(ByteBuffer.wrap(os.toByteArray()));
+                        .from(Buffer.wrap(os.toByteArray()));
         final Query q1 = select().where(eq("int", UnsignedByteArrays.from(1)));
         Assert.assertTrue(db.count(q1) == 1);
         final Query q2 = select().where(eq("int", UnsignedByteArrays.from(2)));
@@ -532,7 +532,7 @@ public class SimpleDatabaseTest {
         final Database db =
                 DatabaseFormat.getCurrent()
                         .getDatabaseReader()
-                        .from(ByteBuffer.wrap(os.toByteArray()));
+                        .from(Buffer.wrap(os.toByteArray()));
         final Query q1 = select().where(eq("int", UnsignedByteArrays.from(1)));
         Assert.assertTrue(db.count(q1) == 1);
         final Query q2 = select().where(eq("int", UnsignedByteArrays.from(2)));

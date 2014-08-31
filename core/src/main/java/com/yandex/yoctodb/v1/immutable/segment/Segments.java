@@ -10,9 +10,9 @@
 
 package com.yandex.yoctodb.v1.immutable.segment;
 
+import com.yandex.yoctodb.util.buf.Buffer;
 import org.jetbrains.annotations.NotNull;
 
-import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -34,14 +34,13 @@ class Segments {
      * @return segment slice
      */
     @NotNull
-    public static ByteBuffer extract(
+    public static Buffer extract(
             @NotNull
-            final ByteBuffer from) {
+            final Buffer from) {
         final int size = from.getInt();
-        final ByteBuffer buffer = from.duplicate();
-        buffer.limit(buffer.position() + size);
-        from.position(from.position() + size);
-        return buffer.slice();
+        final Buffer result = from.slice(size);
+        from.advance(size);
+        return result;
     }
 
     /**
@@ -54,7 +53,7 @@ class Segments {
     @NotNull
     public static String extractString(
             @NotNull
-            final ByteBuffer from) {
+            final Buffer from) {
         final int size = from.getInt();
         final byte[] buffer = new byte[size];
         from.get(buffer);
@@ -62,21 +61,32 @@ class Segments {
         return new String(buffer);
     }
 
-
-    public static byte[] calculateDigest(@NotNull ByteBuffer buffer,
-                                         @NotNull String messageDigestAlgorithm) {
-        MessageDigest md = null;
+    public static Buffer calculateDigest(
+            @NotNull
+            final Buffer buffer,
+            @NotNull
+            final String messageDigestAlgorithm) {
+        final MessageDigest md;
         try {
             md = MessageDigest.getInstance(messageDigestAlgorithm);
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
         md.reset();
-        //get byte buffer without digest length and without digest content
-        ByteBuffer byteBuffer = buffer.duplicate();
-        byteBuffer.limit(byteBuffer.limit() - md.getDigestLength() - 4);
 
-        md.update(byteBuffer.slice());
-        return md.digest();
+        // get byte buffer without digest length and without digest content
+        final Buffer data =
+                buffer.slice(buffer.remaining() - md.getDigestLength() - 4);
+        final byte[] buf =
+                new byte[Math.min((int) Math.max(buffer.remaining(), 8192L), 8192)];
+        while (data.remaining() >= buf.length) {
+            data.get(buf);
+            md.update(buf);
+        }
+        if (data.hasRemaining()) {
+            md.update(data.toByteArray());
+        }
+
+        return Buffer.wrap(md.digest());
     }
 }

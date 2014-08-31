@@ -10,6 +10,7 @@
 
 package com.yandex.yoctodb.immutable.util;
 
+import com.yandex.yoctodb.util.buf.Buffer;
 import org.junit.Assert;
 import org.junit.Test;
 import com.yandex.yoctodb.util.UnsignedByteArray;
@@ -20,7 +21,6 @@ import com.yandex.yoctodb.util.immutable.impl.VariableLengthByteArraySortedSet;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -41,7 +41,7 @@ public class ByteArraySortedSetTest {
         elements.add(UnsignedByteArrays.raw(new byte[]{4, 5, 6, 7}));
         elements.add(UnsignedByteArrays.raw(new byte[]{0, 1, 2, 3}));
 
-        final ByteBuffer bb =
+        final Buffer bb =
                 prepareDataFromFixedLengthByteArraySortedSet(elements);
         final ByteArraySortedSet ss =
                 FixedLengthByteArraySortedSet.from(bb);
@@ -58,7 +58,7 @@ public class ByteArraySortedSetTest {
         }
     }
 
-    private ByteBuffer prepareDataFromFixedLengthByteArraySortedSet(
+    private Buffer prepareDataFromFixedLengthByteArraySortedSet(
             final Collection<UnsignedByteArray> elements) throws IOException {
         final com.yandex.yoctodb.util.mutable.impl.FixedLengthByteArraySortedSet fixedLengthByteArrayIndexedList =
                 new com.yandex.yoctodb.util.mutable.impl.FixedLengthByteArraySortedSet();
@@ -72,7 +72,7 @@ public class ByteArraySortedSetTest {
                 os.size(),
                 fixedLengthByteArrayIndexedList.getSizeInBytes());
 
-        return ByteBuffer.wrap(os.toByteArray());
+        return Buffer.wrap(os.toByteArray());
     }
 
     @Test
@@ -86,7 +86,7 @@ public class ByteArraySortedSetTest {
         elements.add(UnsignedByteArrays.raw(new byte[]{3, 4, 5}));
         elements.add(UnsignedByteArrays.raw(new byte[]{0}));
 
-        final ByteBuffer bb =
+        final Buffer bb =
                 prepareDataFromVariableLengthByteArraySortedSet(elements);
         final ByteArraySortedSet ss =
                 VariableLengthByteArraySortedSet.from(bb);
@@ -103,7 +103,7 @@ public class ByteArraySortedSetTest {
         }
     }
 
-    private ByteBuffer prepareDataFromVariableLengthByteArraySortedSet(
+    private Buffer prepareDataFromVariableLengthByteArraySortedSet(
             final Collection<UnsignedByteArray> elements) throws IOException {
         final com.yandex.yoctodb.util.mutable.impl.VariableLengthByteArraySortedSet fixedLengthByteArrayIndexedList =
                 new com.yandex.yoctodb.util.mutable.impl.VariableLengthByteArraySortedSet();
@@ -117,7 +117,7 @@ public class ByteArraySortedSetTest {
                 os.size(),
                 fixedLengthByteArrayIndexedList.getSizeInBytes());
 
-        return ByteBuffer.wrap(os.toByteArray());
+        return Buffer.wrap(os.toByteArray());
     }
 
     @Test
@@ -128,7 +128,7 @@ public class ByteArraySortedSetTest {
         for (int i = 0; i < size; i++) {
             elements.add(UnsignedByteArrays.from(i));
         }
-        final ByteBuffer bb =
+        final Buffer bb =
                 prepareDataFromVariableLengthByteArraySortedSet(elements);
         final ByteArraySortedSet ss =
                 VariableLengthByteArraySortedSet.from(bb);
@@ -161,7 +161,7 @@ public class ByteArraySortedSetTest {
         for (int i = 0; i < size; i++) {
             elements.add(UnsignedByteArrays.from(i));
         }
-        final ByteBuffer bb =
+        final Buffer bb =
                 prepareDataFromVariableLengthByteArraySortedSet(elements);
         final ByteArraySortedSet ss =
                 VariableLengthByteArraySortedSet.from(bb);

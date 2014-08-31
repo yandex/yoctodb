@@ -10,10 +10,9 @@
 
 package com.yandex.yoctodb.util.immutable;
 
+import com.yandex.yoctodb.util.buf.Buffer;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
-
-import java.nio.ByteBuffer;
 
 /**
  * {@link com.yandex.yoctodb.util.UnsignedByteArray} immutable sorted set with basic operations
@@ -25,7 +24,7 @@ public interface ByteArraySortedSet {
     int size();
 
     @NotNull
-    ByteBuffer get(int i);
+    Buffer get(int i);
 
     /**
      * Get index of the element
@@ -36,7 +35,7 @@ public interface ByteArraySortedSet {
      */
     int indexOf(
             @NotNull
-            ByteBuffer e);
+            Buffer e);
 
     /**
      * Index of element greater than {@code e} taking into account {@code
@@ -50,7 +49,7 @@ public interface ByteArraySortedSet {
      */
     int indexOfGreaterThan(
             @NotNull
-            ByteBuffer e,
+            Buffer e,
             boolean orEquals,
             int upToIndexInclusive);
 
@@ -66,7 +65,7 @@ public interface ByteArraySortedSet {
      */
     int indexOfLessThan(
             @NotNull
-            ByteBuffer e,
+            Buffer e,
             boolean orEquals,
             int fromIndexInclusive);
 }

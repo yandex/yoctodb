@@ -10,6 +10,7 @@
 
 package com.yandex.yoctodb.v1.immutable.segment;
 
+import com.yandex.yoctodb.util.buf.Buffer;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
 import com.yandex.yoctodb.immutable.Payload;
@@ -18,7 +19,6 @@ import com.yandex.yoctodb.util.immutable.impl.VariableLengthByteArrayIndexedList
 import com.yandex.yoctodb.v1.V1DatabaseFormat;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 
 /**
  * Immutable payload segment of V1 format
@@ -43,7 +43,7 @@ public final class V1PayloadSegment implements Payload, Segment {
 
     @NotNull
     @Override
-    public ByteBuffer getPayload(final int i) {
+    public Buffer getPayload(final int i) {
         assert 0 <= i && i < payloads.size();
 
         return payloads.get(i);
@@ -64,13 +64,18 @@ public final class V1PayloadSegment implements Payload, Segment {
                     @Override
                     public Segment read(
                             @NotNull
-                            final ByteBuffer buffer) throws IOException {
-                        final byte[] digest = Segments.calculateDigest(buffer, V1DatabaseFormat.MESSAGE_DIGEST_ALGORITHM);
+                            final Buffer buffer) throws IOException {
+                        final Buffer digest =
+                                Segments.calculateDigest(
+                                        buffer,
+                                        V1DatabaseFormat.MESSAGE_DIGEST_ALGORITHM);
 
-                        final ByteArrayIndexedList payloads = VariableLengthByteArrayIndexedList.from(Segments.extract(buffer));
+                        final ByteArrayIndexedList payloads =
+                                VariableLengthByteArrayIndexedList.from(
+                                        Segments.extract(buffer));
 
-                        final ByteBuffer digestActual = Segments.extract(buffer);
-                        if (!digestActual.equals(ByteBuffer.wrap(digest))) {
+                        final Buffer digestActual = Segments.extract(buffer);
+                        if (!digestActual.equals(digest)) {
                             throw new CorruptSegmentException("checksum error");
                         }
 

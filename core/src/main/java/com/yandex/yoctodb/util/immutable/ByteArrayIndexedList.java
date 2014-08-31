@@ -10,10 +10,9 @@
 
 package com.yandex.yoctodb.util.immutable;
 
+import com.yandex.yoctodb.util.buf.Buffer;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.NotNull;
-
-import java.nio.ByteBuffer;
 
 /**
  * Indexed list of {@link com.yandex.yoctodb.util.UnsignedByteArray}s
@@ -23,7 +22,7 @@ import java.nio.ByteBuffer;
 @ThreadSafe
 public interface ByteArrayIndexedList {
     @NotNull
-    ByteBuffer get(int i);
+    Buffer get(int i);
 
     int size();
 }

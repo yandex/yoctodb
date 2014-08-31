@@ -10,17 +10,17 @@
 
 package com.yandex.yoctodb.query.simple;
 
+import com.yandex.yoctodb.util.buf.Buffer;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
 import com.yandex.yoctodb.query.DocumentScore;
 import com.yandex.yoctodb.query.Order;
 import com.yandex.yoctodb.util.UnsignedByteArrays;
 
-import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 /**
- * Document score based on sort fields {@link ByteBuffer}s
+ * Document score based on sort fields {@link Buffer}s
  *
  * @author incubos
  */
@@ -30,13 +30,13 @@ final class SimpleDocumentMultiScore
     @NotNull
     private final Order.SortOrder[] orders;
     @NotNull
-    private final ByteBuffer[] values;
+    private final Buffer[] values;
 
     public SimpleDocumentMultiScore(
             @NotNull
             final Order.SortOrder[] orders,
             @NotNull
-            final ByteBuffer[] values) {
+            final Buffer[] values) {
         assert values.length == orders.length;
 
         this.orders = orders;

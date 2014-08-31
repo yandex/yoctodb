@@ -10,6 +10,7 @@
 
 package com.yandex.yoctodb.immutable.util;
 
+import com.yandex.yoctodb.util.buf.Buffer;
 import org.junit.Assert;
 import org.junit.Test;
 import com.yandex.yoctodb.util.immutable.IndexToIndexMultiMap;
@@ -20,7 +21,6 @@ import com.yandex.yoctodb.v1.V1DatabaseFormat;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -33,7 +33,7 @@ public class IntIndexToIndexMultiMapTest {
     public void simpleTest() throws IOException {
         final int keys = 128;
         final int values = 128;
-        final ByteBuffer buf = prepareData(keys, values);
+        final Buffer buf = prepareData(keys, values);
         final int code = buf.getInt();
         Assert.assertEquals(V1DatabaseFormat.MultiMapType.LIST_BASED.getCode(), code);
         final IndexToIndexMultiMap map = IntIndexToIndexMultiMap.from(buf);
@@ -55,7 +55,7 @@ public class IntIndexToIndexMultiMapTest {
         }
     }
 
-    private ByteBuffer prepareData(
+    private Buffer prepareData(
             final int keys,
             final int values) throws IOException {
         final com.yandex.yoctodb.util.mutable.IndexToIndexMultiMap indexToIndexMultiMap =
@@ -74,6 +74,6 @@ public class IntIndexToIndexMultiMapTest {
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
         indexToIndexMultiMap.writeTo(os);
         Assert.assertEquals(os.size(), indexToIndexMultiMap.getSizeInBytes());
-        return ByteBuffer.wrap(os.toByteArray());
+        return Buffer.wrap(os.toByteArray());
     }
 }

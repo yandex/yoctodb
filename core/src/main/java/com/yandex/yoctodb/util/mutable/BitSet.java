@@ -10,9 +10,8 @@
 
 package com.yandex.yoctodb.util.mutable;
 
+import com.yandex.yoctodb.util.buf.Buffer;
 import org.jetbrains.annotations.NotNull;
-
-import java.nio.ByteBuffer;
 
 /**
  * Immutable bit set
@@ -88,7 +87,7 @@ public interface BitSet {
      */
     boolean or(
             @NotNull
-            ByteBuffer setInByteBuffer,
+            Buffer setInByteBuffer,
             int startPosition,
             int bitSetSizeInLongs);
 

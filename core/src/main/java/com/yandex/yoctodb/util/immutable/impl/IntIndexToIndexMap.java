@@ -10,11 +10,10 @@
 
 package com.yandex.yoctodb.util.immutable.impl;
 
+import com.yandex.yoctodb.util.buf.Buffer;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
 import com.yandex.yoctodb.util.immutable.IndexToIndexMap;
-
-import java.nio.ByteBuffer;
 
 /**
  * @author svyatoslav
@@ -22,13 +21,13 @@ import java.nio.ByteBuffer;
 @Immutable
 public class IntIndexToIndexMap implements IndexToIndexMap {
     @NotNull
-    private final ByteBuffer elements;
+    private final Buffer elements;
     private final int elementsCount;
 
     private IntIndexToIndexMap(
             final int elementsCount,
             @NotNull
-            final ByteBuffer elements) {
+            final Buffer elements) {
         assert elementsCount > 0;
         assert elements.hasRemaining();
 
@@ -39,9 +38,9 @@ public class IntIndexToIndexMap implements IndexToIndexMap {
     @NotNull
     public static IndexToIndexMap from(
             @NotNull
-            final ByteBuffer buf) {
+            final Buffer buf) {
         final int elementsCount = buf.getInt();
-        final ByteBuffer elements = buf.slice();
+        final Buffer elements = buf.slice();
 
         return new IntIndexToIndexMap(
                 elementsCount,

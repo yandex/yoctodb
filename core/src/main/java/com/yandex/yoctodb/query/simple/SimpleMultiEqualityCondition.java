@@ -10,13 +10,13 @@
 
 package com.yandex.yoctodb.query.simple;
 
+import com.yandex.yoctodb.util.buf.Buffer;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
 import com.yandex.yoctodb.immutable.FilterableIndex;
 import com.yandex.yoctodb.util.UnsignedByteArray;
 import com.yandex.yoctodb.util.mutable.BitSet;
 
-import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 /**
@@ -28,7 +28,7 @@ import java.util.Arrays;
 public final class SimpleMultiEqualityCondition
         extends AbstractSimpleCondition {
     @NotNull
-    private final ByteBuffer[] values;
+    private final Buffer[] values;
 
     public SimpleMultiEqualityCondition(
             @NotNull
@@ -42,7 +42,7 @@ public final class SimpleMultiEqualityCondition
         final UnsignedByteArray[] sorted = values.clone();
         Arrays.sort(sorted);
 
-        this.values = new ByteBuffer[sorted.length];
+        this.values = new Buffer[sorted.length];
         for (int i = 0; i < sorted.length; i++)
             this.values[i] = sorted[i].toByteBuffer();
     }

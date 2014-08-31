@@ -10,6 +10,7 @@
 
 package com.yandex.yoctodb.v1.immutable.segment;
 
+import com.yandex.yoctodb.util.buf.Buffer;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
 import com.yandex.yoctodb.immutable.FilterableIndex;
@@ -23,7 +24,6 @@ import com.yandex.yoctodb.util.mutable.BitSet;
 import com.yandex.yoctodb.v1.V1DatabaseFormat;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.Iterator;
 
 /**
@@ -77,7 +77,7 @@ public final class V1FullIndex
             @NotNull
             final BitSet dest,
             @NotNull
-            final ByteBuffer value) {
+            final Buffer value) {
         return filterableDelegate.eq(dest, value);
     }
 
@@ -86,7 +86,7 @@ public final class V1FullIndex
             @NotNull
             final BitSet dest,
             @NotNull
-            final ByteBuffer... value) {
+            final Buffer... value) {
         return filterableDelegate.in(dest, value);
     }
 
@@ -95,7 +95,7 @@ public final class V1FullIndex
             @NotNull
             final BitSet dest,
             @NotNull
-            final ByteBuffer value,
+            final Buffer value,
             final boolean orEquals) {
         return filterableDelegate.lessThan(dest, value, orEquals);
     }
@@ -105,7 +105,7 @@ public final class V1FullIndex
             @NotNull
             final BitSet dest,
             @NotNull
-            final ByteBuffer value,
+            final Buffer value,
             final boolean orEquals) {
         return filterableDelegate.greaterThan(dest, value, orEquals);
     }
@@ -115,10 +115,10 @@ public final class V1FullIndex
             @NotNull
             final BitSet dest,
             @NotNull
-            final ByteBuffer from,
+            final Buffer from,
             final boolean fromInclusive,
             @NotNull
-            final ByteBuffer to,
+            final Buffer to,
             final boolean toInclusive) {
         return filterableDelegate.between(
                 dest,
@@ -135,7 +135,7 @@ public final class V1FullIndex
 
     @NotNull
     @Override
-    public ByteBuffer getSortValue(final int index) {
+    public Buffer getSortValue(final int index) {
         return values.get(index);
     }
 
@@ -163,9 +163,11 @@ public final class V1FullIndex
                     @Override
                     public Segment read(
                             @NotNull
-                            final ByteBuffer buffer) throws IOException {
-
-                        final byte[] digest = Segments.calculateDigest(buffer, V1DatabaseFormat.MESSAGE_DIGEST_ALGORITHM);
+                            final Buffer buffer) throws IOException {
+                        final Buffer digest =
+                                Segments.calculateDigest(
+                                        buffer,
+                                        V1DatabaseFormat.MESSAGE_DIGEST_ALGORITHM);
 
                         final String fieldName = Segments.extractString(buffer);
 
@@ -181,8 +183,8 @@ public final class V1FullIndex
                                 IntIndexToIndexMap.from(
                                         Segments.extract(buffer));
 
-                        final ByteBuffer digestActual = Segments.extract(buffer);
-                        if (!digestActual.equals(ByteBuffer.wrap(digest))) {
+                        final Buffer digestActual = Segments.extract(buffer);
+                        if (!digestActual.equals(digest)) {
                             throw new CorruptSegmentException("checksum error");
                         }
 
@@ -205,9 +207,11 @@ public final class V1FullIndex
                     @Override
                     public Segment read(
                             @NotNull
-                            final ByteBuffer buffer) throws IOException {
-
-                        final byte[] digest = Segments.calculateDigest(buffer, V1DatabaseFormat.MESSAGE_DIGEST_ALGORITHM);
+                            final Buffer buffer) throws IOException {
+                        final Buffer digest =
+                                Segments.calculateDigest(
+                                        buffer,
+                                        V1DatabaseFormat.MESSAGE_DIGEST_ALGORITHM);
 
                         final String fieldName = Segments.extractString(buffer);
 
@@ -223,8 +227,8 @@ public final class V1FullIndex
                                 IntIndexToIndexMap.from(
                                         Segments.extract(buffer));
 
-                        final ByteBuffer digestActual = Segments.extract(buffer);
-                        if (!digestActual.equals(ByteBuffer.wrap(digest))) {
+                        final Buffer digestActual = Segments.extract(buffer);
+                        if (!digestActual.equals(digest)) {
                             throw new CorruptSegmentException("checksum error");
                         }
 

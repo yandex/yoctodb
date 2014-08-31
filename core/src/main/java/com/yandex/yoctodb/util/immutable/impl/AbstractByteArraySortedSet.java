@@ -10,11 +10,10 @@
 
 package com.yandex.yoctodb.util.immutable.impl;
 
+import com.yandex.yoctodb.util.buf.Buffer;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
 import com.yandex.yoctodb.util.immutable.ByteArraySortedSet;
-
-import java.nio.ByteBuffer;
 
 /**
  * Implementation of common binary search logic in {@link ByteArraySortedSet}
@@ -28,12 +27,12 @@ public abstract class AbstractByteArraySortedSet
     protected abstract int compare(
             int ith,
             @NotNull
-            ByteBuffer that);
+            Buffer that);
 
     @Override
     public int indexOf(
             @NotNull
-            final ByteBuffer e) {
+            final Buffer e) {
         int start = 0;
         int end = size() - 1;
         while (start <= end) {
@@ -54,7 +53,7 @@ public abstract class AbstractByteArraySortedSet
     @Override
     public int indexOfGreaterThan(
             @NotNull
-            final ByteBuffer e,
+            final Buffer e,
             final boolean orEquals,
             final int upToIndexInclusive) {
         assert 0 <= upToIndexInclusive && upToIndexInclusive < size();
@@ -90,7 +89,7 @@ public abstract class AbstractByteArraySortedSet
     @Override
     public int indexOfLessThan(
             @NotNull
-            final ByteBuffer e,
+            final Buffer e,
             final boolean orEquals,
             final int fromIndexInclusive) {
         assert 0 <= fromIndexInclusive && fromIndexInclusive < size();

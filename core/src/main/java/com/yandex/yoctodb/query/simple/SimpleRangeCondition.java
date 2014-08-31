@@ -10,13 +10,12 @@
 
 package com.yandex.yoctodb.query.simple;
 
+import com.yandex.yoctodb.util.buf.Buffer;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
 import com.yandex.yoctodb.immutable.FilterableIndex;
 import com.yandex.yoctodb.util.UnsignedByteArray;
 import com.yandex.yoctodb.util.mutable.BitSet;
-
-import java.nio.ByteBuffer;
 
 /**
  * Range condition
@@ -26,10 +25,10 @@ import java.nio.ByteBuffer;
 @Immutable
 public final class SimpleRangeCondition extends AbstractSimpleCondition {
     @NotNull
-    private final ByteBuffer from;
+    private final Buffer from;
     private final boolean fromInclusive;
     @NotNull
-    private final ByteBuffer to;
+    private final Buffer to;
     private final boolean toInclusive;
 
     public SimpleRangeCondition(

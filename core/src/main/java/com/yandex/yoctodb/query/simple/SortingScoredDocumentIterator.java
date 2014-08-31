@@ -11,6 +11,7 @@
 package com.yandex.yoctodb.query.simple;
 
 import com.google.common.collect.Iterators;
+import com.yandex.yoctodb.util.buf.Buffer;
 import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.NotNull;
 import com.yandex.yoctodb.util.immutable.IntToIntArray;
@@ -19,7 +20,6 @@ import com.yandex.yoctodb.query.Order;
 import com.yandex.yoctodb.query.QueryContext;
 import com.yandex.yoctodb.util.mutable.BitSet;
 
-import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -188,8 +188,8 @@ public final class SortingScoredDocumentIterator
 
         @NotNull
         public SimpleDocumentMultiScore toScore() {
-            final ByteBuffer[] sortValues =
-                    new ByteBuffer[sortValueIndexes.length];
+            final Buffer[] sortValues =
+                    new Buffer[sortValueIndexes.length];
             for (int i = 0; i < sortValueIndexes.length; i++) {
                 sortValues[i] =
                         indexes[i].getSortValue(

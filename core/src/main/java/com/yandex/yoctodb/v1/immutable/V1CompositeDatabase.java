@@ -11,6 +11,7 @@
 package com.yandex.yoctodb.v1.immutable;
 
 import com.google.common.collect.Iterators;
+import com.yandex.yoctodb.util.buf.Buffer;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
 import com.yandex.yoctodb.immutable.Database;
@@ -21,7 +22,6 @@ import com.yandex.yoctodb.query.ScoredDocument;
 import com.yandex.yoctodb.util.mutable.BitSet;
 import com.yandex.yoctodb.util.mutable.impl.ReadOnlyOneBitSet;
 
-import java.nio.ByteBuffer;
 import java.util.*;
 
 /**
@@ -60,7 +60,7 @@ public final class V1CompositeDatabase implements Database {
 
     @NotNull
     @Override
-    public ByteBuffer getDocument(final int i) {
+    public Buffer getDocument(final int i) {
         assert 0 <= i && i < getDocumentCount();
 
         int id = i;

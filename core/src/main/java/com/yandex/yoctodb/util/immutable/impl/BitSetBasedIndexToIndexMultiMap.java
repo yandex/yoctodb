@@ -10,13 +10,13 @@
 
 package com.yandex.yoctodb.util.immutable.impl;
 
+import com.yandex.yoctodb.util.buf.Buffer;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
 import com.yandex.yoctodb.util.immutable.IndexToIndexMultiMap;
 import com.yandex.yoctodb.util.immutable.IntToIntArray;
 import com.yandex.yoctodb.util.mutable.BitSet;
 
-import java.nio.ByteBuffer;
 import java.util.Iterator;
 
 /**
@@ -26,20 +26,20 @@ import java.util.Iterator;
 public class BitSetBasedIndexToIndexMultiMap implements IndexToIndexMultiMap {
     private final int keysCount;
     @NotNull
-    private final ByteBuffer elements;
+    private final Buffer elements;
     private final int bitSetSizeInLongs;
     private final int bitSetSizeInBytes;
 
     @NotNull
     public static IndexToIndexMultiMap from(
             @NotNull
-            final ByteBuffer buf) {
+            final Buffer buf) {
         final int keysCount = buf.getInt();
         assert keysCount > 0;
 
         final int bitSetSizeInLongs = buf.getInt();
 
-        final ByteBuffer elements = buf.slice();
+        final Buffer elements = buf.slice();
 
         final int bitSetSizeInBytes = bitSetSizeInLongs << 3;
 
@@ -52,7 +52,7 @@ public class BitSetBasedIndexToIndexMultiMap implements IndexToIndexMultiMap {
     private BitSetBasedIndexToIndexMultiMap(
             final int keysCount,
             @NotNull
-            final ByteBuffer elements,
+            final Buffer elements,
             final int bitSetSizeInLongs, int bitSetSizeInBytes) {
         this.bitSetSizeInBytes = bitSetSizeInBytes;
         assert keysCount > 0;
@@ -85,7 +85,9 @@ public class BitSetBasedIndexToIndexMultiMap implements IndexToIndexMultiMap {
         boolean result = false;
 
         int current = fromInclusive * bitSetSizeInBytes;
-        int remaining = elements.remaining();
+        final long remaining = elements.remaining();
+
+        assert remaining <= Integer.MAX_VALUE;
 
         while (current < remaining) {
             result |= dest.or(elements, current, bitSetSizeInLongs);

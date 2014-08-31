@@ -10,12 +10,11 @@
 
 package com.yandex.yoctodb.util.immutable.impl;
 
+import com.yandex.yoctodb.util.buf.Buffer;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
 import com.yandex.yoctodb.util.UnsignedByteArrays;
 import com.yandex.yoctodb.util.immutable.TrieBasedByteArraySet;
-
-import java.nio.ByteBuffer;
 
 /**
  * @author svyatoslav
@@ -23,17 +22,17 @@ import java.nio.ByteBuffer;
 @Immutable
 public class SimpleTrieBasedByteArraySet implements TrieBasedByteArraySet {
     private final int size;
-    private final ByteBuffer trie;
+    private final Buffer trie;
 
     public static TrieBasedByteArraySet from(
             @NotNull
-            final ByteBuffer buffer) {
+            final Buffer buffer) {
         final int elementsCount = buffer.getInt();
         assert elementsCount > 0;
         return new SimpleTrieBasedByteArraySet(elementsCount, buffer.slice());
     }
 
-    public SimpleTrieBasedByteArraySet(int size, ByteBuffer trie) {
+    public SimpleTrieBasedByteArraySet(int size, Buffer trie) {
         this.size = size;
         this.trie = trie;
     }
@@ -46,9 +45,9 @@ public class SimpleTrieBasedByteArraySet implements TrieBasedByteArraySet {
     @Override
     public int indexOf(
             @NotNull
-            final ByteBuffer e) {
+            final Buffer e) {
         int position = 0;
-        for (byte currentByte : e.array()) {
+        for (byte currentByte : e.toByteArray()) {
             //node children is compressed (stored ordered list of child nodes)
             final byte terminalTypeByte = trie.get(position++);
             if (terminalTypeByte == UnsignedByteArrays.BOOLEAN_TRUE_IN_BYTE) {
@@ -113,13 +112,13 @@ public class SimpleTrieBasedByteArraySet implements TrieBasedByteArraySet {
     @Override
     public int indexOfGreaterThan(
             @NotNull
-            final ByteBuffer e,
+            final Buffer e,
             final boolean orEquals,
             final int upToIndexInclusive) {
         assert 0 <= upToIndexInclusive && upToIndexInclusive < size();
 
         int position = 0;
-        for (byte currentByte : e.array()) {
+        for (byte currentByte : e.toByteArray()) {
             //node children is compressed (stored ordered list of child nodes)
             final byte terminalTypeByte = trie.get(position++);
             if (terminalTypeByte == UnsignedByteArrays.BOOLEAN_TRUE_IN_BYTE) {
@@ -184,13 +183,13 @@ public class SimpleTrieBasedByteArraySet implements TrieBasedByteArraySet {
     @Override
     public int indexOfLessThan(
             @NotNull
-            final ByteBuffer e,
+            final Buffer e,
             final boolean orEquals,
             final int fromIndexInclusive) {
         assert 0 <= fromIndexInclusive && fromIndexInclusive < size();
 
         int position = 0;
-        for (byte currentByte : e.array()) {
+        for (byte currentByte : e.toByteArray()) {
             //node children is compressed (stored ordered list of child nodes)
             final byte terminalTypeByte = trie.get(position++);
             if (terminalTypeByte == UnsignedByteArrays.BOOLEAN_TRUE_IN_BYTE) {

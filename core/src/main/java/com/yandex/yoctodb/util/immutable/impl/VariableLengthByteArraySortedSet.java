@@ -10,12 +10,11 @@
 
 package com.yandex.yoctodb.util.immutable.impl;
 
+import com.yandex.yoctodb.util.buf.Buffer;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
 import com.yandex.yoctodb.util.UnsignedByteArrays;
 import com.yandex.yoctodb.util.immutable.ByteArraySortedSet;
-
-import java.nio.ByteBuffer;
 
 /**
  * {@link com.yandex.yoctodb.util.immutable.ByteArraySortedSet} with variable
@@ -29,23 +28,22 @@ public final class VariableLengthByteArraySortedSet
     private final int maxElement;
     private final int size;
     @NotNull
-    private final ByteBuffer offsets;
+    private final Buffer offsets;
     @NotNull
-    private final ByteBuffer elements;
+    private final Buffer elements;
 
     public static ByteArraySortedSet from(
             @NotNull
-            final ByteBuffer buffer) {
+            final Buffer buffer) {
         final int maxElement = buffer.getInt();
         assert maxElement > 0;
 
         final int size = buffer.getInt();
         assert size > 0;
 
-        final ByteBuffer offsets = buffer.slice();
-        offsets.limit(4 * (size + 1));
+        final Buffer offsets = buffer.slice((size + 1) << 2);
 
-        final ByteBuffer elements = buffer.slice();
+        final Buffer elements = buffer.slice();
         elements.position(offsets.remaining());
 
         return new VariableLengthByteArraySortedSet(
@@ -59,9 +57,9 @@ public final class VariableLengthByteArraySortedSet
             final int maxElement,
             final int size,
             @NotNull
-            final ByteBuffer offsets,
+            final Buffer offsets,
             @NotNull
-            final ByteBuffer elements) {
+            final Buffer elements) {
         assert maxElement > 0;
         assert size > 0;
         assert offsets.hasRemaining();
@@ -77,7 +75,7 @@ public final class VariableLengthByteArraySortedSet
     protected int compare(
             final int ith,
             @NotNull
-            final ByteBuffer that) {
+            final Buffer that) {
         assert 0 <= ith && ith < size;
 
         final int leftFrom = offsets.getInt(ith << 2);
@@ -98,7 +96,7 @@ public final class VariableLengthByteArraySortedSet
 
     @NotNull
     @Override
-    public ByteBuffer get(final int i) {
+    public Buffer get(final int i) {
         assert 0 <= i && i < size;
 
         final int start = offsets.getInt(i << 2);
@@ -106,11 +104,7 @@ public final class VariableLengthByteArraySortedSet
 
         assert start < end;
 
-        final ByteBuffer copy = elements.duplicate();
-        copy.position(start);
-        copy.limit(end);
-
-        return copy.slice();
+        return elements.slice(start, end - start);
     }
 
     @Override

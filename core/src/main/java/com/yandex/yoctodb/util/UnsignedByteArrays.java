@@ -12,9 +12,9 @@ package com.yandex.yoctodb.util;
 
 import com.google.common.base.Charsets;
 import com.google.common.primitives.*;
+import com.yandex.yoctodb.util.buf.Buffer;
 import org.jetbrains.annotations.NotNull;
 
-import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
 /**
@@ -76,19 +76,19 @@ public class UnsignedByteArrays {
 
     public static int compare(
             @NotNull
-            final ByteBuffer left,
-            int leftFrom,
-            final int leftLength,
+            final Buffer left,
+            long leftFrom,
+            final long leftLength,
             @NotNull
-            final ByteBuffer right,
-            int rightFrom,
-            final int rightLength) {
+            final Buffer right,
+            long rightFrom,
+            final long rightLength) {
         assert leftLength > 0;
         assert rightLength > 0;
 
         // Adapted from Guava UnsignedBytes
 
-        int length = Math.min(leftLength, rightLength);
+        long length = Math.min(leftLength, rightLength);
 
         for (;
              length >= Longs.BYTES;
@@ -124,16 +124,18 @@ public class UnsignedByteArrays {
             }
         }
 
-        return leftLength - rightLength;
+        return (leftLength < rightLength) ?
+                -1 :
+                ((leftLength == rightLength) ? 0 : 1);
     }
 
     public static int compare(
             @NotNull
-            final ByteBuffer left,
-            int leftFrom,
-            final int leftLength,
+            final Buffer left,
+            final long leftFrom,
+            final long leftLength,
             @NotNull
-            final ByteBuffer right) {
+            final Buffer right) {
         return compare(
                 left,
                 leftFrom,
@@ -145,9 +147,9 @@ public class UnsignedByteArrays {
 
     public static int compare(
             @NotNull
-            final ByteBuffer left,
+            final Buffer left,
             @NotNull
-            final ByteBuffer right) {
+            final Buffer right) {
         return compare(
                 left,
                 left.position(),
@@ -157,4 +159,3 @@ public class UnsignedByteArrays {
                 right.remaining());
     }
 }
-

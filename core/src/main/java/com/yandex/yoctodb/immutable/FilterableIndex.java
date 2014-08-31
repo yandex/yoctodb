@@ -10,11 +10,10 @@
 
 package com.yandex.yoctodb.immutable;
 
+import com.yandex.yoctodb.util.buf.Buffer;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
 import com.yandex.yoctodb.util.mutable.BitSet;
-
-import java.nio.ByteBuffer;
 
 /**
  * Index filtering documents.
@@ -39,35 +38,35 @@ public interface FilterableIndex extends Index {
             @NotNull
             BitSet dest,
             @NotNull
-            ByteBuffer value);
+            Buffer value);
 
     boolean in(
             @NotNull
             BitSet dest,
             @NotNull
-            ByteBuffer... value);
+            Buffer... value);
 
     boolean lessThan(
             @NotNull
             BitSet dest,
             @NotNull
-            ByteBuffer value,
+            Buffer value,
             boolean orEquals);
 
     boolean greaterThan(
             @NotNull
             BitSet dest,
             @NotNull
-            ByteBuffer value,
+            Buffer value,
             boolean orEquals);
 
     boolean between(
             @NotNull
             BitSet dest,
             @NotNull
-            ByteBuffer from,
+            Buffer from,
             boolean fromInclusive,
             @NotNull
-            ByteBuffer to,
+            Buffer to,
             boolean toInclusive);
 }

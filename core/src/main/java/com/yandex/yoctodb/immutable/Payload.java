@@ -10,10 +10,9 @@
 
 package com.yandex.yoctodb.immutable;
 
+import com.yandex.yoctodb.util.buf.Buffer;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
-
-import java.nio.ByteBuffer;
 
 /**
  * Payload segment interface
@@ -25,5 +24,5 @@ public interface Payload {
     int getSize();
 
     @NotNull
-    ByteBuffer getPayload(final int i);
+    Buffer getPayload(final int i);
 }

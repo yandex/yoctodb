@@ -10,12 +10,12 @@
 
 package com.yandex.yoctodb.immutable;
 
+import com.yandex.yoctodb.util.buf.Buffer;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
 import com.yandex.yoctodb.util.immutable.IntToIntArray;
 import com.yandex.yoctodb.util.mutable.BitSet;
 
-import java.nio.ByteBuffer;
 import java.util.Iterator;
 
 /**
@@ -40,7 +40,7 @@ public interface SortableIndex extends Index {
      * @return      sort value
      */
     @NotNull
-    ByteBuffer getSortValue(int index);
+    Buffer getSortValue(int index);
 
     /**
      * Get ascending iterator for {@link IntToIntArray} values mapping

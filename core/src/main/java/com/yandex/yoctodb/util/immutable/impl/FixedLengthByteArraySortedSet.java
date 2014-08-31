@@ -10,12 +10,11 @@
 
 package com.yandex.yoctodb.util.immutable.impl;
 
+import com.yandex.yoctodb.util.buf.Buffer;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
 import com.yandex.yoctodb.util.UnsignedByteArrays;
 import com.yandex.yoctodb.util.immutable.ByteArraySortedSet;
-
-import java.nio.ByteBuffer;
 
 /**
  * {@link com.yandex.yoctodb.util.immutable.ByteArraySortedSet} with fixed size
@@ -28,12 +27,12 @@ public final class FixedLengthByteArraySortedSet
         extends AbstractByteArraySortedSet {
     private final int elementSize;
     private final int size;
-    private final ByteBuffer elements;
+    private final Buffer elements;
 
     @NotNull
     public static ByteArraySortedSet from(
             @NotNull
-            final ByteBuffer buf) {
+            final Buffer buf) {
         final int elementSize = buf.getInt();
         final int elementsCount = buf.getInt();
 
@@ -46,7 +45,7 @@ public final class FixedLengthByteArraySortedSet
     private FixedLengthByteArraySortedSet(
             final int elementSize,
             final int elementsCount,
-            final ByteBuffer elements) {
+            final Buffer elements) {
         assert elementSize > 0;
         assert elementsCount > 0;
         assert elements.hasRemaining();
@@ -60,7 +59,7 @@ public final class FixedLengthByteArraySortedSet
     protected int compare(
             final int ith,
             @NotNull
-            final ByteBuffer that) {
+            final Buffer that) {
         assert 0 <= ith && ith < size;
 
         return UnsignedByteArrays.compare(
@@ -77,14 +76,10 @@ public final class FixedLengthByteArraySortedSet
 
     @NotNull
     @Override
-    public ByteBuffer get(final int i) {
+    public Buffer get(final int i) {
         assert 0 <= i && i < size;
 
-        final ByteBuffer copy = elements.duplicate();
-        copy.position(i * elementSize);
-        copy.limit(copy.position() + elementSize);
-
-        return copy.slice();
+        return elements.slice(i * elementSize, elementSize);
     }
 
     @Override

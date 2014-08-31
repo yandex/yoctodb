@@ -10,6 +10,7 @@
 
 package com.yandex.yoctodb.immutable.util;
 
+import com.yandex.yoctodb.util.buf.Buffer;
 import org.junit.Assert;
 import org.junit.Test;
 import com.yandex.yoctodb.util.UnsignedByteArray;
@@ -19,7 +20,6 @@ import com.yandex.yoctodb.util.mutable.impl.SimpleTrieBasedByteArraySet;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -42,7 +42,7 @@ public class TrieBasedByteArraySetTest {
         elements.add(UnsignedByteArrays.raw(new byte[]{0, 1, 3, 3}));
         elements.add(UnsignedByteArrays.raw(new byte[]{0, 1, 4, 3}));
 
-        final ByteBuffer bb =
+        final Buffer bb =
                 prepareDataFromTrieBasedByteArraySet(elements);
         final com.yandex.yoctodb.util.immutable.TrieBasedByteArraySet ss =
                 com.yandex.yoctodb.util.immutable.impl.SimpleTrieBasedByteArraySet.from(bb);
@@ -55,13 +55,31 @@ public class TrieBasedByteArraySetTest {
             Assert.assertEquals(i, ss.indexOf(elements.get(i).toByteBuffer()));
         }
         //not contains
-        Assert.assertEquals(-1, ss.indexOf(ByteBuffer.wrap(new byte[]{0})));
-        Assert.assertEquals(-1, ss.indexOf(ByteBuffer.wrap(new byte[]{0, 1, 2, 3, 4})));
-        Assert.assertEquals(-1, ss.indexOf(ByteBuffer.wrap(new byte[]{4, 5})));
-        Assert.assertEquals(-1, ss.indexOf(ByteBuffer.wrap(new byte[]{2, 3})));
+        Assert.assertEquals(-1, ss.indexOf(
+                                    Buffer.wrap(
+                                            new byte[]{
+                                                    0})));
+        Assert.assertEquals(-1, ss.indexOf(
+                                    Buffer.wrap(
+                                            new byte[]{
+                                                    0,
+                                                    1,
+                                                    2,
+                                                    3,
+                                                    4})));
+        Assert.assertEquals(-1, ss.indexOf(
+                                    Buffer.wrap(
+                                            new byte[]{
+                                                    4,
+                                                    5})));
+        Assert.assertEquals(-1, ss.indexOf(
+                                    Buffer.wrap(
+                                            new byte[]{
+                                                    2,
+                                                    3})));
     }
 
-    private ByteBuffer prepareDataFromTrieBasedByteArraySet(
+    private Buffer prepareDataFromTrieBasedByteArraySet(
             final Collection<UnsignedByteArray> elements) throws IOException {
         final TrieBasedByteArraySet trieBasedByteArraySet = new SimpleTrieBasedByteArraySet();
         for (UnsignedByteArray element : elements) {
@@ -74,7 +92,7 @@ public class TrieBasedByteArraySetTest {
                 os.size(),
                 trieBasedByteArraySet.getSizeInBytes());
 
-        return ByteBuffer.wrap(os.toByteArray());
+        return Buffer.wrap(os.toByteArray());
     }
 
 }

@@ -12,6 +12,7 @@ package com.yandex.yoctodb.util;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.UnsignedBytes;
+import com.yandex.yoctodb.util.buf.Buffer;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
 
@@ -44,8 +45,8 @@ public final class UnsignedByteArray
     }
 
     @NotNull
-    public ByteBuffer toByteBuffer() {
-        return ByteBuffer.wrap(data);
+    public Buffer toByteBuffer() {
+        return Buffer.wrap(ByteBuffer.wrap(data));
     }
 
     @Override

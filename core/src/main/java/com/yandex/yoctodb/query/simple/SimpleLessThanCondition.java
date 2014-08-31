@@ -10,13 +10,12 @@
 
 package com.yandex.yoctodb.query.simple;
 
+import com.yandex.yoctodb.util.buf.Buffer;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
 import com.yandex.yoctodb.immutable.FilterableIndex;
 import com.yandex.yoctodb.util.UnsignedByteArray;
 import com.yandex.yoctodb.util.mutable.BitSet;
-
-import java.nio.ByteBuffer;
 
 /**
  * Less than condition
@@ -26,7 +25,7 @@ import java.nio.ByteBuffer;
 @Immutable
 public final class SimpleLessThanCondition extends AbstractSimpleCondition {
     @NotNull
-    private final ByteBuffer value;
+    private final Buffer value;
 
     public SimpleLessThanCondition(
             @NotNull

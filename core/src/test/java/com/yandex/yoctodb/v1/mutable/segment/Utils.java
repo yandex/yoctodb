@@ -10,9 +10,9 @@
 
 package com.yandex.yoctodb.v1.mutable.segment;
 
+import com.yandex.yoctodb.util.buf.Buffer;
 import org.jetbrains.annotations.NotNull;
 
-import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -22,7 +22,7 @@ import java.security.NoSuchAlgorithmException;
 public class Utils {
     public static byte[] calculateDigest(
             @NotNull
-            final ByteBuffer buffer,
+            final Buffer buffer,
             @NotNull
             final String messageDigestAlgorithm) {
         final MessageDigest md;
@@ -33,10 +33,10 @@ public class Utils {
         }
         md.reset();
         //get byte buffer without digest length and without digest content
-        final ByteBuffer byteBuffer = buffer.duplicate();
-        byteBuffer.limit(byteBuffer.limit() - md.getDigestLength() - 4);
-
-        md.update(byteBuffer.slice());
+        md.update(
+                buffer.slice(
+                        buffer.remaining() - md.getDigestLength() - 4)
+                      .toByteArray());
         return md.digest();
     }
 }

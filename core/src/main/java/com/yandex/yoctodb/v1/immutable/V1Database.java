@@ -11,6 +11,7 @@
 package com.yandex.yoctodb.v1.immutable;
 
 import com.google.common.collect.Iterators;
+import com.yandex.yoctodb.util.buf.Buffer;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
 import com.yandex.yoctodb.immutable.Database;
@@ -26,7 +27,6 @@ import com.yandex.yoctodb.util.mutable.impl.LongArrayBitSet;
 import com.yandex.yoctodb.util.mutable.impl.ReadOnlyOneBitSet;
 import org.jetbrains.annotations.Nullable;
 
-import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -80,7 +80,7 @@ public final class V1Database implements QueryContext {
 
     @NotNull
     @Override
-    public ByteBuffer getDocument(final int i) {
+    public Buffer getDocument(final int i) {
         return payload.getPayload(i);
     }
 

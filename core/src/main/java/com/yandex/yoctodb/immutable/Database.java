@@ -10,12 +10,11 @@
 
 package com.yandex.yoctodb.immutable;
 
+import com.yandex.yoctodb.util.buf.Buffer;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
 import com.yandex.yoctodb.query.DocumentProcessor;
 import com.yandex.yoctodb.query.Query;
-
-import java.nio.ByteBuffer;
 
 /**
  * An immutable database
@@ -27,7 +26,7 @@ public interface Database {
     int getDocumentCount();
 
     @NotNull
-    ByteBuffer getDocument(int i);
+    Buffer getDocument(int i);
 
     /**
      * Execute {@code query} and apply {@code processor} to the documents found

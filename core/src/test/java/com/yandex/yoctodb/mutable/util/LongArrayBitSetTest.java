@@ -11,6 +11,7 @@
 package com.yandex.yoctodb.mutable.util;
 
 import com.google.common.primitives.Longs;
+import com.yandex.yoctodb.util.buf.Buffer;
 import org.junit.Assert;
 import org.junit.Test;
 import com.yandex.yoctodb.util.mutable.BitSet;
@@ -18,7 +19,6 @@ import com.yandex.yoctodb.util.mutable.impl.LongArrayBitSet;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 
 /**
  * @author svyatoslav
@@ -49,7 +49,7 @@ public class LongArrayBitSetTest {
             for (long word : bs2.toArray()) {
                 os.write(Longs.toByteArray(word));
             }
-            ByteBuffer bs2BB = ByteBuffer.wrap(os.toByteArray());
+            Buffer bs2BB = Buffer.wrap(os.toByteArray());
 
             bs1.or(bs2BB, 0, bs2.toArray().length);
             Assert.assertEquals(i, bs1.cardinality());

@@ -10,6 +10,7 @@
 
 package com.yandex.yoctodb.v1.mutable.segment;
 
+import com.yandex.yoctodb.util.buf.Buffer;
 import org.junit.Assert;
 import org.junit.Test;
 import com.yandex.yoctodb.util.OutputStreamWritable;
@@ -17,7 +18,6 @@ import com.yandex.yoctodb.v1.V1DatabaseFormat;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 
 import static com.yandex.yoctodb.v1.mutable.segment.Utils.calculateDigest;
 
@@ -40,7 +40,7 @@ public class V1PayloadSegmentBinaryTest {
         outputStreamWritable.writeTo(os);
         Assert.assertEquals(os.size(), outputStreamWritable.getSizeInBytes() + 8);
 
-        final ByteBuffer byteBuffer = ByteBuffer.wrap(os.toByteArray());
+        final Buffer byteBuffer = Buffer.wrap(os.toByteArray());
 
         final int fullSizeInBytes = byteBuffer.getInt();
         Assert.assertEquals(fullSizeInBytes, outputStreamWritable.getSizeInBytes());

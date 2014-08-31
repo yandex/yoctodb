@@ -10,16 +10,16 @@
 
 package com.yandex.yoctodb.immutable;
 
+import com.yandex.yoctodb.util.buf.Buffer;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.Collection;
 
 /**
- * Builds immutable {@link Database} from file or {@link ByteBuffer}
+ * Builds immutable {@link Database} from file or {@link Buffer}
  *
  * @author incubos
  */
@@ -28,7 +28,7 @@ public interface DatabaseReader {
     @NotNull
     Database from(
             @NotNull
-            ByteBuffer b) throws IOException;
+            Buffer b) throws IOException;
 
     @NotNull
     Database composite(
