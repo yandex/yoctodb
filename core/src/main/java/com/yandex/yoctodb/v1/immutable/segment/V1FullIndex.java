@@ -1,0 +1,243 @@
+/*
+ * (C) YANDEX LLC, 2014
+ *
+ * The Source Code called "YoctoDB" available at
+ * https://bitbucket.org/yandex/yoctodb is subject to the terms of the
+ * Mozilla Public License, v. 2.0 (hereinafter - MPL).
+ *
+ * A copy of the MPL is available at http://mozilla.org/MPL/2.0/.
+ */
+
+package com.yandex.yoctodb.v1.immutable.segment;
+
+import com.yandex.yoctodb.util.buf.Buffer;
+import net.jcip.annotations.Immutable;
+import org.jetbrains.annotations.NotNull;
+import com.yandex.yoctodb.immutable.FilterableIndex;
+import com.yandex.yoctodb.util.immutable.IntToIntArray;
+import com.yandex.yoctodb.immutable.SortableIndex;
+import com.yandex.yoctodb.util.immutable.ByteArraySortedSet;
+import com.yandex.yoctodb.util.immutable.IndexToIndexMap;
+import com.yandex.yoctodb.util.immutable.IndexToIndexMultiMap;
+import com.yandex.yoctodb.util.immutable.impl.*;
+import com.yandex.yoctodb.util.mutable.BitSet;
+import com.yandex.yoctodb.v1.V1DatabaseFormat;
+
+import java.io.IOException;
+import java.util.Iterator;
+
+/**
+ * Immutable implementation of {@link FilterableIndex} and {@link
+ * SortableIndex}
+ *
+ * @author incubos
+ */
+@Immutable
+public final class V1FullIndex
+        implements FilterableIndex, SortableIndex, Segment {
+    @NotNull
+    private final String fieldName;
+    @NotNull
+    private final V1FilterableIndex filterableDelegate;
+    @NotNull
+    private final ByteArraySortedSet values;
+    @NotNull
+    private final IndexToIndexMultiMap valueToDocuments;
+    @NotNull
+    private final IndexToIndexMap documentToValues;
+
+    private V1FullIndex(
+            @NotNull
+            final String fieldName,
+            @NotNull
+            final ByteArraySortedSet values,
+            @NotNull
+            final IndexToIndexMultiMap valueToDocuments,
+            @NotNull
+            final IndexToIndexMap documentToValues) {
+        assert !fieldName.isEmpty();
+
+        // May be constructed only from SegmentReader
+        this.fieldName = fieldName;
+        this.filterableDelegate =
+                new V1FilterableIndex(fieldName, values, valueToDocuments);
+        this.values = values;
+        this.valueToDocuments = valueToDocuments;
+        this.documentToValues = documentToValues;
+    }
+
+    @NotNull
+    @Override
+    public String getFieldName() {
+        return fieldName;
+    }
+
+    @Override
+    public boolean eq(
+            @NotNull
+            final BitSet dest,
+            @NotNull
+            final Buffer value) {
+        return filterableDelegate.eq(dest, value);
+    }
+
+    @Override
+    public boolean in(
+            @NotNull
+            final BitSet dest,
+            @NotNull
+            final Buffer... value) {
+        return filterableDelegate.in(dest, value);
+    }
+
+    @Override
+    public boolean lessThan(
+            @NotNull
+            final BitSet dest,
+            @NotNull
+            final Buffer value,
+            final boolean orEquals) {
+        return filterableDelegate.lessThan(dest, value, orEquals);
+    }
+
+    @Override
+    public boolean greaterThan(
+            @NotNull
+            final BitSet dest,
+            @NotNull
+            final Buffer value,
+            final boolean orEquals) {
+        return filterableDelegate.greaterThan(dest, value, orEquals);
+    }
+
+    @Override
+    public boolean between(
+            @NotNull
+            final BitSet dest,
+            @NotNull
+            final Buffer from,
+            final boolean fromInclusive,
+            @NotNull
+            final Buffer to,
+            final boolean toInclusive) {
+        return filterableDelegate.between(
+                dest,
+                from,
+                fromInclusive,
+                to,
+                toInclusive);
+    }
+
+    @Override
+    public int getSortValueIndex(final int document) {
+        return documentToValues.get(document);
+    }
+
+    @NotNull
+    @Override
+    public Buffer getSortValue(final int index) {
+        return values.get(index);
+    }
+
+    @NotNull
+    @Override
+    public Iterator<IntToIntArray> ascending(
+            @NotNull
+            final BitSet docs) {
+        return valueToDocuments.ascending(docs);
+    }
+
+    @NotNull
+    @Override
+    public Iterator<IntToIntArray> descending(
+            @NotNull
+            final BitSet docs) {
+        return valueToDocuments.descending(docs);
+    }
+
+    static void registerReader() {
+        SegmentRegistry.register(
+                V1DatabaseFormat.SegmentType.FIXED_LENGTH_FULL_INDEX.getCode(),
+                new SegmentReader() {
+                    @NotNull
+                    @Override
+                    public Segment read(
+                            @NotNull
+                            final Buffer buffer) throws IOException {
+                        final Buffer digest =
+                                Segments.calculateDigest(
+                                        buffer,
+                                        V1DatabaseFormat.MESSAGE_DIGEST_ALGORITHM);
+
+                        final String fieldName = Segments.extractString(buffer);
+
+                        final ByteArraySortedSet values =
+                                FixedLengthByteArraySortedSet.from(
+                                        Segments.extract(buffer));
+
+                        final IndexToIndexMultiMap valueToDocuments =
+                                IndexToIndexMultiMapReader.from(
+                                        Segments.extract(buffer));
+
+                        final IndexToIndexMap documentToValues =
+                                IntIndexToIndexMap.from(
+                                        Segments.extract(buffer));
+
+                        final Buffer digestActual = Segments.extract(buffer);
+                        if (!digestActual.equals(digest)) {
+                            throw new CorruptSegmentException("checksum error");
+                        }
+
+                        return new V1FullIndex(
+                                fieldName,
+                                values,
+                                valueToDocuments,
+                                documentToValues);
+                    }
+
+
+                });
+
+        SegmentRegistry.register(
+                V1DatabaseFormat.SegmentType
+                        .VARIABLE_LENGTH_FULL_INDEX
+                        .getCode(),
+                new SegmentReader() {
+                    @NotNull
+                    @Override
+                    public Segment read(
+                            @NotNull
+                            final Buffer buffer) throws IOException {
+                        final Buffer digest =
+                                Segments.calculateDigest(
+                                        buffer,
+                                        V1DatabaseFormat.MESSAGE_DIGEST_ALGORITHM);
+
+                        final String fieldName = Segments.extractString(buffer);
+
+                        final ByteArraySortedSet values =
+                                VariableLengthByteArraySortedSet.from(
+                                        Segments.extract(buffer));
+
+                        final IndexToIndexMultiMap valueToDocuments =
+                                IndexToIndexMultiMapReader.from(
+                                        Segments.extract(buffer));
+
+                        final IndexToIndexMap documentToValues =
+                                IntIndexToIndexMap.from(
+                                        Segments.extract(buffer));
+
+                        final Buffer digestActual = Segments.extract(buffer);
+                        if (!digestActual.equals(digest)) {
+                            throw new CorruptSegmentException("checksum error");
+                        }
+
+                        return new V1FullIndex(
+                                fieldName,
+                                values,
+                                valueToDocuments,
+                                documentToValues);
+                    }
+                });
+    }
+}
