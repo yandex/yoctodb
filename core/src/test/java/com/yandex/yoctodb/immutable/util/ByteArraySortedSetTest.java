@@ -72,7 +72,7 @@ public class ByteArraySortedSetTest {
                 os.size(),
                 fixedLengthByteArrayIndexedList.getSizeInBytes());
 
-        return Buffer.wrap(os.toByteArray());
+        return Buffer.from(os.toByteArray());
     }
 
     @Test
@@ -117,7 +117,7 @@ public class ByteArraySortedSetTest {
                 os.size(),
                 fixedLengthByteArrayIndexedList.getSizeInBytes());
 
-        return Buffer.wrap(os.toByteArray());
+        return Buffer.from(os.toByteArray());
     }
 
     @Test

@@ -61,6 +61,6 @@ public class V1PayloadSegmentBinaryTest {
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
         final OutputStreamWritable outputStreamWritable = v1PayloadSegment.buildWritable();
         outputStreamWritable.writeTo(os);
-        return Buffer.wrap(os.toByteArray());
+        return Buffer.from(os.toByteArray());
     }
 }

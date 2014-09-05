@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.yandex.yoctodb</groupId>
     <artifactId>yoctodb-parent</artifactId>
-    <version>0.0.4</version>
+    <version>0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>YoctoDB parent</name>

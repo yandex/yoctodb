@@ -49,7 +49,7 @@ public class LongArrayBitSetTest {
             for (long word : bs2.toArray()) {
                 os.write(Longs.toByteArray(word));
             }
-            Buffer bs2BB = Buffer.wrap(os.toByteArray());
+            Buffer bs2BB = Buffer.from(os.toByteArray());
 
             bs1.or(bs2BB, 0, bs2.toArray().length);
             Assert.assertEquals(i, bs1.cardinality());

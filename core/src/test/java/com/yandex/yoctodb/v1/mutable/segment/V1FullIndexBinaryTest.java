@@ -57,7 +57,7 @@ public class V1FullIndexBinaryTest {
         outputStreamWritable.writeTo(os);
         Assert.assertEquals(os.size(), outputStreamWritable.getSizeInBytes() + 8);
 
-        Buffer byteBuffer = Buffer.wrap(os.toByteArray());
+        Buffer byteBuffer = Buffer.from(os.toByteArray());
 
         final int fullSizeInBytes = byteBuffer.getInt();
         Assert.assertEquals(fullSizeInBytes, outputStreamWritable.getSizeInBytes());
@@ -179,7 +179,7 @@ public class V1FullIndexBinaryTest {
         outputStreamWritable.writeTo(os);
         Assert.assertEquals(os.size(), outputStreamWritable.getSizeInBytes() + 8);
 
-        final Buffer byteBuffer = Buffer.wrap(os.toByteArray());
+        final Buffer byteBuffer = Buffer.from(os.toByteArray());
 
         final int fullSizeInBytes = byteBuffer.getInt();
 

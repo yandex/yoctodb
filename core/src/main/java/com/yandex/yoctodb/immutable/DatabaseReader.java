@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.Collection;
 
 /**
@@ -36,8 +37,13 @@ public interface DatabaseReader {
             Collection<Database> databases) throws IOException;
 
     @NotNull
-    Database from(
+    Database mmap(
             @NotNull
             File f,
             boolean forceToMemory) throws IOException;
+
+    @NotNull
+    Database from(
+            @NotNull
+            RandomAccessFile f) throws IOException;
 }

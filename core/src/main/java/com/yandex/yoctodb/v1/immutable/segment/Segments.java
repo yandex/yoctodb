@@ -87,6 +87,6 @@ class Segments {
             md.update(data.toByteArray());
         }
 
-        return Buffer.wrap(md.digest());
+        return Buffer.from(md.digest());
     }
 }
