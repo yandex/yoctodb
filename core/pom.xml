@@ -47,7 +47,7 @@
 
         <!-- Annotations -->
         <dependency>
-            <groupId>com.intellij</groupId>
+            <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
         </dependency>
         <dependency>

@@ -48,7 +48,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- External -->
-        <annotations.version>9.0.4</annotations.version>
+        <annotations.version>13.0</annotations.version>
         <guava.version>17.0</guava.version>
         <jcip-annotations.version>1.0</jcip-annotations.version>
         <junit.version>4.11</junit.version>
@@ -73,7 +73,7 @@
 
             <!-- Annotations -->
             <dependency>
-                <groupId>com.intellij</groupId>
+                <groupId>org.jetbrains</groupId>
                 <artifactId>annotations</artifactId>
                 <version>${annotations.version}</version>
             </dependency>
