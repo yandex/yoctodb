@@ -70,8 +70,9 @@ public final class ByteBufferWrapper extends Buffer {
     }
 
     @Override
-    public ByteBuffer get(final byte[] dst) {
-        return delegate.get(dst);
+    public Buffer get(final byte[] dst) {
+        delegate.get(dst);
+        return this;
     }
 
     @Override
@@ -112,7 +113,7 @@ public final class ByteBufferWrapper extends Buffer {
 
     @Override
     public Buffer slice() {
-        return Buffer.wrap(delegate.slice());
+        return Buffer.from(delegate.slice());
     }
 
     @Override
@@ -122,7 +123,7 @@ public final class ByteBufferWrapper extends Buffer {
         final ByteBuffer slice = delegate.duplicate();
         slice.limit((int) (slice.position() + length));
 
-        return Buffer.wrap(slice.slice());
+        return Buffer.from(slice.slice());
     }
 
     @Override
@@ -135,6 +136,6 @@ public final class ByteBufferWrapper extends Buffer {
         slice.position((int) from);
         slice.limit((int) (from + size));
 
-        return Buffer.wrap(slice.slice());
+        return Buffer.from(slice.slice());
     }
 }

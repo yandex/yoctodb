@@ -40,7 +40,7 @@ public class V1PayloadSegmentBinaryTest {
         outputStreamWritable.writeTo(os);
         Assert.assertEquals(os.size(), outputStreamWritable.getSizeInBytes() + 8);
 
-        final Buffer byteBuffer = Buffer.wrap(os.toByteArray());
+        final Buffer byteBuffer = Buffer.from(os.toByteArray());
 
         final int fullSizeInBytes = byteBuffer.getInt();
         Assert.assertEquals(fullSizeInBytes, outputStreamWritable.getSizeInBytes());

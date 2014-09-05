@@ -56,11 +56,11 @@ public class TrieBasedByteArraySetTest {
         }
         //not contains
         Assert.assertEquals(-1, ss.indexOf(
-                                    Buffer.wrap(
+                                    Buffer.from(
                                             new byte[]{
                                                     0})));
         Assert.assertEquals(-1, ss.indexOf(
-                                    Buffer.wrap(
+                                    Buffer.from(
                                             new byte[]{
                                                     0,
                                                     1,
@@ -68,12 +68,12 @@ public class TrieBasedByteArraySetTest {
                                                     3,
                                                     4})));
         Assert.assertEquals(-1, ss.indexOf(
-                                    Buffer.wrap(
+                                    Buffer.from(
                                             new byte[]{
                                                     4,
                                                     5})));
         Assert.assertEquals(-1, ss.indexOf(
-                                    Buffer.wrap(
+                                    Buffer.from(
                                             new byte[]{
                                                     2,
                                                     3})));
@@ -92,7 +92,7 @@ public class TrieBasedByteArraySetTest {
                 os.size(),
                 trieBasedByteArraySet.getSizeInBytes());
 
-        return Buffer.wrap(os.toByteArray());
+        return Buffer.from(os.toByteArray());
     }
 
 }

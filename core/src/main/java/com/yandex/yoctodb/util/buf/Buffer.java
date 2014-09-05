@@ -16,6 +16,7 @@ import com.yandex.yoctodb.util.UnsignedByteArrays;
 import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 
 /**
@@ -26,17 +27,24 @@ import java.nio.ByteBuffer;
 @NotThreadSafe
 public abstract class Buffer implements Comparable<Buffer> {
     @NotNull
-    public static Buffer wrap(
+    public static Buffer from(
             @NotNull
             final ByteBuffer buf) {
         return new ByteBufferWrapper(buf);
     }
 
     @NotNull
-    public static Buffer wrap(
+    public static Buffer from(
             @NotNull
             final byte[] buf) {
-        return Buffer.wrap(ByteBuffer.wrap(buf));
+        return Buffer.from(ByteBuffer.wrap(buf));
+    }
+
+    @NotNull
+    public static Buffer from(
+            @NotNull
+            final RandomAccessFile file) {
+        return new SynchronizedFileBuffer(file);
     }
 
     public abstract long position();
@@ -59,7 +67,7 @@ public abstract class Buffer implements Comparable<Buffer> {
         return result;
     }
 
-    public abstract ByteBuffer get(byte[] dst);
+    public abstract Buffer get(byte[] dst);
 
     public abstract byte get();
 
@@ -78,7 +86,8 @@ public abstract class Buffer implements Comparable<Buffer> {
     }
 
     public Buffer slice(long size) {
-        return slice(position(), remaining());
+        assert size <= remaining();
+        return slice(position(), size);
     }
 
     public abstract Buffer slice(long from, long size);

@@ -79,7 +79,7 @@ public class SimpleDatabaseTest {
         final Database db =
                 DatabaseFormat.getCurrent()
                         .getDatabaseReader()
-                        .from(Buffer.wrap(os.toByteArray()));
+                        .from(Buffer.from(os.toByteArray()));
         final Query q1 = select().where(eq("int", UnsignedByteArrays.from(1)));
         Assert.assertTrue(db.count(q1) == 1);
         final Query q2 = select().where(eq("int", UnsignedByteArrays.from(2)));
@@ -165,7 +165,7 @@ public class SimpleDatabaseTest {
         final Database db =
                 DatabaseFormat.getCurrent()
                         .getDatabaseReader()
-                        .from(Buffer.wrap(os.toByteArray()));
+                        .from(Buffer.from(os.toByteArray()));
         final Query q1 = select().where(eq("int_field_full", UnsignedByteArrays
                                                    .from(1)));
         Assert.assertTrue(db.count(q1) == 1);
@@ -225,7 +225,7 @@ public class SimpleDatabaseTest {
         final Database db =
                 DatabaseFormat.getCurrent()
                         .getDatabaseReader()
-                        .from(Buffer.wrap(os.toByteArray()));
+                        .from(Buffer.from(os.toByteArray()));
         final Query q2 = select().where(eq("int", UnsignedByteArrays.from(2)));
         Assert.assertTrue(db.count(q2) == 1);
 
@@ -262,7 +262,7 @@ public class SimpleDatabaseTest {
         final Database db =
                 DatabaseFormat.getCurrent()
                         .getDatabaseReader()
-                        .from(Buffer.wrap(os.toByteArray()));
+                        .from(Buffer.from(os.toByteArray()));
 
         //less
         for (int i = 0; i < docs; i++) {
@@ -327,7 +327,7 @@ public class SimpleDatabaseTest {
         final Database db =
                 DatabaseFormat.getCurrent()
                         .getDatabaseReader()
-                        .from(Buffer.wrap(os.toByteArray()));
+                        .from(Buffer.from(os.toByteArray()));
 
         final Query q1 =
                 select().where(gte("id", UnsignedByteArrays.from(0)))
@@ -380,7 +380,7 @@ public class SimpleDatabaseTest {
         final Database db =
                 DatabaseFormat.getCurrent()
                         .getDatabaseReader()
-                        .from(Buffer.wrap(os.toByteArray()));
+                        .from(Buffer.from(os.toByteArray()));
 
         final Query q1 =
                 select().where(
@@ -477,7 +477,7 @@ public class SimpleDatabaseTest {
         final Database db =
                 DatabaseFormat.getCurrent()
                         .getDatabaseReader()
-                        .from(Buffer.wrap(os.toByteArray()));
+                        .from(Buffer.from(os.toByteArray()));
         final Query q1 = select().where(eq("int", UnsignedByteArrays.from(1)));
         Assert.assertTrue(db.count(q1) == 1);
         final Query q2 = select().where(eq("int", UnsignedByteArrays.from(2)));
@@ -532,7 +532,7 @@ public class SimpleDatabaseTest {
         final Database db =
                 DatabaseFormat.getCurrent()
                         .getDatabaseReader()
-                        .from(Buffer.wrap(os.toByteArray()));
+                        .from(Buffer.from(os.toByteArray()));
         final Query q1 = select().where(eq("int", UnsignedByteArrays.from(1)));
         Assert.assertTrue(db.count(q1) == 1);
         final Query q2 = select().where(eq("int", UnsignedByteArrays.from(2)));

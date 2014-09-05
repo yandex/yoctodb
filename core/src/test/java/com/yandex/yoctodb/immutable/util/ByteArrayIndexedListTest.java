@@ -68,7 +68,7 @@ public class ByteArrayIndexedListTest {
                 os.size(),
                 fixedLengthByteArrayIndexedList.getSizeInBytes());
 
-        return Buffer.wrap(os.toByteArray());
+        return Buffer.from(os.toByteArray());
     }
 
     @Test
@@ -108,6 +108,6 @@ public class ByteArrayIndexedListTest {
                 os.size(),
                 variableLengthByteArrayIndexedList.getSizeInBytes());
 
-        return Buffer.wrap(os.toByteArray());
+        return Buffer.from(os.toByteArray());
     }
 }
