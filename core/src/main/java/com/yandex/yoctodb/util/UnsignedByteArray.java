@@ -46,7 +46,7 @@ public final class UnsignedByteArray
 
     @NotNull
     public Buffer toByteBuffer() {
-        return Buffer.wrap(ByteBuffer.wrap(data));
+        return Buffer.from(ByteBuffer.wrap(data));
     }
 
     @Override

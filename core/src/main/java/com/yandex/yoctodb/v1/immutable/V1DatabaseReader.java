@@ -127,7 +127,7 @@ public class V1DatabaseReader implements DatabaseReader {
 
     @NotNull
     @Override
-    public Database from(
+    public Database mmap(
             @NotNull
             final File f,
             final boolean forceToMemory) throws IOException {
@@ -161,6 +161,14 @@ public class V1DatabaseReader implements DatabaseReader {
         // Setting byte order
         buffer.order(ByteOrder.BIG_ENDIAN);
 
-        return from(Buffer.wrap(buffer));
+        return from(Buffer.from(buffer));
+    }
+
+    @NotNull
+    @Override
+    public Database from(
+            @NotNull
+            final RandomAccessFile f) throws IOException {
+        return from(Buffer.from(f));
     }
 }

@@ -74,6 +74,6 @@ public class IntIndexToIndexMultiMapTest {
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
         indexToIndexMultiMap.writeTo(os);
         Assert.assertEquals(os.size(), indexToIndexMultiMap.getSizeInBytes());
-        return Buffer.wrap(os.toByteArray());
+        return Buffer.from(os.toByteArray());
     }
 }
