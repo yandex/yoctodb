@@ -19,6 +19,7 @@ import com.yandex.yoctodb.util.immutable.IntToIntArray;
 import com.yandex.yoctodb.util.mutable.BitSet;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * @author svyatoslav
@@ -36,10 +37,7 @@ public final class IntIndexToIndexMultiMap implements IndexToIndexMultiMap {
             @NotNull
             final Buffer buf) {
         final int keysCount = buf.getInt();
-        assert keysCount > 0;
-
         final Buffer offsets = buf.slice(keysCount << 2);
-
         final Buffer elements =
                 buf.slice().position(offsets.remaining()).slice();
 
@@ -55,9 +53,12 @@ public final class IntIndexToIndexMultiMap implements IndexToIndexMultiMap {
             final Buffer offsets,
             @NotNull
             final Buffer elements) {
-        assert keysCount > 0;
-        assert offsets.hasRemaining();
-        assert elements.hasRemaining();
+        if (keysCount <= 0)
+            throw new IllegalArgumentException("Non positive keys count");
+        if (!offsets.hasRemaining())
+            throw new IllegalArgumentException("Empty offsets");
+        if (!elements.hasRemaining())
+            throw new IllegalArgumentException("Empty elements");
 
         this.keysCount = keysCount;
         this.offsets = offsets;
@@ -240,7 +241,8 @@ public final class IntIndexToIndexMultiMap implements IndexToIndexMultiMap {
 
             @Override
             public IntToIntArray next() {
-                assert next != null;
+                if (!hasNext())
+                    throw new NoSuchElementException();
 
                 final IntToIntArray result = next;
                 next = null;
@@ -285,7 +287,8 @@ public final class IntIndexToIndexMultiMap implements IndexToIndexMultiMap {
 
             @Override
             public IntToIntArray next() {
-                assert next != null;
+                if (!hasNext())
+                    throw new NoSuchElementException();
 
                 final IntToIntArray result = next;
                 next = null;

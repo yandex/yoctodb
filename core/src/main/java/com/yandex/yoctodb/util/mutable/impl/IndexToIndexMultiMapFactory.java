@@ -19,8 +19,9 @@ public class IndexToIndexMultiMapFactory {
 
     public static final int UNIQUE_VALUES_THRESHOLD = 30;
 
-    public static IndexToIndexMultiMap buildIndexToIndexMultiMap(final int documentsCount,
-                                                                 final int uniqueValuesCount) {
+    public static IndexToIndexMultiMap buildIndexToIndexMultiMap(
+            final int documentsCount,
+            final int uniqueValuesCount) {
         if (uniqueValuesCount < UNIQUE_VALUES_THRESHOLD) {
             return new BitSetMultiMap(documentsCount);
         } else {

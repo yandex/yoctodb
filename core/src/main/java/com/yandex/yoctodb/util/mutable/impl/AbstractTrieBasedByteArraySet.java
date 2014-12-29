@@ -31,7 +31,8 @@ abstract class AbstractTrieBasedByteArraySet implements TrieBasedByteArraySet {
     protected int trieSizeInBytes = 0;
 
     protected void build() {
-        assert !frozen;
+        if (frozen)
+            throw new IllegalStateException("The collection is frozen");
 
         // Sorting
         final UnsignedByteArray[] sorted =
@@ -121,7 +122,8 @@ abstract class AbstractTrieBasedByteArraySet implements TrieBasedByteArraySet {
     public UnsignedByteArray add(
             @NotNull
             final UnsignedByteArray e) {
-        assert e.length() > 0;
+        if (e.isEmpty())
+            throw new IllegalArgumentException("Empty element");
 
         if (frozen)
             throw new IllegalStateException("The collection is frozen");

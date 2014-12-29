@@ -58,6 +58,10 @@ public final class UnsignedByteArray
         return data.length;
     }
 
+    public boolean isEmpty() {
+        return data.length == 0;
+    }
+
     @Override
     public int getSizeInBytes() {
         return length();
@@ -66,8 +70,7 @@ public final class UnsignedByteArray
     @Override
     public void writeTo(
             @NotNull
-            final
-            OutputStream os) throws IOException {
+            final OutputStream os) throws IOException {
         os.write(data);
     }
 

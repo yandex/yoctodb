@@ -22,16 +22,18 @@ import com.yandex.yoctodb.util.immutable.IndexToIndexMap;
 public class IntIndexToIndexMap implements IndexToIndexMap {
     @NotNull
     private final Buffer elements;
-    private final int elementsCount;
+    private final int elementCount;
 
     private IntIndexToIndexMap(
-            final int elementsCount,
+            final int elementCount,
             @NotNull
             final Buffer elements) {
-        assert elementsCount > 0;
-        assert elements.hasRemaining();
+        if (elementCount <= 0)
+            throw new IllegalArgumentException("Non positive element count");
+        if (!elements.hasRemaining())
+            throw new IllegalArgumentException("Empty elements");
 
-        this.elementsCount = elementsCount;
+        this.elementCount = elementCount;
         this.elements = elements;
     }
 
@@ -49,20 +51,20 @@ public class IntIndexToIndexMap implements IndexToIndexMap {
 
     @Override
     public int get(final int key) {
-        assert 0 <= key && key < elementsCount;
+        assert 0 <= key && key < elementCount;
 
         return elements.getInt(key << 2);
     }
 
     @Override
     public int size() {
-        return elementsCount;
+        return elementCount;
     }
 
     @Override
     public String toString() {
         return "IntIndexToIndexMap{" +
-                "elementsCount=" + elementsCount +
+                "elementCount=" + elementCount +
                 '}';
     }
 }

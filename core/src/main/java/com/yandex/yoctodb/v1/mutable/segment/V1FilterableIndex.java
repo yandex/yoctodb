@@ -54,7 +54,8 @@ public final class V1FilterableIndex
             @NotNull
             final String fieldName,
             final boolean fixedLength) {
-        assert !fieldName.isEmpty();
+        if (fieldName.isEmpty())
+            throw new IllegalArgumentException("Empty field name");
 
         this.fieldName = fieldName.getBytes();
         this.fixedLength = fixedLength;
@@ -72,12 +73,17 @@ public final class V1FilterableIndex
             final int documentId,
             @NotNull
             final Collection<UnsignedByteArray> values) {
-        assert documentId >= 0;
-        assert !values.isEmpty();
+        if (documentId < 0)
+            throw new IllegalArgumentException("Negative document ID");
+        if (values.isEmpty())
+            throw new IllegalArgumentException("No values");
 
         checkNotFrozen();
 
         for (UnsignedByteArray value : values) {
+            if (value.isEmpty())
+                throw new IllegalArgumentException("Empty value");
+
             valueToDocuments.put(this.values.add(value), documentId);
         }
 
@@ -169,8 +175,9 @@ public final class V1FilterableIndex
                 valueToDocumentsIndex.writeTo(mdos);
 
                 //writing checksum
-                assert V1DatabaseFormat.DIGEST_SIZE_IN_BYTES ==
-                        md.getDigestLength();
+                if (V1DatabaseFormat.DIGEST_SIZE_IN_BYTES !=
+                        md.getDigestLength())
+                    throw new IllegalArgumentException("Wrong digest size");
                 os.write(Ints.toByteArray(V1DatabaseFormat.DIGEST_SIZE_IN_BYTES));
                 os.write(mdos.digest());
             }

@@ -37,7 +37,8 @@ public final class FixedLengthByteArrayIndexedList
     public void add(
             @NotNull
             final UnsignedByteArray e) {
-        assert e.length() > 0;
+        if (e.isEmpty())
+            throw new IllegalArgumentException("Empty element");
 
         elements.add(e);
 
@@ -45,14 +46,16 @@ public final class FixedLengthByteArrayIndexedList
             elementSize = e.length();
         }
 
-        assert e.length() == elementSize :
-                "Element length <" + e.length() +
-                "> is not equal to expected <" + elementSize + ">";
+        if (e.length() != elementSize)
+            throw new IllegalArgumentException(
+                    "Element length <" + e.length() +
+                            "> is not equal to expected <" + elementSize + ">");
     }
 
     @Override
     public int getSizeInBytes() {
-        assert !elements.isEmpty();
+        if (elements.isEmpty())
+            throw new IllegalStateException("Empty list");
 
         return 4 + // Element size
                4 + // Element count
@@ -63,7 +66,9 @@ public final class FixedLengthByteArrayIndexedList
     public void writeTo(
             @NotNull
             final OutputStream os) throws IOException {
-        assert !elements.isEmpty();
+        if (elements.isEmpty())
+            throw new IllegalStateException("Empty list");
+
         // Element size
         os.write(Ints.toByteArray(elementSize));
 

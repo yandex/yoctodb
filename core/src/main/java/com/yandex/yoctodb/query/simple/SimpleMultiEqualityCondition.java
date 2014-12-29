@@ -37,14 +37,19 @@ public final class SimpleMultiEqualityCondition
             final UnsignedByteArray... values) {
         super(fieldName);
 
-        assert values.length > 0;
+        if (values.length == 0)
+            throw new IllegalArgumentException("Empty value array");
 
         final UnsignedByteArray[] sorted = values.clone();
         Arrays.sort(sorted);
 
         this.values = new Buffer[sorted.length];
-        for (int i = 0; i < sorted.length; i++)
+        for (int i = 0; i < sorted.length; i++) {
+            if (sorted[i].isEmpty())
+                throw new IllegalArgumentException("Empty value");
+
             this.values[i] = sorted[i].toByteBuffer();
+        }
     }
 
     @Override

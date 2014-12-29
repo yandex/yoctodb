@@ -44,14 +44,17 @@ public final class FixedLengthByteArraySortedSet
 
     private FixedLengthByteArraySortedSet(
             final int elementSize,
-            final int elementsCount,
+            final int elementCount,
             final Buffer elements) {
-        assert elementSize > 0;
-        assert elementsCount > 0;
-        assert elements.hasRemaining();
+        if (elementSize <= 0)
+            throw new IllegalArgumentException("Non positive element size");
+        if (elementCount <= 0)
+            throw new IllegalArgumentException("Non positive element count");
+        if (!elements.hasRemaining())
+            throw new IllegalArgumentException("Empty elements");
 
         this.elementSize = elementSize;
-        this.size = elementsCount;
+        this.size = elementCount;
         this.elements = elements;
     }
 

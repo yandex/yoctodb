@@ -15,6 +15,7 @@ import com.yandex.yoctodb.immutable.Database;
 import com.yandex.yoctodb.util.mutable.BitSet;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * {@link Iterator} implementation mapping document IDs to {@link
@@ -35,9 +36,11 @@ public final class IdScoredDocumentIterator
             final Database database,
             @NotNull
             final BitSet docs) {
+        assert docs.getSize() == database.getDocumentCount();
+
         this.database = database;
         this.docs = docs;
-        currentDoc = docs.nextSetBit(0);
+        this.currentDoc = docs.nextSetBit(0);
     }
 
     @Override
@@ -47,7 +50,8 @@ public final class IdScoredDocumentIterator
 
     @Override
     public IdScoredDocument next() {
-        assert currentDoc >= 0;
+        if (!hasNext())
+            throw new NoSuchElementException();
 
         final int id = currentDoc;
         currentDoc = docs.nextSetBit(currentDoc + 1);
