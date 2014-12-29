@@ -42,9 +42,12 @@ public final class SimpleRangeCondition extends AbstractSimpleCondition {
             final boolean toInclusive) {
         super(fieldName);
 
-        assert from.length() > 0;
-        assert to.length() > 0;
-        assert from.compareTo(to) < 0;
+        if (from.length() == 0)
+            throw new IllegalArgumentException("Empty from value");
+        if (to.length() == 0)
+            throw new IllegalArgumentException("Empty to value");
+        if (from.compareTo(to) >= 0)
+            throw new IllegalArgumentException("from >= to");
 
         this.from = from.toByteBuffer();
         this.fromInclusive = fromInclusive;

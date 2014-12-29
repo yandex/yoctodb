@@ -36,13 +36,8 @@ public final class VariableLengthByteArraySortedSet
             @NotNull
             final Buffer buffer) {
         final int maxElement = buffer.getInt();
-        assert maxElement > 0;
-
         final int size = buffer.getInt();
-        assert size > 0;
-
         final Buffer offsets = buffer.slice((size + 1) << 2);
-
         final Buffer elements = buffer.slice();
         elements.position(offsets.remaining());
 
@@ -60,10 +55,14 @@ public final class VariableLengthByteArraySortedSet
             final Buffer offsets,
             @NotNull
             final Buffer elements) {
-        assert maxElement > 0;
-        assert size > 0;
-        assert offsets.hasRemaining();
-        assert elements.hasRemaining();
+        if (maxElement <= 0)
+            throw new IllegalArgumentException("Non positive max element");
+        if (size <= 0)
+            throw new IllegalArgumentException("Non positive size");
+        if (!offsets.hasRemaining())
+            throw new IllegalArgumentException("Empty offsets");
+        if (!elements.hasRemaining())
+            throw new IllegalArgumentException("Empty elements");
 
         this.maxElement = maxElement;
         this.size = size;
@@ -80,6 +79,7 @@ public final class VariableLengthByteArraySortedSet
 
         final int leftFrom = offsets.getInt(ith << 2);
         final int leftEnd = offsets.getInt((ith + 1) << 2);
+
         assert leftFrom < leftEnd;
 
         return UnsignedByteArrays.compare(

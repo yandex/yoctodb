@@ -23,6 +23,7 @@ import com.yandex.yoctodb.util.mutable.BitSet;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * {@link Iterator} implementation producing {@link SimpleScoredDocument}s
@@ -138,16 +139,18 @@ public final class SortingScoredDocumentIterator
 
     @Override
     public SimpleScoredDocument next() {
-        assert hasNext();
+        if (!hasNext())
+            throw new NoSuchElementException();
 
-        if (chunk.hasNext())
+        if (chunk.hasNext()) {
             return chunk.next().toScoredDocument();
+        } else {
+            fillChunk();
 
-        fillChunk();
+            assert chunk.hasNext();
 
-        assert chunk.hasNext();
-
-        return chunk.next().toScoredDocument();
+            return chunk.next().toScoredDocument();
+        }
     }
 
     @Override

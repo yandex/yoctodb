@@ -35,10 +35,7 @@ public class VariableLengthByteArrayIndexedList
             @NotNull
             final Buffer buf) {
         final int elementsCount = buf.getInt();
-        assert elementsCount > 0;
-
         final Buffer offsets = buf.slice((elementsCount + 1) << 2);
-
         final Buffer elements =
                 buf.slice().position(offsets.remaining()).slice();
 
@@ -54,9 +51,12 @@ public class VariableLengthByteArrayIndexedList
             final Buffer offsets,
             @NotNull
             final Buffer elements) {
-        assert elementCount > 0;
-        assert offsets.hasRemaining();
-        assert elements.hasRemaining();
+        if (elementCount <= 0)
+            throw new IllegalArgumentException("Non positive element count");
+        if (!offsets.hasRemaining())
+            throw new IllegalArgumentException("Empty offsets");
+        if (!elements.hasRemaining())
+            throw new IllegalArgumentException("Empty elements");
 
         this.elementCount = elementCount;
         this.elements = elements;

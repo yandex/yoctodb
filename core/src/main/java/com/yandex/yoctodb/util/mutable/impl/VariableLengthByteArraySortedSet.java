@@ -34,6 +34,9 @@ public final class VariableLengthByteArraySortedSet
     public UnsignedByteArray add(
             @NotNull
             final UnsignedByteArray e) {
+        if (e.isEmpty())
+            throw new IllegalArgumentException("Empty element");
+
         maxElement = Math.max(maxElement, e.length());
 
         return super.add(e);
@@ -45,7 +48,8 @@ public final class VariableLengthByteArraySortedSet
             build();
         }
 
-        assert !sortedElements.isEmpty();
+        if (sortedElements.isEmpty())
+            throw new IllegalStateException("Empty set");
 
         int elementSize = 0;
         for (UnsignedByteArray e : sortedElements.keySet())
@@ -65,7 +69,8 @@ public final class VariableLengthByteArraySortedSet
             build();
         }
 
-        assert !sortedElements.isEmpty();
+        if (sortedElements.isEmpty())
+            throw new IllegalStateException("Empty set");
 
         // Max element
         os.write(Ints.toByteArray(maxElement));

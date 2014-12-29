@@ -45,7 +45,10 @@ public final class V1PayloadSegment
             final int documentId,
             @NotNull
             final byte[] payload) {
-        assert currentDocumentId == documentId;
+        if (documentId != currentDocumentId)
+            throw new IllegalArgumentException(
+                    "Wrong document ID <" + documentId + ">. Expecting <" +
+                    currentDocumentId + ">.");
 
         checkNotFrozen();
 
@@ -104,8 +107,9 @@ public final class V1PayloadSegment
                 payloads.writeTo(mdos);
 
                 //writing checksum
-                assert V1DatabaseFormat.DIGEST_SIZE_IN_BYTES ==
-                       md.getDigestLength();
+                if (V1DatabaseFormat.DIGEST_SIZE_IN_BYTES !=
+                       md.getDigestLength())
+                    throw new IllegalArgumentException("Wrong digest size");
                 os.write(Ints.toByteArray(V1DatabaseFormat.DIGEST_SIZE_IN_BYTES));
                 os.write(mdos.digest());
             }

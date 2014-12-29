@@ -27,7 +27,8 @@ public final class SimpleAscendingOrder implements Order {
     public SimpleAscendingOrder(
             @NotNull
             final String fieldName) {
-        assert !fieldName.isEmpty();
+        if (fieldName.isEmpty())
+            throw new IllegalArgumentException("Empty field name");
 
         this.fieldName = fieldName;
     }

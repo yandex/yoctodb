@@ -15,6 +15,8 @@ import org.jetbrains.annotations.NotNull;
 import com.yandex.yoctodb.util.UnsignedByteArray;
 import com.yandex.yoctodb.util.OutputStreamWritable;
 
+import java.util.NoSuchElementException;
+
 /**
  * {@link com.yandex.yoctodb.util.UnsignedByteArray} mutable sorted set with basic operations.
  *
@@ -37,9 +39,15 @@ public interface ByteArraySortedSet extends OutputStreamWritable {
             @NotNull
             UnsignedByteArray e);
 
+    /**
+     * Returns index of the element
+     *
+     * @param e element
+     * @return  index of the element or {@link NoSuchElementException}
+     */
     int indexOf(
             @NotNull
-            UnsignedByteArray e);
+            UnsignedByteArray e) throws NoSuchElementException;
 
     int size();
 }

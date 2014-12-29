@@ -10,6 +10,7 @@
 
 package com.yandex.yoctodb.util.mutable.impl;
 
+import com.google.common.primitives.Ints;
 import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.NotNull;
 import com.yandex.yoctodb.util.mutable.IndexToIndexMap;
@@ -32,12 +33,17 @@ public final class IntIndexToIndexMap implements IndexToIndexMap {
 
     @Override
     public void put(final int key, final int value) {
-        assert key >= 0;
-        assert value >= 0;
+        if (key < 0)
+            throw new IllegalArgumentException("Negative key");
+        if (value < 0)
+            throw new IllegalArgumentException("Negative value");
 
         final Integer previous = elements.put(key, value);
 
-        assert previous == null;
+        if (previous != null)
+            throw new IllegalArgumentException(
+                    "Key <" + key + "> was bound to <" + previous +
+                            "> not <" + value + ">");
     }
 
     @Override
@@ -49,21 +55,17 @@ public final class IntIndexToIndexMap implements IndexToIndexMap {
     public void writeTo(
             @NotNull
             final OutputStream os) throws IOException {
-        final byte[] buf = new byte[4];
         // Elements count
-        os.write(ByteBuffer.wrap(buf).putInt(elements.size()).array());
+        os.write(Ints.toByteArray(elements.size()));
 
         // Values
         int index = 0;
         for (Map.Entry<Integer, Integer> entry : elements.entrySet()) {
             if (entry.getKey() != index) {
-                throw new IllegalStateException("indexes are not continuous");
+                throw new IllegalStateException("Indexes are not continuous");
             }
 
-            os.write(
-                    ByteBuffer.wrap(buf)
-                              .putInt(entry.getValue())
-                              .array());
+            os.write(Ints.toByteArray(entry.getValue()));
 
             index++;
         }
