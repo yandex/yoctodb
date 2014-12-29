@@ -35,14 +35,16 @@ public final class VariableLengthByteArrayIndexedList
     public void add(
             @NotNull
             final UnsignedByteArray e) {
-        assert e.length() > 0;
+        if (e.isEmpty())
+            throw new IllegalArgumentException("Empty element");
 
         elements.add(e);
     }
 
     @Override
     public int getSizeInBytes() {
-        assert !elements.isEmpty();
+        if (elements.isEmpty())
+            throw new IllegalStateException("Empty list");
 
         int elementSize = 0;
         for (UnsignedByteArray e : elements)
@@ -57,7 +59,9 @@ public final class VariableLengthByteArrayIndexedList
     public void writeTo(
             @NotNull
             final OutputStream os) throws IOException {
-        assert !elements.isEmpty();
+        if (elements.isEmpty())
+            throw new IllegalStateException("Empty list");
+
         // Element count
         os.write(Ints.toByteArray(elements.size()));
 

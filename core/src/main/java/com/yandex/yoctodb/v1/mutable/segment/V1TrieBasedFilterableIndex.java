@@ -32,9 +32,8 @@ import java.util.Collection;
 import java.util.Map;
 
 /**
- * @author svyatoslav Date: 12.04.14
+ * @author svyatoslav
  */
-
 @NotThreadSafe
 public class V1TrieBasedFilterableIndex extends Freezable
         implements IndexSegment {
@@ -49,8 +48,10 @@ public class V1TrieBasedFilterableIndex extends Freezable
 
     public V1TrieBasedFilterableIndex(
             @NotNull
-            String fieldName) {
-        assert !fieldName.isEmpty();
+            final String fieldName) {
+        if (fieldName.isEmpty())
+            throw new IllegalArgumentException("Empty field name");
+
         this.fieldName = fieldName.getBytes();
         this.values = new SimpleTrieBasedByteArraySet();
         this.valueToDocuments = HashMultimap.create();
@@ -58,11 +59,14 @@ public class V1TrieBasedFilterableIndex extends Freezable
 
     @NotNull
     @Override
-    public IndexSegment addDocument(int documentId,
-                                    @NotNull
-                                    Collection<UnsignedByteArray> values) {
-        assert documentId >= 0;
-        assert !values.isEmpty();
+    public IndexSegment addDocument(
+            final int documentId,
+            @NotNull
+            final Collection<UnsignedByteArray> values) {
+        if (documentId < 0)
+            throw new IllegalArgumentException("Negative document ID");
+        if (values.isEmpty())
+            throw new IllegalArgumentException("Empty values");
 
         checkNotFrozen();
 
@@ -154,8 +158,9 @@ public class V1TrieBasedFilterableIndex extends Freezable
                 valueToDocumentsIndex.writeTo(mdos);
 
                 //writing checksum
-                assert V1DatabaseFormat.DIGEST_SIZE_IN_BYTES ==
-                        md.getDigestLength();
+                if (V1DatabaseFormat.DIGEST_SIZE_IN_BYTES !=
+                        md.getDigestLength())
+                    throw new IllegalArgumentException("Wrong digest size");
                 os.write(Ints.toByteArray(V1DatabaseFormat.DIGEST_SIZE_IN_BYTES));
                 os.write(mdos.digest());
             }

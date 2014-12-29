@@ -35,32 +35,31 @@ public class BitSetBasedIndexToIndexMultiMap implements IndexToIndexMultiMap {
             @NotNull
             final Buffer buf) {
         final int keysCount = buf.getInt();
-        assert keysCount > 0;
-
         final int bitSetSizeInLongs = buf.getInt();
-
         final Buffer elements = buf.slice();
-
         final int bitSetSizeInBytes = bitSetSizeInLongs << 3;
 
         return new BitSetBasedIndexToIndexMultiMap(
                 keysCount,
                 elements.slice(),
-                bitSetSizeInLongs, bitSetSizeInBytes);
+                bitSetSizeInLongs,
+                bitSetSizeInBytes);
     }
 
     private BitSetBasedIndexToIndexMultiMap(
             final int keysCount,
             @NotNull
             final Buffer elements,
-            final int bitSetSizeInLongs, int bitSetSizeInBytes) {
-        this.bitSetSizeInBytes = bitSetSizeInBytes;
-        assert keysCount > 0;
-
-        assert elements.hasRemaining();
+            final int bitSetSizeInLongs,
+            final int bitSetSizeInBytes) {
+        if (keysCount <= 0)
+            throw new IllegalArgumentException("No keys");
+        if (!elements.hasRemaining())
+            throw new IllegalArgumentException("No elements");
 
         this.keysCount = keysCount;
         this.bitSetSizeInLongs = bitSetSizeInLongs;
+        this.bitSetSizeInBytes = bitSetSizeInBytes;
         this.elements = elements;
     }
 

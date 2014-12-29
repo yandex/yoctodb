@@ -51,13 +51,13 @@ public final class V1FullIndex
     private final Map<Integer, UnsignedByteArray> documentToValue;
     private int currentDocumentId = 0;
     private final boolean fixedLength;
-    private int databaseDocumentsCount;
 
     public V1FullIndex(
             @NotNull
             final String fieldName,
             final boolean fixedLength) {
-        assert !fieldName.isEmpty();
+        if (fieldName.isEmpty())
+            throw new IllegalArgumentException("Empty field name");
 
         this.fieldName = fieldName.getBytes();
         this.fixedLength = fixedLength;
@@ -76,8 +76,12 @@ public final class V1FullIndex
             final int documentId,
             @NotNull
             final Collection<UnsignedByteArray> values) {
-        assert documentId == currentDocumentId;
-        assert values.size() == 1;
+        if (documentId != currentDocumentId)
+            throw new IllegalArgumentException(
+                    "Wrong document ID <" + documentId +
+                            ">. Expecting <" + currentDocumentId + ">.");
+        if (values.size() != 1)
+            throw new IllegalArgumentException("Expecting a single value");
 
         checkNotFrozen();
 
@@ -90,8 +94,8 @@ public final class V1FullIndex
     }
 
     @Override
-    public void setDatabaseDocumentsCount(int documentsCount) {
-        this.databaseDocumentsCount = documentsCount;
+    public void setDatabaseDocumentsCount(final int documentsCount) {
+        // Ignoring the hint
     }
 
     @NotNull
@@ -185,8 +189,9 @@ public final class V1FullIndex
                 documentToValueIndex.writeTo(mdos);
 
                 //writing checksum
-                assert V1DatabaseFormat.DIGEST_SIZE_IN_BYTES ==
-                        md.getDigestLength();
+                if (V1DatabaseFormat.DIGEST_SIZE_IN_BYTES !=
+                        md.getDigestLength())
+                    throw new IllegalArgumentException("Wrong digest length");
                 os.write(Ints.toByteArray(V1DatabaseFormat.DIGEST_SIZE_IN_BYTES));
                 os.write(mdos.digest());
             }

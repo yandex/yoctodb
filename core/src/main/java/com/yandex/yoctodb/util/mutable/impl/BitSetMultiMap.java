@@ -45,8 +45,10 @@ public final class BitSetMultiMap implements IndexToIndexMultiMap {
 
     @Override
     public void add(int key, int value) {
-        assert key >= 0;
-        assert value >= 0;
+        if (key < 0)
+            throw new IllegalArgumentException("Negative key");
+        if (value < 0)
+            throw new IllegalArgumentException("Negative value");
 
         rawMap.put(key, value);
     }

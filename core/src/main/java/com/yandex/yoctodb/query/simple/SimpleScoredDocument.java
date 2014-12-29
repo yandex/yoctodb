@@ -13,7 +13,6 @@ package com.yandex.yoctodb.query.simple;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
 import com.yandex.yoctodb.immutable.Database;
-import com.yandex.yoctodb.query.DocumentScore;
 import com.yandex.yoctodb.query.ScoredDocument;
 
 /**
@@ -36,7 +35,7 @@ public final class SimpleScoredDocument
             @NotNull
             final SimpleDocumentMultiScore score,
             final int document) {
-        assert document >= 0;
+        assert 0 <= document && document < database.getDocumentCount();
 
         this.database = database;
         this.score = score;
@@ -55,7 +54,9 @@ public final class SimpleScoredDocument
     }
 
     @Override
-    public int compareTo(final SimpleScoredDocument o) {
+    public int compareTo(
+            @NotNull
+            final SimpleScoredDocument o) {
         return score.compareTo(o.score);
     }
 }

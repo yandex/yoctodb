@@ -34,15 +34,17 @@ public final class FixedLengthByteArraySortedSet
     public UnsignedByteArray add(
             @NotNull
             final UnsignedByteArray e) {
-        assert e.length() > 0;
+        if (e.isEmpty())
+            throw new IllegalArgumentException("Empty element");
 
         if (elementSize == -1) {
             elementSize = e.length();
         }
 
-        assert e.length() == elementSize :
-                "Element length <" + e.length() +
-                "> is not equal to expected <" + elementSize + ">";
+        if (e.length() != elementSize)
+            throw new IllegalArgumentException(
+                    "Element length <" + e.length() +
+                            "> is not equal to expected <" + elementSize + ">");
 
         return super.add(e);
     }
@@ -53,7 +55,8 @@ public final class FixedLengthByteArraySortedSet
             build();
         }
 
-        assert !sortedElements.isEmpty();
+        if (sortedElements.isEmpty())
+            throw new IllegalStateException("Empty set");
 
         return 4 + // Element size
                4 + // Element count
@@ -68,7 +71,8 @@ public final class FixedLengthByteArraySortedSet
             build();
         }
 
-        assert !sortedElements.isEmpty();
+        if (sortedElements.isEmpty())
+            throw new IllegalStateException("Empty set");
 
         // Element size
         os.write(Ints.toByteArray(elementSize));

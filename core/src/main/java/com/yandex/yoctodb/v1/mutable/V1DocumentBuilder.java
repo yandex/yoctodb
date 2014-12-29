@@ -63,10 +63,18 @@ public final class V1DocumentBuilder extends AbstractDocumentBuilder {
         checkNotBuilt();
 
         this.fields.put(name, value);
+
         final IndexOption previousIndex = this.index.put(name, index);
-        assert previousIndex == null || previousIndex == index;
+        if (previousIndex != null && previousIndex != index)
+            throw new IllegalArgumentException(
+                    "Current index <" + index + "> for name <" + name +
+                            "> differs from <" + previousIndex + ">");
+
         final LengthOption previousLength = this.length.put(name, length);
-        assert previousLength == null || previousLength == length;
+        if (previousLength != null && previousLength != length)
+            throw new IllegalArgumentException(
+                    "Current length <" + length + "> for name <" + name +
+                            "> differs from <" + previousLength + ">");
 
         return this;
     }

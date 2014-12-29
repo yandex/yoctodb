@@ -26,9 +26,9 @@ import java.util.Collection;
 public interface IndexSegment extends OutputStreamWritableBuilder {
     @NotNull
     IndexSegment addDocument(
-            final int documentId,
+            int documentId,
             @NotNull
-            final Collection<UnsignedByteArray> values);
+            Collection<UnsignedByteArray> values);
 
     void setDatabaseDocumentsCount(int documentsCount);
 }

@@ -12,6 +12,7 @@ package com.yandex.yoctodb.util.mutable.impl;
 
 import com.google.common.collect.Multimap;
 import com.google.common.collect.TreeMultimap;
+import com.google.common.primitives.Ints;
 import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.NotNull;
 import com.yandex.yoctodb.util.mutable.IndexToIndexMultiMap;
@@ -19,7 +20,6 @@ import com.yandex.yoctodb.v1.V1DatabaseFormat;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.ByteBuffer;
 import java.util.Collection;
 
 /**
@@ -33,46 +33,53 @@ public final class IntIndexToIndexMultiMap implements IndexToIndexMultiMap {
 
     @Override
     public void add(final int key, final int value) {
-        assert key >= 0;
-        assert value >= 0;
+        if (key < 0)
+            throw new IllegalArgumentException("Negative key");
+        if (value < 0)
+            throw new IllegalArgumentException("Negative value");
 
         map.put(key, value);
     }
 
     @Override
     public int getSizeInBytes() {
-        return  4 + //type
-                4 + //keys count
-                (4 + 4) * map.keySet().size() + //offsets
-                4 * map.size();    //sets
+        if (map.isEmpty())
+            throw new IllegalStateException("Empty multimap");
+
+        return  4 + // type
+                4 + // keys count
+                (4 + 4) * map.keySet().size() + // offsets
+                4 * map.size();    // sets
     }
 
     @Override
     public void writeTo(
             @NotNull
-            final
-            OutputStream os) throws IOException {
-        final byte[] buf = new byte[4];
-        //type
-        os.write(ByteBuffer.wrap(buf).putInt(V1DatabaseFormat.MultiMapType.LIST_BASED.getCode()).array());
+            final OutputStream os) throws IOException {
+        if (map.isEmpty())
+            throw new IllegalStateException("Empty multimap");
+
+        // Type
+        os.write(
+                Ints.toByteArray(
+                        V1DatabaseFormat.MultiMapType.LIST_BASED.getCode()));
 
         // Keys count
-        os.write(ByteBuffer.wrap(buf).putInt(map.keySet().size()).array());
+        os.write(Ints.toByteArray(map.keySet().size()));
 
         // Offsets
         int offset = 0;
         for (Collection<Integer> value : map.asMap().values()) {
-            os.write(ByteBuffer.wrap(buf).putInt(offset).array());
-
+            os.write(Ints.toByteArray(offset));
             offset += 4 + 4 * value.size();
         }
 
         // Sets
         for (Collection<Integer> value : map.asMap().values()) {
-            os.write(ByteBuffer.wrap(buf).putInt(value.size()).array());
+            os.write(Ints.toByteArray(value.size()));
 
             for (Integer v : value) {
-                os.write(ByteBuffer.wrap(buf).putInt(v).array());
+                os.write(Ints.toByteArray(v));
             }
         }
     }

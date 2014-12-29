@@ -35,7 +35,8 @@ public final class SimpleLessThanOrEqualsCondition
             final UnsignedByteArray value) {
         super(fieldName);
 
-        assert value.length() > 0;
+        if (value.length() == 0)
+            throw new IllegalArgumentException("Empty value");
 
         this.value = value.toByteBuffer();
     }

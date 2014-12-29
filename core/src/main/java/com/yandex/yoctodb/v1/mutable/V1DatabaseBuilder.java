@@ -66,10 +66,12 @@ public final class V1DatabaseBuilder
         for (Map.Entry<String, Collection<UnsignedByteArray>> e :
                 builder.fields.asMap().entrySet()) {
             final String fieldName = e.getKey();
-            assert !fieldName.isEmpty();
+            if (fieldName.isEmpty())
+                throw new IllegalArgumentException("Empty field name");
 
             final Collection<UnsignedByteArray> values = e.getValue();
-            assert !e.getValue().isEmpty();
+            if (values.isEmpty())
+                throw new IllegalArgumentException("Empty values");
 
             final IndexSegment existingIndex = indexes.get(fieldName);
             if (existingIndex == null) {

@@ -15,10 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import com.yandex.yoctodb.util.UnsignedByteArray;
 import com.yandex.yoctodb.util.mutable.ByteArraySortedSet;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * {@link ByteArraySortedSet} abstract implementation with common methods
@@ -38,10 +35,11 @@ abstract class AbstractByteArraySortedSet
     public UnsignedByteArray add(
             @NotNull
             final UnsignedByteArray e) {
-        assert e.length() > 0;
-
         if (frozen)
             throw new IllegalStateException("The collection is frozen");
+
+        if (e.isEmpty())
+            throw new IllegalArgumentException("Empty element");
 
         final UnsignedByteArray previous = elements.get(e);
         if (previous == null) {
@@ -54,7 +52,8 @@ abstract class AbstractByteArraySortedSet
     }
 
     protected void build() {
-        assert !frozen;
+        if (frozen)
+            throw new IllegalStateException("The collection is frozen");
 
         // Sorting
         final UnsignedByteArray[] sorted =
@@ -84,20 +83,17 @@ abstract class AbstractByteArraySortedSet
 
         final Integer result = sortedElements.get(e);
 
-        assert result != null;
+        if (result == null)
+            throw new NoSuchElementException();
 
         return result;
     }
 
     @Override
     public int size() {
-        if (elements != null) {
-            return elements.size();
-        }
-
-        if (sortedElements != null) {
+        if (frozen)
             return sortedElements.size();
-        }
-        return elements.size();
+        else
+            return elements.size();
     }
 }

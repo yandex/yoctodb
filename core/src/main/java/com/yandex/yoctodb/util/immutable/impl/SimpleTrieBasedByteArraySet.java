@@ -28,11 +28,17 @@ public class SimpleTrieBasedByteArraySet implements TrieBasedByteArraySet {
             @NotNull
             final Buffer buffer) {
         final int elementsCount = buffer.getInt();
-        assert elementsCount > 0;
         return new SimpleTrieBasedByteArraySet(elementsCount, buffer.slice());
     }
 
-    public SimpleTrieBasedByteArraySet(int size, Buffer trie) {
+    private SimpleTrieBasedByteArraySet(
+            final int size,
+            final Buffer trie) {
+        if (size <= 0)
+            throw new IllegalArgumentException("Non positive size");
+        if (!trie.hasRemaining())
+            throw new IllegalArgumentException("Empty trie");
+
         this.size = size;
         this.trie = trie;
     }
