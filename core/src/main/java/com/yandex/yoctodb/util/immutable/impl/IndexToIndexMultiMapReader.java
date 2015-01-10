@@ -23,10 +23,11 @@ public class IndexToIndexMultiMapReader {
         final int type = byteBuffer.getInt();
         if (type == V1DatabaseFormat.MultiMapType.LIST_BASED.getCode()) {
             return IntIndexToIndexMultiMap.from(byteBuffer.slice());
-        }
-        if (type == V1DatabaseFormat.MultiMapType.LONG_ARRAY_BIT_SET_BASED.getCode()) {
+        } else if (type == V1DatabaseFormat.MultiMapType.LONG_ARRAY_BIT_SET_BASED.getCode()) {
             return BitSetBasedIndexToIndexMultiMap.from(byteBuffer.slice());
+        } else {
+            throw new UnsupportedOperationException(
+                    "Unsupported IndexToIndexMultiMap type: " + type);
         }
-        return null;
     }
 }
