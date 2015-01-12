@@ -53,16 +53,15 @@ public final class BitSetMultiMap implements IndexToIndexMultiMap {
         rawMap.put(key, value);
     }
 
-
     @Override
-    public int getSizeInBytes() {
+    public long getSizeInBytes() {
         if (!mapFilled){
             fillMap();
         }
         return 4 + //size four bytes
                 4 + //type
                 4 +
-                (8) * map.size() * bitSetSizeInLongs;
+                8L * map.size() * bitSetSizeInLongs;
     }
 
     private LongArrayBitSet fillArray(Collection<Integer> docIds, int size) {
@@ -75,7 +74,7 @@ public final class BitSetMultiMap implements IndexToIndexMultiMap {
     }
 
     private int getBitSetSizeInLongs() {
-        return ((LongArrayBitSet) LongArrayBitSet.one(documentsCount)).toArray().length;
+        return LongArrayBitSet.arraySize(documentsCount);
     }
 
     @Override

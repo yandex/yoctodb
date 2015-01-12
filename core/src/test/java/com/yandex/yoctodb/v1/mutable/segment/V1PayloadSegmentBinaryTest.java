@@ -38,11 +38,11 @@ public class V1PayloadSegmentBinaryTest {
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
         final OutputStreamWritable outputStreamWritable = v1PayloadSegment.buildWritable();
         outputStreamWritable.writeTo(os);
-        Assert.assertEquals(os.size(), outputStreamWritable.getSizeInBytes() + 8);
+        Assert.assertEquals(os.size(), outputStreamWritable.getSizeInBytes() + 12);
 
         final Buffer byteBuffer = Buffer.from(os.toByteArray());
 
-        final int fullSizeInBytes = byteBuffer.getInt();
+        final long fullSizeInBytes = byteBuffer.getLong();
         Assert.assertEquals(fullSizeInBytes, outputStreamWritable.getSizeInBytes());
 
         final int payloadCode = byteBuffer.getInt();
@@ -50,8 +50,8 @@ public class V1PayloadSegmentBinaryTest {
 
         final byte[] digest = calculateDigest(byteBuffer, V1DatabaseFormat.MESSAGE_DIGEST_ALGORITHM);
 
-        final int elementsSizeInButes = byteBuffer.getInt();
-        Assert.assertEquals(193, elementsSizeInButes);
+        final long elementsSizeInBytes = byteBuffer.getLong();
+        Assert.assertEquals(193, elementsSizeInBytes);
 
         final int elementsCount = byteBuffer.getInt();
         Assert.assertEquals(15, elementsCount);
@@ -69,7 +69,7 @@ public class V1PayloadSegmentBinaryTest {
             Assert.assertEquals(("payload" + i), new String(currentElementBytes));
         }
 
-        int digestSize = byteBuffer.getInt();
+        final long digestSize = byteBuffer.getLong();
         Assert.assertEquals(V1DatabaseFormat.DIGEST_SIZE_IN_BYTES, digestSize);
         for (int i = 0; i < digestSize; i++) {
             byte actualDigestByte = byteBuffer.get();

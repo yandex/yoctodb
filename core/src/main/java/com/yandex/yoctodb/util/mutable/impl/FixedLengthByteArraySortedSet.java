@@ -50,7 +50,7 @@ public final class FixedLengthByteArraySortedSet
     }
 
     @Override
-    public int getSizeInBytes() {
+    public long getSizeInBytes() {
         if (!frozen) {
             build();
         }
@@ -59,8 +59,8 @@ public final class FixedLengthByteArraySortedSet
             throw new IllegalStateException("Empty set");
 
         return 4 + // Element size
-               4 + // Element count
-               elementSize * sortedElements.size();
+                4 + // Element count
+                (long) elementSize * sortedElements.size();
     }
 
     @Override

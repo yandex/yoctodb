@@ -53,13 +53,13 @@ public final class FixedLengthByteArrayIndexedList
     }
 
     @Override
-    public int getSizeInBytes() {
+    public long getSizeInBytes() {
         if (elements.isEmpty())
             throw new IllegalStateException("Empty list");
 
         return 4 + // Element size
                4 + // Element count
-               elementSize * elements.size();
+                (long) elementSize * elements.size();
     }
 
     @Override

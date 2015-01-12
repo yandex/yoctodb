@@ -28,7 +28,6 @@ import static com.yandex.yoctodb.v1.mutable.segment.Utils.calculateDigest;
 
 /**
  * @author svyatoslav
- *         Date: 08.11.13
  */
 public class V1FullIndexBinaryTest {
 
@@ -55,11 +54,11 @@ public class V1FullIndexBinaryTest {
         v1FullIndex.setDatabaseDocumentsCount(3);
         OutputStreamWritable outputStreamWritable = v1FullIndex.buildWritable();
         outputStreamWritable.writeTo(os);
-        Assert.assertEquals(os.size(), outputStreamWritable.getSizeInBytes() + 8);
+        Assert.assertEquals(os.size(), outputStreamWritable.getSizeInBytes() + 12);
 
         Buffer byteBuffer = Buffer.from(os.toByteArray());
 
-        final int fullSizeInBytes = byteBuffer.getInt();
+        final long fullSizeInBytes = byteBuffer.getLong();
         Assert.assertEquals(fullSizeInBytes, outputStreamWritable.getSizeInBytes());
 
         int segmentCode = byteBuffer.getInt();
@@ -77,7 +76,7 @@ public class V1FullIndexBinaryTest {
 
 
         //Reading values
-        final int valuesSize = byteBuffer.getInt();
+        final long valuesSize = byteBuffer.getLong();
         Assert.assertEquals(16, valuesSize);
 
         final int elementSize = byteBuffer.getInt();
@@ -102,7 +101,7 @@ public class V1FullIndexBinaryTest {
                 elements.get(1));
 
         //Reading values to document indexes
-        final int valuesToDocumentIndexesSize1 = byteBuffer.getInt();
+        final long valuesToDocumentIndexesSize1 = byteBuffer.getLong();
         Assert.assertEquals(36, valuesToDocumentIndexesSize1);
         final int code = byteBuffer.getInt();
         Assert.assertEquals(V1DatabaseFormat.MultiMapType.LIST_BASED.getCode(), code);
@@ -130,7 +129,7 @@ public class V1FullIndexBinaryTest {
         Assert.assertArrayEquals(new int[]{0, 2}, valuesToDocumentIndexes[1]);
 
         //Reading documents to value indexes
-        final int documentsToValueIndexSizeInBytes = byteBuffer.getInt();
+        final long documentsToValueIndexSizeInBytes = byteBuffer.getLong();
         Assert.assertEquals(16, documentsToValueIndexSizeInBytes);
 
         final int documentsToValueKeysCount = byteBuffer.getInt();
@@ -143,7 +142,7 @@ public class V1FullIndexBinaryTest {
         }
         Assert.assertArrayEquals(new int[]{1, 0, 1}, documentsToValueIndex);
 
-        int digestSize = byteBuffer.getInt();
+        long digestSize = byteBuffer.getLong();
         Assert.assertEquals(V1DatabaseFormat.DIGEST_SIZE_IN_BYTES, digestSize);
         for (int i = 0; i < digestSize; i++) {
             byte actualDigestByte = byteBuffer.get();
@@ -177,11 +176,11 @@ public class V1FullIndexBinaryTest {
         v1FullIndex.setDatabaseDocumentsCount(3);
         OutputStreamWritable outputStreamWritable = v1FullIndex.buildWritable();
         outputStreamWritable.writeTo(os);
-        Assert.assertEquals(os.size(), outputStreamWritable.getSizeInBytes() + 8);
+        Assert.assertEquals(os.size(), outputStreamWritable.getSizeInBytes() + 12);
 
         final Buffer byteBuffer = Buffer.from(os.toByteArray());
 
-        final int fullSizeInBytes = byteBuffer.getInt();
+        final long fullSizeInBytes = byteBuffer.getLong();
 
         Assert.assertEquals(fullSizeInBytes, outputStreamWritable.getSizeInBytes());
 
@@ -199,7 +198,7 @@ public class V1FullIndexBinaryTest {
         Assert.assertEquals("variable_length_field_name", fieldName);
 
         //Reading values
-        final int valuesSize = byteBuffer.getInt();
+        final long valuesSize = byteBuffer.getLong();
         Assert.assertEquals(29, valuesSize);
 
         final int maxElement = byteBuffer.getInt();
@@ -232,7 +231,7 @@ public class V1FullIndexBinaryTest {
                 UnsignedByteArrays.raw(new byte[]{7, 7, 7, 7, 7}));
 
         //Reading values to document indexes
-        final int valuesToDocumentIndexesSize1 = byteBuffer.getInt();
+        final long valuesToDocumentIndexesSize1 = byteBuffer.getLong();
         Assert.assertEquals(36, valuesToDocumentIndexesSize1);
         final int code = byteBuffer.getInt();
         Assert.assertEquals(V1DatabaseFormat.MultiMapType.LIST_BASED.getCode(), code);
@@ -260,7 +259,7 @@ public class V1FullIndexBinaryTest {
         Assert.assertArrayEquals(new int[]{0, 2}, valuesToDocumentIndexes[1]);
 
         //Reading documents to value indexes
-        final int documentsToValueIndexSizeInBytes = byteBuffer.getInt();
+        final long documentsToValueIndexSizeInBytes = byteBuffer.getLong();
         Assert.assertEquals(16, documentsToValueIndexSizeInBytes);
 
         final int documentsToValueKeysCount = byteBuffer.getInt();
@@ -273,8 +272,7 @@ public class V1FullIndexBinaryTest {
         }
         Assert.assertArrayEquals(new int[]{1, 0, 1}, documentsToValueIndex);
 
-
-        int digestSize = byteBuffer.getInt();
+        final long digestSize = byteBuffer.getLong();
         Assert.assertEquals(V1DatabaseFormat.DIGEST_SIZE_IN_BYTES, digestSize);
         for (int i = 0; i < digestSize; i++) {
             byte actualDigestByte = byteBuffer.get();

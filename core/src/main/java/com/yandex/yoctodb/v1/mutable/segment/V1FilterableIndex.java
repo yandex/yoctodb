@@ -13,6 +13,7 @@ package com.yandex.yoctodb.v1.mutable.segment;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.primitives.Ints;
+import com.google.common.primitives.Longs;
 import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.NotNull;
 import com.yandex.yoctodb.util.MessageDigestOutputStreamWrapper;
@@ -48,7 +49,7 @@ public final class V1FilterableIndex
     @NotNull
     private final Multimap<UnsignedByteArray, Integer> valueToDocuments;
     private final boolean fixedLength;
-    private int databaseDocumentsCount;
+    private int databaseDocumentsCount = -1;
 
     public V1FilterableIndex(
             @NotNull
@@ -91,7 +92,9 @@ public final class V1FilterableIndex
     }
 
     @Override
-    public void setDatabaseDocumentsCount(int documentsCount) {
+    public void setDatabaseDocumentsCount(final int documentsCount) {
+        assert documentsCount > 0;
+
         this.databaseDocumentsCount = documentsCount;
     }
 
@@ -117,15 +120,15 @@ public final class V1FilterableIndex
 
         return new OutputStreamWritable() {
             @Override
-            public int getSizeInBytes() {
+            public long getSizeInBytes() {
                 //without code and full size (8 bytes)
                 return 4 + // Field name
                         fieldName.length +
-                        4 + // Values
+                        8 + // Values
                         values.getSizeInBytes() +
-                        4 + // Value to documents
+                        8 + // Value to documents
                         valueToDocumentsIndex.getSizeInBytes() +
-                        4 + //checksum
+                        8 + //checksum
                         V1DatabaseFormat.DIGEST_SIZE_IN_BYTES;
             }
 
@@ -143,7 +146,7 @@ public final class V1FilterableIndex
 
                 md.reset();
 
-                os.write(Ints.toByteArray(getSizeInBytes()));
+                os.write(Longs.toByteArray(getSizeInBytes()));
 
                 // Payload segment type
                 os.write(
@@ -167,18 +170,18 @@ public final class V1FilterableIndex
                 mdos.write(fieldName);
 
                 // Values
-                mdos.write(Ints.toByteArray(values.getSizeInBytes()));
+                mdos.write(Longs.toByteArray(values.getSizeInBytes()));
                 values.writeTo(mdos);
 
                 // Documents
-                mdos.write(Ints.toByteArray(valueToDocumentsIndex.getSizeInBytes()));
+                mdos.write(Longs.toByteArray(valueToDocumentsIndex.getSizeInBytes()));
                 valueToDocumentsIndex.writeTo(mdos);
 
                 //writing checksum
                 if (V1DatabaseFormat.DIGEST_SIZE_IN_BYTES !=
                         md.getDigestLength())
                     throw new IllegalArgumentException("Wrong digest size");
-                os.write(Ints.toByteArray(V1DatabaseFormat.DIGEST_SIZE_IN_BYTES));
+                os.write(Longs.toByteArray(V1DatabaseFormat.DIGEST_SIZE_IN_BYTES));
                 os.write(mdos.digest());
             }
         };

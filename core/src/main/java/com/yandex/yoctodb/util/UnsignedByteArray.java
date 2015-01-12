@@ -19,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.Iterator;
 
 /**
@@ -63,7 +64,7 @@ public final class UnsignedByteArray
     }
 
     @Override
-    public int getSizeInBytes() {
+    public long getSizeInBytes() {
         return length();
     }
 
@@ -77,10 +78,7 @@ public final class UnsignedByteArray
     @Override
     public int hashCode() {
         if (hash == 0) {
-            int result = 1;
-            for (byte element : data)
-                result = 31 * result + element;
-            hash = result;
+            hash = Arrays.hashCode(data);
         }
         return hash;
     }
@@ -92,18 +90,7 @@ public final class UnsignedByteArray
 
         final UnsignedByteArray that = (UnsignedByteArray) o;
 
-        final int length = data.length;
-        final byte[] thatData = that.data;
-        if (length != thatData.length) {
-            return false;
-        }
-
-        for (int i = 0; i < length; i++)
-            if (data[i] != thatData[i]) {
-                return false;
-            }
-
-        return true;
+        return Arrays.equals(data, that.data);
     }
 
     @Override

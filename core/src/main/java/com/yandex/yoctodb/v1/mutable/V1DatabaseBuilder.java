@@ -144,9 +144,9 @@ public final class V1DatabaseBuilder
 
         return new OutputStreamWritable() {
             @Override
-            public int getSizeInBytes() {
+            public long getSizeInBytes() {
                 // Magic and format
-                int size = 4 + 4;
+                long size = 4 + 4;
 
                 for (OutputStreamWritable writable : writables) {
                     size += writable.getSizeInBytes();

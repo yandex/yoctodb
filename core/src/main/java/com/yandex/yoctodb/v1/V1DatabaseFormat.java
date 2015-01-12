@@ -27,12 +27,12 @@ import com.yandex.yoctodb.v1.mutable.V1DocumentBuilder;
  */
 @ThreadSafe
 public final class V1DatabaseFormat extends DatabaseFormat {
-    public final static int FORMAT = 1;
+    public final static int FORMAT = 2;
 
     public final static DatabaseReader DATABASE_READER = new V1DatabaseReader();
 
     public final static String MESSAGE_DIGEST_ALGORITHM = "MD5";
-    public final static int DIGEST_SIZE_IN_BYTES = 16;
+    public final static long DIGEST_SIZE_IN_BYTES = 16;
 
     // Segment types
     public enum SegmentType {

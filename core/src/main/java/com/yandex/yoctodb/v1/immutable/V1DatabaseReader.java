@@ -62,7 +62,7 @@ public class V1DatabaseReader implements DatabaseReader {
         final Map<String, SortableIndex> sorters =
                 new HashMap<String, SortableIndex>();
         while (buffer.hasRemaining()) {
-            final int size = buffer.getInt();
+            final long size = buffer.getLong();
             final int type = buffer.getInt();
 
             final Buffer segmentBuffer = buffer.slice(size);

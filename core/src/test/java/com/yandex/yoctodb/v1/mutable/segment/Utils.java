@@ -35,7 +35,7 @@ public class Utils {
         //get byte buffer without digest length and without digest content
         md.update(
                 buffer.slice(
-                        buffer.remaining() - md.getDigestLength() - 4)
+                        buffer.remaining() - md.getDigestLength() - 8)
                       .toByteArray());
         return md.digest();
     }

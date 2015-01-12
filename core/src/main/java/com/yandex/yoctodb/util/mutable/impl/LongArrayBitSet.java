@@ -35,7 +35,11 @@ public final class LongArrayBitSet implements ArrayBitSet {
         assert size > 0;
 
         this.size = size;
-        this.words = new long[(size >>> 6) + 1];
+        this.words = new long[arraySize(size)];
+    }
+
+    public static int arraySize(final int size) {
+        return (size >>> 6) + 1;
     }
 
     public static BitSet one(final int size) {
