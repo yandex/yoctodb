@@ -11,6 +11,7 @@
 package com.yandex.yoctodb.v1.mutable.segment;
 
 import com.google.common.primitives.Ints;
+import com.google.common.primitives.Longs;
 import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.NotNull;
 import com.yandex.yoctodb.util.MessageDigestOutputStreamWrapper;
@@ -65,11 +66,11 @@ public final class V1PayloadSegment
 
         return new OutputStreamWritable() {
             @Override
-            public int getSizeInBytes() {
+            public long getSizeInBytes() {
                 //without code and full size (8 bytes)
-                return 4 +// Payload
+                return 8 + // Payload
                        payloads.getSizeInBytes() +
-                       4 + //checksum
+                       8 + //checksum
                        V1DatabaseFormat.DIGEST_SIZE_IN_BYTES;
             }
 
@@ -87,7 +88,7 @@ public final class V1PayloadSegment
                 md.reset();
 
                 // full size in bytes
-                os.write(Ints.toByteArray(getSizeInBytes()));
+                os.write(Longs.toByteArray(getSizeInBytes()));
 
                 // Payload segment type
                 os.write(
@@ -103,14 +104,14 @@ public final class V1PayloadSegment
                         new MessageDigestOutputStreamWrapper(os, md);
 
                 // data
-                mdos.write(Ints.toByteArray(payloads.getSizeInBytes()));
+                mdos.write(Longs.toByteArray(payloads.getSizeInBytes()));
                 payloads.writeTo(mdos);
 
                 //writing checksum
                 if (V1DatabaseFormat.DIGEST_SIZE_IN_BYTES !=
                        md.getDigestLength())
                     throw new IllegalArgumentException("Wrong digest size");
-                os.write(Ints.toByteArray(V1DatabaseFormat.DIGEST_SIZE_IN_BYTES));
+                os.write(Longs.toByteArray(V1DatabaseFormat.DIGEST_SIZE_IN_BYTES));
                 os.write(mdos.digest());
             }
         };

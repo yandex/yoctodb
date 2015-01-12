@@ -23,7 +23,7 @@ import java.io.OutputStream;
  */
 @ThreadSafe
 public interface OutputStreamWritable {
-    int getSizeInBytes();
+    long getSizeInBytes();
 
     void writeTo(
             @NotNull

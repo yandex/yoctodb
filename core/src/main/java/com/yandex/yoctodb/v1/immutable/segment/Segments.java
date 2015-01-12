@@ -27,7 +27,7 @@ class Segments {
     }
 
     /**
-     * Reads {@code int} segment size, extracts the slice and advances
+     * Reads {@code long} segment size, extracts the slice and advances
      * {@code from} buffer
      *
      * @param from buffer to extract segment slice from
@@ -37,7 +37,7 @@ class Segments {
     public static Buffer extract(
             @NotNull
             final Buffer from) {
-        final int size = from.getInt();
+        final long size = from.getLong();
         final Buffer result = from.slice(size);
         from.advance(size);
         return result;
@@ -76,7 +76,7 @@ class Segments {
 
         // get byte buffer without digest length and without digest content
         final Buffer data =
-                buffer.slice(buffer.remaining() - md.getDigestLength() - 4);
+                buffer.slice(buffer.remaining() - md.getDigestLength() - 8);
         final byte[] buf =
                 new byte[Math.min((int) Math.max(buffer.remaining(), 8192L), 8192)];
         while (data.remaining() >= buf.length) {

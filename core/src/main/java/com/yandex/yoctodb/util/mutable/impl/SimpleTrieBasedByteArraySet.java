@@ -42,8 +42,8 @@ public class SimpleTrieBasedByteArraySet extends AbstractTrieBasedByteArraySet {
     }
 
     @Override
-    public int getSizeInBytes() {
-        return trieSizeInBytes + 4;
+    public long getSizeInBytes() {
+        return trieSizeInBytes + 4L;
     }
 
     @Override
