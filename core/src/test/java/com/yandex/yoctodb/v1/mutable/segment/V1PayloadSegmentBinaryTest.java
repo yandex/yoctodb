@@ -51,20 +51,20 @@ public class V1PayloadSegmentBinaryTest {
         final byte[] digest = calculateDigest(byteBuffer, V1DatabaseFormat.MESSAGE_DIGEST_ALGORITHM);
 
         final long elementsSizeInBytes = byteBuffer.getLong();
-        Assert.assertEquals(193, elementsSizeInBytes);
+        Assert.assertEquals(257, elementsSizeInBytes);
 
         final int elementsCount = byteBuffer.getInt();
         Assert.assertEquals(15, elementsCount);
 
-        final int[] offsets = new int[elementsCount + 1];
+        final long[] offsets = new long[elementsCount + 1];
 
         for (int i = 0; i <= elementsCount; i++) {
-            offsets[i] = byteBuffer.getInt();
+            offsets[i] = byteBuffer.getLong();
         }
-        Assert.assertArrayEquals(new int[]{0, 8, 16, 24, 32, 40, 48, 56, 64, 72, 80, 89, 98, 107, 116, 125}, offsets);
+        Assert.assertArrayEquals(new long[]{0, 8, 16, 24, 32, 40, 48, 56, 64, 72, 80, 89, 98, 107, 116, 125}, offsets);
 
         for (int i = 0; i < elementsCount; i++) {
-            final byte[] currentElementBytes = new byte[offsets[i + 1] - offsets[i]];
+            final byte[] currentElementBytes = new byte[(int) (offsets[i + 1] - offsets[i])];
             byteBuffer.get(currentElementBytes);
             Assert.assertEquals(("payload" + i), new String(currentElementBytes));
         }
