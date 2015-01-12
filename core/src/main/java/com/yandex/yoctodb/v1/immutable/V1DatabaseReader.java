@@ -136,6 +136,11 @@ public class V1DatabaseReader implements DatabaseReader {
                     "File doesn't exist: " + f);
         }
 
+        if (f.length() > Integer.MAX_VALUE) {
+            throw new IllegalArgumentException(
+                    "mmapping of files >2 GB is not supported yet");
+        }
+
         // Mapping the file
         final MappedByteBuffer buffer;
         final RandomAccessFile raf = new RandomAccessFile(f, "r");
