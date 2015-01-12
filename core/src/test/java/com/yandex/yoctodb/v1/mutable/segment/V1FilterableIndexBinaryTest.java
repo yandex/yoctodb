@@ -69,10 +69,10 @@ public class V1FilterableIndexBinaryTest {
         v1FilterableIndex.setDatabaseDocumentsCount(2);
         final OutputStreamWritable outputStreamWritable = v1FilterableIndex.buildWritable();
         outputStreamWritable.writeTo(os);
-        Assert.assertEquals(os.size(), outputStreamWritable.getSizeInBytes() + 8);
+        Assert.assertEquals(os.size(), outputStreamWritable.getSizeInBytes() + 12);
 
         final Buffer byteBuffer = Buffer.from(os.toByteArray());
-        final int fullSizeInBytes = byteBuffer.getInt();
+        final long fullSizeInBytes = byteBuffer.getLong();
 
         Assert.assertEquals(fullSizeInBytes, outputStreamWritable.getSizeInBytes());
 
@@ -90,7 +90,7 @@ public class V1FilterableIndexBinaryTest {
         Assert.assertEquals("variable_length_field_name", fieldName);
 
         //Reading values
-        final int valuesSize = byteBuffer.getInt();
+        final long valuesSize = byteBuffer.getLong();
         Assert.assertEquals(87, valuesSize);
 
         final int maxElement = byteBuffer.getInt();
@@ -127,7 +127,7 @@ public class V1FilterableIndexBinaryTest {
         Assert.assertEquals(UnsignedByteArrays.raw(new byte[]{14}), elements.get(9));
         Assert.assertEquals(UnsignedByteArrays.raw(new byte[]{15}), elements.get(10));
         //Reading indexes
-        final int indexesSize = byteBuffer.getInt();
+        final long indexesSize = byteBuffer.getLong();
         Assert.assertEquals(100, indexesSize);
         final int code = byteBuffer.getInt();
         Assert.assertEquals(V1DatabaseFormat.MultiMapType.LONG_ARRAY_BIT_SET_BASED.getCode(), code);
@@ -204,11 +204,11 @@ public class V1FilterableIndexBinaryTest {
         v1FilterableIndex.setDatabaseDocumentsCount(2);
         final OutputStreamWritable outputStreamWritable = v1FilterableIndex.buildWritable();
         outputStreamWritable.writeTo(os);
-        Assert.assertEquals(os.size(), outputStreamWritable.getSizeInBytes() + 8);
+        Assert.assertEquals(os.size(), outputStreamWritable.getSizeInBytes() + 12);
 
         final Buffer byteBuffer = Buffer.from(os.toByteArray());
 
-        final int fullSizeInBytes = byteBuffer.getInt();
+        final long fullSizeInBytes = byteBuffer.getLong();
         Assert.assertEquals(fullSizeInBytes, outputStreamWritable.getSizeInBytes());
 
         final int segmentTypeCode = byteBuffer.getInt();
@@ -225,7 +225,7 @@ public class V1FilterableIndexBinaryTest {
         Assert.assertEquals("fixed_length_field_name", fieldName);
 
         //Reading values
-        final int valuesSize = byteBuffer.getInt();
+        final long valuesSize = byteBuffer.getLong();
         Assert.assertEquals(52, valuesSize);
 
         final int elementSize = byteBuffer.getInt();
@@ -254,7 +254,7 @@ public class V1FilterableIndexBinaryTest {
         Assert.assertEquals(UnsignedByteArrays.raw(new byte[]{16, 17, 18, 19}), elements.get(9));
         Assert.assertEquals(UnsignedByteArrays.raw(new byte[]{19, 18, 17, 16}), elements.get(10));
         //Reading indexes
-        final int indexesSize = byteBuffer.getInt();
+        final long indexesSize = byteBuffer.getLong();
         Assert.assertEquals(100, indexesSize);
         final int code = byteBuffer.getInt();
         Assert.assertEquals(V1DatabaseFormat.MultiMapType.LONG_ARRAY_BIT_SET_BASED.getCode(), code);

@@ -11,6 +11,7 @@
 package com.yandex.yoctodb.util.mutable.impl;
 
 import com.google.common.primitives.Ints;
+import com.google.common.primitives.Longs;
 import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.NotNull;
 import com.yandex.yoctodb.util.UnsignedByteArray;
@@ -30,6 +31,7 @@ import java.util.List;
 public final class VariableLengthByteArrayIndexedList
         implements ByteArrayIndexedList {
     private final List<UnsignedByteArray> elements = new ArrayList<UnsignedByteArray>();
+    private long elementSize = 0;
 
     @Override
     public void add(
@@ -39,19 +41,16 @@ public final class VariableLengthByteArrayIndexedList
             throw new IllegalArgumentException("Empty element");
 
         elements.add(e);
+        elementSize += e.length();
     }
 
     @Override
-    public int getSizeInBytes() {
+    public long getSizeInBytes() {
         if (elements.isEmpty())
             throw new IllegalStateException("Empty list");
 
-        int elementSize = 0;
-        for (UnsignedByteArray e : elements)
-            elementSize += e.length();
-
         return 4 + // Element count
-                4 * (elements.size() + 1) + // Element offsets
+                8 * (elements.size() + 1L) + // Element offsets
                 elementSize; // Element array size
     }
 
@@ -66,12 +65,12 @@ public final class VariableLengthByteArrayIndexedList
         os.write(Ints.toByteArray(elements.size()));
 
         // Element offsets
-        int elementOffset = 0;
+        long elementOffset = 0;
         for (UnsignedByteArray e : elements) {
-            os.write(Ints.toByteArray(elementOffset));
+            os.write(Longs.toByteArray(elementOffset));
             elementOffset += e.length();
         }
-        os.write(Ints.toByteArray(elementOffset));
+        os.write(Longs.toByteArray(elementOffset));
 
         // Elements
         for (UnsignedByteArray e : elements)

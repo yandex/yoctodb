@@ -42,14 +42,14 @@ public final class IntIndexToIndexMultiMap implements IndexToIndexMultiMap {
     }
 
     @Override
-    public int getSizeInBytes() {
+    public long getSizeInBytes() {
         if (map.isEmpty())
             throw new IllegalStateException("Empty multimap");
 
-        return  4 + // type
+        return 4 + // type
                 4 + // keys count
-                (4 + 4) * map.keySet().size() + // offsets
-                4 * map.size();    // sets
+                (4 + 4) * (long) map.keySet().size() + // offsets
+                4L * map.size();    // sets
     }
 
     @Override

@@ -17,12 +17,15 @@ import com.yandex.yoctodb.util.mutable.IndexToIndexMultiMap;
  */
 public class IndexToIndexMultiMapFactory {
 
-    public static final int UNIQUE_VALUES_THRESHOLD = 30;
-
     public static IndexToIndexMultiMap buildIndexToIndexMultiMap(
             final int documentsCount,
             final int uniqueValuesCount) {
-        if (uniqueValuesCount < UNIQUE_VALUES_THRESHOLD) {
+        assert documentsCount > 0;
+        assert uniqueValuesCount > 0;
+
+        if (1.0 * uniqueValuesCount * documentsCount / 64.0 <
+                documentsCount * 4.0) {
+            // BitSet might be more effective
             return new BitSetMultiMap(documentsCount);
         } else {
             return new IntIndexToIndexMultiMap();

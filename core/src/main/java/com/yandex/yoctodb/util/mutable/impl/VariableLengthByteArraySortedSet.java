@@ -43,7 +43,7 @@ public final class VariableLengthByteArraySortedSet
     }
 
     @Override
-    public int getSizeInBytes() {
+    public long getSizeInBytes() {
         if (!frozen) {
             build();
         }
@@ -56,9 +56,9 @@ public final class VariableLengthByteArraySortedSet
             elementSize += e.length();
 
         return 4 + // Max element size
-               4 + // Element count
-               4 * (sortedElements.size() + 1) + // Element offsets
-               elementSize; // Element array size
+                4 + // Element count
+                4L * (sortedElements.size() + 1) + // Element offsets
+                (long) elementSize; // Element array size
     }
 
     @Override

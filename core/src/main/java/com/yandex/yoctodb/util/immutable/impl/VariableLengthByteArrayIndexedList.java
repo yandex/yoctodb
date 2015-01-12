@@ -35,7 +35,7 @@ public class VariableLengthByteArrayIndexedList
             @NotNull
             final Buffer buf) {
         final int elementsCount = buf.getInt();
-        final Buffer offsets = buf.slice((elementsCount + 1) << 2);
+        final Buffer offsets = buf.slice((elementsCount + 1) << 3);
         final Buffer elements =
                 buf.slice().position(offsets.remaining()).slice();
 
@@ -68,8 +68,8 @@ public class VariableLengthByteArrayIndexedList
     public Buffer get(final int i) {
         assert 0 <= i && i < elementCount;
 
-        final int start = offsets.getInt(i << 2);
-        final int end = offsets.getInt((i + 1) << 2);
+        final long start = offsets.getLong(i << 3);
+        final long end = offsets.getLong((i + 1) << 3);
 
         assert start < end;
 
