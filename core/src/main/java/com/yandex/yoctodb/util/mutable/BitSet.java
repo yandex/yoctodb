@@ -81,13 +81,15 @@ public interface BitSet {
     /**
      * Modify current bit set by applying bitwise {@code &} operation
      *
-     * @param setInByteBuffer source bit set
+     * @param longArrayBitSetInByteBuffer source bit set
+     * @param startPosition               position to start reading from
+     * @param bitSetSizeInLongs           bit set size in {@code long}s
      *
      * @return whether there are nonzero bits
      */
     boolean or(
             @NotNull
-            Buffer setInByteBuffer,
+            Buffer longArrayBitSetInByteBuffer,
             int startPosition,
             int bitSetSizeInLongs);
 

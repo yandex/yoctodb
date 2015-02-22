@@ -25,7 +25,7 @@ import java.util.Iterator;
 /**
  * A wrapper for {@code byte[]} providing {@code equals()} and {@code
  * hashCode()} implementations. The array is supposed to be immutable.
- * <p/>
+ *
  * Bytes in the byte array are treated as unsigned.
  *
  * @author incubos
