@@ -75,7 +75,8 @@ public class V1PayloadSegmentBinaryTest {
             os.close();
         }
 
-        final Buffer buf = Buffer.from(new RandomAccessFile(f, "r"));
+        final Buffer buf =
+                Buffer.from(new RandomAccessFile(f, "r").getChannel());
 
         final long segmentSize = buf.getLong();
         Assert.assertEquals(segmentSize + 4, buf.remaining());
