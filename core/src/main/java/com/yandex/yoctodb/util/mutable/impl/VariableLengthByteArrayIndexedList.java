@@ -19,7 +19,7 @@ import com.yandex.yoctodb.util.mutable.ByteArrayIndexedList;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -30,7 +30,8 @@ import java.util.List;
 @NotThreadSafe
 public final class VariableLengthByteArrayIndexedList
         implements ByteArrayIndexedList {
-    private final List<UnsignedByteArray> elements = new ArrayList<UnsignedByteArray>();
+    private final List<UnsignedByteArray> elements =
+            new LinkedList<UnsignedByteArray>();
     private long elementSize = 0;
 
     @Override
