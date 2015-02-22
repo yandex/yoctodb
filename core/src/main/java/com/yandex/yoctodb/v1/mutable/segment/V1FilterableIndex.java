@@ -122,7 +122,8 @@ public final class V1FilterableIndex
             @Override
             public long getSizeInBytes() {
                 //without code and full size (8 bytes)
-                return 4 + // Field name
+                final long result =
+                        4 + // Field name
                         fieldName.length +
                         8 + // Values
                         values.getSizeInBytes() +
@@ -130,6 +131,10 @@ public final class V1FilterableIndex
                         valueToDocumentsIndex.getSizeInBytes() +
                         8 + //checksum
                         V1DatabaseFormat.DIGEST_SIZE_IN_BYTES;
+
+                assert result <= Integer.MAX_VALUE : "Segment reached 2GB";
+
+                return result;
             }
 
             @Override
