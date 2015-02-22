@@ -10,11 +10,9 @@
 
 package com.yandex.yoctodb.query.simple;
 
+import com.yandex.yoctodb.query.TermCondition;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
-import com.yandex.yoctodb.immutable.FilterableIndex;
-import com.yandex.yoctodb.query.Condition;
-import com.yandex.yoctodb.util.mutable.BitSet;
 
 /**
  * Abstract condition
@@ -22,7 +20,7 @@ import com.yandex.yoctodb.util.mutable.BitSet;
  * @author incubos
  */
 @Immutable
-abstract class AbstractSimpleCondition implements Condition {
+abstract class AbstractSimpleCondition implements TermCondition {
     @NotNull
     private final String fieldName;
 
