@@ -36,15 +36,9 @@ abstract class AbstractSimpleCondition implements Condition {
     }
 
     @NotNull
-    public String getFieldName() {
+    protected String getFieldName() {
         return fieldName;
     }
-
-    public abstract boolean set(
-            @NotNull
-            final FilterableIndex index,
-            @NotNull
-            final BitSet to);
 
     @Override
     public String toString() {

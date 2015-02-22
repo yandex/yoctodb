@@ -43,7 +43,6 @@ public interface QueryContext extends Database {
     @NotNull
     BitSet getZeroBitSet();
 
-
     /**
      * You can borrow it only once per query
      *

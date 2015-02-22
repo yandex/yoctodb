@@ -46,6 +46,13 @@ public interface BitSet {
     void clear();
 
     /**
+     * Inverse all bits
+     *
+     * @return whether there are nonzero bits
+     */
+    boolean inverse();
+
+    /**
      * Set all bits
      */
     void set();
@@ -68,13 +75,24 @@ public interface BitSet {
     int nextSetBit(int fromIndexInclusive);
 
     /**
-     * Modify current bit set by applying bitwise {@code &} operation
+     * Modify current bit set by applying bitwise {@code AND} operation
      *
      * @param set source bit set
      *
      * @return whether there are nonzero bits
      */
     boolean and(
+            @NotNull
+            BitSet set);
+
+    /**
+     * Modify current bit set by applying bitwise {@code OR}
+     *
+     * @param set source bit set
+     *
+     * @return whether there are nonzero bits
+     */
+    boolean or(
             @NotNull
             BitSet set);
 

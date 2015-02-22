@@ -22,18 +22,14 @@ import com.yandex.yoctodb.util.mutable.BitSet;
  * methods, because if there are no documents found, then {@code dest} bit set
  * might be left unchanged.
  *
+ * The contract of each comparison method is:
+ * Set to one bits in {@code dest} for conforming documents and
+ * leave the other bits untouched.
+ *
  * @author incubos
  */
 @Immutable
 public interface FilterableIndex extends Index {
-    /**
-     * Sets to one bits in {@code dest} for documents having equal {@code value}
-     * and zeroes the other bits
-     *
-     * @param dest  result accumulator
-     * @param value value to compare to
-     * @return whether filter returned nonempty set
-     */
     boolean eq(
             @NotNull
             BitSet dest,

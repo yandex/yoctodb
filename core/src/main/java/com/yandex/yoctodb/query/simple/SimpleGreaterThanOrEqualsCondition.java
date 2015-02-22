@@ -10,6 +10,7 @@
 
 package com.yandex.yoctodb.query.simple;
 
+import com.yandex.yoctodb.query.QueryContext;
 import com.yandex.yoctodb.util.buf.Buffer;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
@@ -44,9 +45,10 @@ public final class SimpleGreaterThanOrEqualsCondition
     @Override
     public boolean set(
             @NotNull
-            final FilterableIndex index,
+            final QueryContext ctx,
             @NotNull
             final BitSet to) {
-        return index.greaterThan(to, value, true);
+        final FilterableIndex index = ctx.getFilter(getFieldName());
+        return index != null && index.greaterThan(to, value, true);
     }
 }

@@ -10,7 +10,6 @@
 
 package com.yandex.yoctodb.query.simple;
 
-import com.yandex.yoctodb.immutable.FilterableIndex;
 import com.yandex.yoctodb.query.*;
 import com.yandex.yoctodb.util.mutable.BitSet;
 import com.yandex.yoctodb.util.mutable.impl.ReadOnlyOneBitSet;
@@ -18,8 +17,8 @@ import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -30,10 +29,9 @@ import java.util.List;
 @NotThreadSafe
 public final class SimpleSelect implements Select {
     @NotNull
-    private final List<AbstractSimpleCondition> conditions =
-            new ArrayList<AbstractSimpleCondition>();
+    private final List<Condition> conditions = new LinkedList<Condition>();
     @NotNull
-    private final List<Order> sorts = new ArrayList<Order>();
+    private final List<Order> sorts = new LinkedList<Order>();
     private int skip = 0;
     private int limit = Integer.MAX_VALUE;
 
@@ -42,7 +40,7 @@ public final class SimpleSelect implements Select {
     public Where where(
             @NotNull
             final Condition condition) {
-        conditions.add((AbstractSimpleCondition) condition);
+        conditions.add(condition);
         return new SimpleWhereClause(this, conditions);
     }
 
@@ -92,10 +90,9 @@ public final class SimpleSelect implements Select {
         if (conditions.isEmpty()) {
             return new ReadOnlyOneBitSet(ctx.getDocumentCount());
         } else if (conditions.size() == 1) {
-            final AbstractSimpleCondition c = conditions.iterator().next();
+            final Condition c = conditions.iterator().next();
             final BitSet result = ctx.getZeroBitSet();
-            final FilterableIndex filter = ctx.getFilter(c.getFieldName());
-            if (filter != null && c.set(filter, result)) {
+            if (c.set(ctx, result)) {
                 return result;
             } else {
                 return null;
@@ -104,12 +101,10 @@ public final class SimpleSelect implements Select {
             // Searching
             final BitSet result = ctx.getOneBitSet();
             final BitSet conditionResult = ctx.getZeroBitSet();
-            final Iterator<AbstractSimpleCondition> iter =
-                    conditions.iterator();
+            final Iterator<Condition> iter = conditions.iterator();
             while (iter.hasNext()) {
-                final AbstractSimpleCondition c = iter.next();
-                final FilterableIndex filter = ctx.getFilter(c.getFieldName());
-                if (filter == null || !c.set(filter, conditionResult)) {
+                final Condition c = iter.next();
+                if (!c.set(ctx, conditionResult)) {
                     return null;
                 }
                 if (!result.and(conditionResult)) {

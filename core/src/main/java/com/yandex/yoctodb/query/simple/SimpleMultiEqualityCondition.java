@@ -10,6 +10,7 @@
 
 package com.yandex.yoctodb.query.simple;
 
+import com.yandex.yoctodb.query.QueryContext;
 import com.yandex.yoctodb.util.buf.Buffer;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
@@ -55,9 +56,10 @@ public final class SimpleMultiEqualityCondition
     @Override
     public boolean set(
             @NotNull
-            final FilterableIndex index,
+            final QueryContext ctx,
             @NotNull
             final BitSet to) {
-        return index.in(to, values);
+        final FilterableIndex index = ctx.getFilter(getFieldName());
+        return index != null && index.in(to, values);
     }
 }
