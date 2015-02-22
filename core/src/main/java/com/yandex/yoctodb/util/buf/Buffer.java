@@ -16,8 +16,8 @@ import com.yandex.yoctodb.util.UnsignedByteArrays;
 import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 
 /**
  * Read only {@code long} addressed implementation of {@link java.nio.Buffer}
@@ -43,8 +43,8 @@ public abstract class Buffer implements Comparable<Buffer> {
     @NotNull
     public static Buffer from(
             @NotNull
-            final RandomAccessFile file) {
-        return new SynchronizedFileBuffer(file);
+            final FileChannel file) {
+        return new FileChannelBuffer(file);
     }
 
     public abstract long position();

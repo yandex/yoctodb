@@ -173,7 +173,7 @@ public class V1DatabaseReader implements DatabaseReader {
     @Override
     public Database from(
             @NotNull
-            final RandomAccessFile f) throws IOException {
+            final FileChannel f) throws IOException {
         return from(Buffer.from(f));
     }
 }

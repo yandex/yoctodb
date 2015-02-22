@@ -37,7 +37,7 @@ import static com.yandex.yoctodb.query.QueryBuilder.*;
  *
  * @author incubos
  */
-public class CompositeSynchronizedDatabaseTest {
+public class CompositeFileDatabaseTest {
     private static final String BASE;
 
     static {
@@ -58,7 +58,7 @@ public class CompositeSynchronizedDatabaseTest {
                 READER.from(
                         new RandomAccessFile(
                                 buildDatabase1("1.dat"),
-                                "r"));
+                                "r").getChannel());
 
         Assert.assertEquals(DOCS, db1.getDocumentCount());
 
@@ -66,7 +66,7 @@ public class CompositeSynchronizedDatabaseTest {
                 READER.from(
                         new RandomAccessFile(
                                 buildDatabase2("2.dat"),
-                                "r"));
+                                "r").getChannel());
 
         Assert.assertEquals(DOCS, db2.getDocumentCount());
 
@@ -83,11 +83,11 @@ public class CompositeSynchronizedDatabaseTest {
                                 READER.from(
                                         new RandomAccessFile(
                                                 buildDatabase1("1.dat"),
-                                                "r")),
+                                                "r").getChannel()),
                                 READER.from(
                                         new RandomAccessFile(
                                                 buildDatabase2("2.dat"),
-                                                "r"))));
+                                                "r").getChannel())));
 
         // skip
         final Query qSkip = select().skip(DOCS / 4);
@@ -110,11 +110,11 @@ public class CompositeSynchronizedDatabaseTest {
                                 READER.from(
                                         new RandomAccessFile(
                                                 buildDatabase1("1.dat"),
-                                                "r")),
+                                                "r").getChannel()),
                                 READER.from(
                                         new RandomAccessFile(
                                                 buildDatabase2("2.dat"),
-                                                "r"))));
+                                                "r").getChannel())));
 
         for (int i = 0; i < DOCS; i++)
             Assert.assertEquals(
@@ -169,11 +169,11 @@ public class CompositeSynchronizedDatabaseTest {
                                 READER.from(
                                         new RandomAccessFile(
                                                 buildDatabase1("1.dat"),
-                                                "r")),
+                                                "r").getChannel()),
                                 READER.from(
                                         new RandomAccessFile(
                                                 buildDatabase2("2.dat"),
-                                                "r"))));
+                                                "r").getChannel())));
 
         final List<Integer> docs = new ArrayList<Integer>(2 * DOCS);
         db.execute(
@@ -205,12 +205,12 @@ public class CompositeSynchronizedDatabaseTest {
                 READER.from(
                         new RandomAccessFile(
                                 buildDatabase1("1.dat"),
-                                "r"));
+                                "r").getChannel());
         final Database db2 =
                 READER.from(
                         new RandomAccessFile(
                                 buildDatabase2("2.dat"),
-                                "r"));
+                                "r").getChannel());
 
         final Database db = READER.composite(Arrays.asList(db1, db2));
 
@@ -246,12 +246,12 @@ public class CompositeSynchronizedDatabaseTest {
                 READER.from(
                         new RandomAccessFile(
                                 buildDatabase1("1.dat"),
-                                "r"));
+                                "r").getChannel());
         final Database db2 =
                 READER.from(
                         new RandomAccessFile(
                                 buildDatabase2("2.dat"),
-                                "r"));
+                                "r").getChannel());
 
         final Database db = READER.composite(Arrays.asList(db1, db2));
 
@@ -292,12 +292,12 @@ public class CompositeSynchronizedDatabaseTest {
                 READER.from(
                         new RandomAccessFile(
                                 buildDatabase1("1.dat"),
-                                "r"));
+                                "r").getChannel());
         final Database db2 =
                 READER.from(
                         new RandomAccessFile(
                                 buildDatabase2("2.dat"),
-                                "r"));
+                                "r").getChannel());
 
         final Database db = READER.composite(Arrays.asList(db1, db2));
 
@@ -338,12 +338,12 @@ public class CompositeSynchronizedDatabaseTest {
                 READER.from(
                         new RandomAccessFile(
                                 buildDatabase1("1.dat"),
-                                "r"));
+                                "r").getChannel());
         final Database db2 =
                 READER.from(
                         new RandomAccessFile(
                                 buildDatabase2("2.dat"),
-                                "r"));
+                                "r").getChannel());
 
         final Database db = READER.composite(Arrays.asList(db1, db2));
 
@@ -417,12 +417,12 @@ public class CompositeSynchronizedDatabaseTest {
                 READER.from(
                         new RandomAccessFile(
                                 buildDatabase1("1.dat"),
-                                "r"));
+                                "r").getChannel());
         final Database db2 =
                 READER.from(
                         new RandomAccessFile(
                                 buildDatabase2("2.dat"),
-                                "r"));
+                                "r").getChannel());
 
         final Database db = READER.composite(Arrays.asList(db1, db2));
 

@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.nio.channels.FileChannel;
 import java.util.Collection;
 
 /**
@@ -45,5 +45,5 @@ public interface DatabaseReader {
     @NotNull
     Database from(
             @NotNull
-            RandomAccessFile f) throws IOException;
+            FileChannel f) throws IOException;
 }
