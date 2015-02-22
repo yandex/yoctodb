@@ -12,6 +12,7 @@ package com.yandex.yoctodb.query.simple;
 
 import com.yandex.yoctodb.query.Condition;
 import com.yandex.yoctodb.query.QueryContext;
+import com.yandex.yoctodb.query.TermCondition;
 import com.yandex.yoctodb.util.mutable.BitSet;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
@@ -27,14 +28,14 @@ import java.util.Collection;
 @Immutable
 public final class SimpleOneOfCondition implements Condition {
     @NotNull
-    private final Collection<Condition> clauses;
+    private final Collection<TermCondition> clauses;
 
     public SimpleOneOfCondition(
             @NotNull
-            final Collection<Condition> conditions) {
+            final Collection<TermCondition> conditions) {
         assert conditions.size() >= 2;
 
-        this.clauses = new ArrayList<Condition>(conditions);
+        this.clauses = new ArrayList<TermCondition>(conditions);
     }
 
     @Override
