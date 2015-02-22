@@ -15,6 +15,10 @@ import org.jetbrains.annotations.NotNull;
 import com.yandex.yoctodb.query.simple.*;
 import com.yandex.yoctodb.util.UnsignedByteArray;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+
 /**
  * Abstract {@link Query} builder
  *
@@ -101,6 +105,28 @@ public final class QueryBuilder {
                 fromInclusive,
                 to,
                 toInclusive);
+    }
+
+    @NotNull
+    public static Condition not(
+            @NotNull
+            final Condition condition) {
+        return new SimpleNotCondition(condition);
+    }
+
+    @NotNull
+    public static Condition oneOf(
+            @NotNull
+            final Condition c1,
+            final Condition c2,
+            final Condition... rest) {
+        final Collection<Condition> conditions =
+                new ArrayList<Condition>(rest.length + 2);
+        conditions.add(c1);
+        conditions.add(c2);
+        conditions.addAll(Arrays.asList(rest));
+
+        return new SimpleOneOfCondition(conditions);
     }
 
     @NotNull
