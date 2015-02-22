@@ -39,6 +39,7 @@ public interface Query {
     /**
      * Return sorted results not taking into account skip/limit
      *
+     * @param docs documents to sort
      * @param ctx query context
      * @return sorted results
      */
