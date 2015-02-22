@@ -36,7 +36,7 @@ public final class QueryBuilder {
     }
 
     @NotNull
-    public static Condition eq(
+    public static TermCondition eq(
             @NotNull
             final String fieldName,
             @NotNull
@@ -45,7 +45,7 @@ public final class QueryBuilder {
     }
 
     @NotNull
-    public static Condition lt(
+    public static TermCondition lt(
             @NotNull
             final String fieldName,
             @NotNull
@@ -54,7 +54,7 @@ public final class QueryBuilder {
     }
 
     @NotNull
-    public static Condition lte(
+    public static TermCondition lte(
             @NotNull
             final String fieldName,
             @NotNull
@@ -63,7 +63,7 @@ public final class QueryBuilder {
     }
 
     @NotNull
-    public static Condition gt(
+    public static TermCondition gt(
             @NotNull
             final String fieldName,
             @NotNull
@@ -72,7 +72,7 @@ public final class QueryBuilder {
     }
 
     @NotNull
-    public static Condition gte(
+    public static TermCondition gte(
             @NotNull
             final String fieldName,
             @NotNull
@@ -81,7 +81,7 @@ public final class QueryBuilder {
     }
 
     @NotNull
-    public static Condition in(
+    public static TermCondition in(
             @NotNull
             final String fieldName,
             @NotNull
@@ -90,7 +90,7 @@ public final class QueryBuilder {
     }
 
     @NotNull
-    public static Condition in(
+    public static TermCondition in(
             @NotNull
             final String fieldName,
             @NotNull
@@ -110,18 +110,18 @@ public final class QueryBuilder {
     @NotNull
     public static Condition not(
             @NotNull
-            final Condition condition) {
+            final TermCondition condition) {
         return new SimpleNotCondition(condition);
     }
 
     @NotNull
     public static Condition oneOf(
             @NotNull
-            final Condition c1,
-            final Condition c2,
-            final Condition... rest) {
-        final Collection<Condition> conditions =
-                new ArrayList<Condition>(rest.length + 2);
+            final TermCondition c1,
+            final TermCondition c2,
+            final TermCondition... rest) {
+        final Collection<TermCondition> conditions =
+                new ArrayList<TermCondition>(rest.length + 2);
         conditions.add(c1);
         conditions.add(c2);
         conditions.addAll(Arrays.asList(rest));

@@ -12,6 +12,7 @@ package com.yandex.yoctodb.query.simple;
 
 import com.yandex.yoctodb.query.Condition;
 import com.yandex.yoctodb.query.QueryContext;
+import com.yandex.yoctodb.query.TermCondition;
 import com.yandex.yoctodb.util.mutable.BitSet;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
@@ -24,11 +25,11 @@ import org.jetbrains.annotations.NotNull;
 @Immutable
 public final class SimpleNotCondition implements Condition {
     @NotNull
-    private final Condition delegate;
+    private final TermCondition delegate;
 
     public SimpleNotCondition(
             @NotNull
-            final Condition delegate) {
+            final TermCondition delegate) {
         this.delegate = delegate;
     }
 
