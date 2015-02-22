@@ -29,13 +29,13 @@ public final class SimpleWhereClause implements Where {
     @NotNull
     private final SimpleSelect select;
     @NotNull
-    private final List<AbstractSimpleCondition> conditions;
+    private final List<Condition> conditions;
 
     public SimpleWhereClause(
             @NotNull
             final SimpleSelect delegate,
             @NotNull
-            final List<AbstractSimpleCondition> conditions) {
+            final List<Condition> conditions) {
         this.select = delegate;
         this.conditions = conditions;
     }
@@ -45,7 +45,7 @@ public final class SimpleWhereClause implements Where {
     public Where and(
             @NotNull
             final Condition condition) {
-        conditions.add((AbstractSimpleCondition) condition);
+        conditions.add(condition);
 
         return this;
     }

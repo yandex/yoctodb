@@ -56,12 +56,24 @@ public final class ReadOnlyZeroBitSet implements BitSet {
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    public boolean inverse() {
+        throw new UnsupportedOperationException();
+    }
+
     public void set() {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public boolean and(
+            @NotNull
+            final BitSet set) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean or(
             @NotNull
             final BitSet set) {
         throw new UnsupportedOperationException();

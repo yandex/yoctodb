@@ -101,6 +101,30 @@ public final class LongArrayBitSet implements ArrayBitSet {
         Arrays.fill(words, 0L);
     }
 
+    @Override
+    public boolean inverse() {
+        boolean notEmpty = false;
+
+        // Inverse all the words except last one
+        for (int i = 0; i < words.length - 1; i++) {
+            words[i] = ~words[i];
+            if (words[i] != 0)
+                notEmpty = true;
+        }
+
+        // Fix bits in last word
+        final int shift = size & 0x3f;
+        if (shift != 0) {
+            final int last = words.length - 1;
+            words[last] = ~words[last] & ~(-1L << shift);
+
+            if (words[last] != 0)
+                notEmpty = true;
+        }
+
+        return notEmpty;
+    }
+
     public void set() {
         // Filling with ones
         Arrays.fill(words, 0, words.length - 1, -1L);
@@ -126,6 +150,31 @@ public final class LongArrayBitSet implements ArrayBitSet {
                     notEmpty = true;
                 }
             }
+        } else {
+            throw new UnsupportedOperationException();
+        }
+
+        return notEmpty;
+    }
+
+    @Override
+    public boolean or(
+            @NotNull
+            final BitSet set) {
+        assert size == set.getSize();
+
+        boolean notEmpty = false;
+        if (set instanceof ArrayBitSet) {
+            final long[] from = ((ArrayBitSet) set).toArray();
+            for (int i = 0; i < words.length; i++) {
+                final long word = words[i] | from[i];
+                words[i] = word;
+                if (word != 0) {
+                    notEmpty = true;
+                }
+            }
+        } else {
+            throw new UnsupportedOperationException();
         }
 
         return notEmpty;

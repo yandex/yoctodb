@@ -26,6 +26,8 @@ import com.yandex.yoctodb.util.UnsignedByteArrays;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 import static com.yandex.yoctodb.query.QueryBuilder.*;
@@ -543,6 +545,137 @@ public class SimpleDatabaseTest {
                                 .from(1)));
         Assert.assertTrue(db.count(q3) == 1);
     }
+
+    @Test
+    public void notQuery() throws IOException {
+        final DatabaseBuilder dbBuilder =
+                DatabaseFormat.getCurrent().newDatabaseBuilder();
+
+        // Document 1
+        dbBuilder.merge(
+                DatabaseFormat
+                        .getCurrent()
+                        .newDocumentBuilder()
+                        .withField(
+                                "text",
+                                "doc1234",
+                                DocumentBuilder.IndexOption.FULL)
+                        .withField(
+                                "int",
+                                1,
+                                DocumentBuilder.IndexOption.FULL)
+                        .withPayload("payload1".getBytes())
+        );
+
+        // Document 2
+        dbBuilder.merge(
+                DatabaseFormat
+                        .getCurrent()
+                        .newDocumentBuilder()
+                        .withField(
+                                "text",
+                                "doc2",
+                                DocumentBuilder.IndexOption.FULL)
+                        .withField(
+                                "int",
+                                2,
+                                DocumentBuilder.IndexOption.FULL)
+                        .withPayload("payload2".getBytes())
+        );
+
+        final ByteArrayOutputStream os = new ByteArrayOutputStream();
+        dbBuilder.buildWritable().writeTo(os);
+        final Database db =
+                DatabaseFormat.getCurrent()
+                        .getDatabaseReader()
+                        .from(Buffer.from(os.toByteArray()));
+
+        final Query q1 =
+                select().where(not(eq("int", UnsignedByteArrays.from(1))));
+        Assert.assertEquals(1, db.count(q1));
+        final List<Integer> ids1 = new LinkedList<Integer>();
+        db.execute(q1, new DocumentProcessor() {
+            @Override
+            public boolean process(
+                    int document,
+                    @NotNull Database database) {
+                ids1.add(document);
+                return true;
+            }
+        });
+        Assert.assertEquals(Arrays.asList(1), ids1);
+
+        final Query q2 =
+                select().where(not(eq("int", UnsignedByteArrays.from(1))))
+                        .and(eq("text", UnsignedByteArrays.from("doc2")));
+        Assert.assertEquals(1, db.count(q2));
+        final List<Integer> ids2 = new LinkedList<Integer>();
+        db.execute(q2, new DocumentProcessor() {
+            @Override
+            public boolean process(
+                    int document,
+                    @NotNull Database database) {
+                ids2.add(document);
+                return true;
+            }
+        });
+        Assert.assertEquals(Arrays.asList(1), ids2);
+
+        final Query q3 =
+                select().where(not(eq("int", UnsignedByteArrays.from(1))))
+                        .and(not(eq("int", UnsignedByteArrays.from(2))));
+        Assert.assertEquals(0, db.count(q3));
+    }
+
+    @Test
+    public void oneOfQuery() throws IOException {
+        final DatabaseBuilder dbBuilder =
+                DatabaseFormat.getCurrent().newDatabaseBuilder();
+
+        // Document 1
+        dbBuilder.merge(
+                DatabaseFormat
+                        .getCurrent()
+                        .newDocumentBuilder()
+                        .withField(
+                                "text",
+                                "doc1234",
+                                DocumentBuilder.IndexOption.FULL)
+                        .withField(
+                                "int",
+                                1,
+                                DocumentBuilder.IndexOption.FULL)
+                        .withPayload("payload1".getBytes())
+        );
+
+        // Document 2
+        dbBuilder.merge(
+                DatabaseFormat
+                        .getCurrent()
+                        .newDocumentBuilder()
+                        .withField(
+                                "text",
+                                "doc2",
+                                DocumentBuilder.IndexOption.FULL)
+                        .withField(
+                                "int",
+                                2,
+                                DocumentBuilder.IndexOption.FULL)
+                        .withPayload("payload2".getBytes())
+        );
+
+        final ByteArrayOutputStream os = new ByteArrayOutputStream();
+        dbBuilder.buildWritable().writeTo(os);
+        final Database db =
+                DatabaseFormat.getCurrent()
+                        .getDatabaseReader()
+                        .from(Buffer.from(os.toByteArray()));
+
+        final Query q =
+                select().where(
+                        oneOf(
+                                eq("int", UnsignedByteArrays.from(1)),
+                                eq("text", UnsignedByteArrays.from("doc2"))));
+        Assert.assertEquals(2, db.count(q));
+    }
 }
-
-

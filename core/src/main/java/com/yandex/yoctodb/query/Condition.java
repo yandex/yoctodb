@@ -10,7 +10,9 @@
 
 package com.yandex.yoctodb.query;
 
+import com.yandex.yoctodb.util.mutable.BitSet;
 import net.jcip.annotations.Immutable;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * {@link Where} condition
@@ -19,4 +21,9 @@ import net.jcip.annotations.Immutable;
  */
 @Immutable
 public interface Condition {
+    boolean set(
+            @NotNull
+            QueryContext ctx,
+            @NotNull
+            BitSet to);
 }
