@@ -70,6 +70,12 @@ public final class ByteBufferWrapper extends Buffer {
     }
 
     @Override
+    public Buffer get(byte[] dst, int offset, int length) {
+        delegate.get(dst, offset, length);
+        return this;
+    }
+
+    @Override
     public Buffer get(final byte[] dst) {
         delegate.get(dst);
         return this;
