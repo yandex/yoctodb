@@ -109,6 +109,23 @@ public final class FileChannelBuffer extends Buffer {
     }
 
     @Override
+    public Buffer get(byte[] dst, int offset, int length) {
+        assert length <= remaining();
+
+        try {
+            final int c =
+                    ch.read(ByteBuffer.wrap(dst, offset, length), this.offset + this.position);
+            assert c == length;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        this.position += length;
+
+        return this;
+    }
+
+    @Override
     public Buffer get(final byte[] dst) {
         assert dst.length <= remaining();
 
