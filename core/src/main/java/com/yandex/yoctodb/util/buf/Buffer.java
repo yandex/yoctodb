@@ -67,6 +67,8 @@ public abstract class Buffer implements Comparable<Buffer> {
         return result;
     }
 
+    public abstract Buffer get(byte[] dst, int offset, int length);
+
     public abstract Buffer get(byte[] dst);
 
     public abstract byte get();
