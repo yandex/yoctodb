@@ -1,3 +1,8 @@
+0.0.7
+  * #17: Limited range of possible query ASTs
+  * Allow to use not with general conditions
+  * Buffer.get(buf, offset, length) method added
+
 0.0.6
   * Fixed #17: Implemented `not` and `oneOf` query condition combinators
 
