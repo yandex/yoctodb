@@ -47,8 +47,9 @@ public final class SimpleRangeCondition extends AbstractSimpleCondition {
             throw new IllegalArgumentException("Empty from value");
         if (to.length() == 0)
             throw new IllegalArgumentException("Empty to value");
-        if (from.compareTo(to) >= 0)
-            throw new IllegalArgumentException("from >= to");
+        if (!(from.compareTo(to) < 0 ||
+                from.equals(to) && fromInclusive && toInclusive))
+            throw new IllegalArgumentException("Empty range");
 
         this.from = from.toByteBuffer();
         this.fromInclusive = fromInclusive;
