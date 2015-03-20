@@ -1,3 +1,6 @@
+0.0.8
+  * #26: Invalid invariant checking in SimpleRangeCondition
+
 0.0.7
   * #17: Limited range of possible query ASTs
   * Allow to use not with general conditions
