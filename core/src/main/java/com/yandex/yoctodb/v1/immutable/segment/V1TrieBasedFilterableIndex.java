@@ -10,16 +10,16 @@
 
 package com.yandex.yoctodb.v1.immutable.segment;
 
-import com.yandex.yoctodb.util.buf.Buffer;
-import net.jcip.annotations.Immutable;
-import org.jetbrains.annotations.NotNull;
 import com.yandex.yoctodb.immutable.FilterableIndex;
+import com.yandex.yoctodb.util.buf.Buffer;
 import com.yandex.yoctodb.util.immutable.IndexToIndexMultiMap;
 import com.yandex.yoctodb.util.immutable.TrieBasedByteArraySet;
 import com.yandex.yoctodb.util.immutable.impl.IndexToIndexMultiMapReader;
 import com.yandex.yoctodb.util.immutable.impl.SimpleTrieBasedByteArraySet;
 import com.yandex.yoctodb.util.mutable.BitSet;
 import com.yandex.yoctodb.v1.V1DatabaseFormat;
+import net.jcip.annotations.Immutable;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
@@ -141,11 +141,6 @@ public class V1TrieBasedFilterableIndex implements FilterableIndex, Segment {
                     public Segment read(
                             @NotNull
                             final Buffer buffer) throws IOException {
-                        final Buffer digest =
-                                Segments.calculateDigest(
-                                        buffer,
-                                        V1DatabaseFormat.MESSAGE_DIGEST_ALGORITHM);
-
                         final String fieldName = Segments.extractString(buffer);
 
                         final TrieBasedByteArraySet values =
@@ -155,11 +150,6 @@ public class V1TrieBasedFilterableIndex implements FilterableIndex, Segment {
                         final IndexToIndexMultiMap valueToDocuments =
                                 IndexToIndexMultiMapReader.from(
                                         Segments.extract(buffer));
-
-                        final Buffer digestActual = Segments.extract(buffer);
-                        if (!digestActual.equals(digest)) {
-                            throw new CorruptSegmentException("checksum error");
-                        }
 
                         return new V1TrieBasedFilterableIndex(
                                 fieldName,
