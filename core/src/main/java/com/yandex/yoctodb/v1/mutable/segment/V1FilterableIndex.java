@@ -14,9 +14,6 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
-import net.jcip.annotations.NotThreadSafe;
-import org.jetbrains.annotations.NotNull;
-import com.yandex.yoctodb.util.MessageDigestOutputStreamWrapper;
 import com.yandex.yoctodb.util.OutputStreamWritable;
 import com.yandex.yoctodb.util.UnsignedByteArray;
 import com.yandex.yoctodb.util.mutable.ByteArraySortedSet;
@@ -25,11 +22,11 @@ import com.yandex.yoctodb.util.mutable.impl.FixedLengthByteArraySortedSet;
 import com.yandex.yoctodb.util.mutable.impl.IndexToIndexMultiMapFactory;
 import com.yandex.yoctodb.util.mutable.impl.VariableLengthByteArraySortedSet;
 import com.yandex.yoctodb.v1.V1DatabaseFormat;
+import net.jcip.annotations.NotThreadSafe;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.Map;
 
@@ -128,9 +125,7 @@ public final class V1FilterableIndex
                         8 + // Values
                         values.getSizeInBytes() +
                         8 + // Value to documents
-                        valueToDocumentsIndex.getSizeInBytes() +
-                        8 + //checksum
-                        V1DatabaseFormat.DIGEST_SIZE_IN_BYTES;
+                        valueToDocumentsIndex.getSizeInBytes();
 
                 assert result <= Integer.MAX_VALUE : "Segment reached 2GB";
 
@@ -141,16 +136,6 @@ public final class V1FilterableIndex
             public void writeTo(
                     @NotNull
                     final OutputStream os) throws IOException {
-                final MessageDigest md;
-                try {
-                    md = MessageDigest.getInstance(
-                            V1DatabaseFormat.MESSAGE_DIGEST_ALGORITHM);
-                } catch (NoSuchAlgorithmException e) {
-                    throw new RuntimeException(e);
-                }
-
-                md.reset();
-
                 os.write(Longs.toByteArray(getSizeInBytes()));
 
                 // Payload segment type
@@ -166,28 +151,17 @@ public final class V1FilterableIndex
                         )
                 );
 
-                // With digest calculation
-                final MessageDigestOutputStreamWrapper mdos =
-                        new MessageDigestOutputStreamWrapper(os, md);
-
                 // Field name
-                mdos.write(Ints.toByteArray(fieldName.length));
-                mdos.write(fieldName);
+                os.write(Ints.toByteArray(fieldName.length));
+                os.write(fieldName);
 
                 // Values
-                mdos.write(Longs.toByteArray(values.getSizeInBytes()));
-                values.writeTo(mdos);
+                os.write(Longs.toByteArray(values.getSizeInBytes()));
+                values.writeTo(os);
 
                 // Documents
-                mdos.write(Longs.toByteArray(valueToDocumentsIndex.getSizeInBytes()));
-                valueToDocumentsIndex.writeTo(mdos);
-
-                //writing checksum
-                if (V1DatabaseFormat.DIGEST_SIZE_IN_BYTES !=
-                        md.getDigestLength())
-                    throw new IllegalArgumentException("Wrong digest size");
-                os.write(Longs.toByteArray(V1DatabaseFormat.DIGEST_SIZE_IN_BYTES));
-                os.write(mdos.digest());
+                os.write(Longs.toByteArray(valueToDocumentsIndex.getSizeInBytes()));
+                valueToDocumentsIndex.writeTo(os);
             }
         };
     }

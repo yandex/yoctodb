@@ -11,18 +11,21 @@
 package com.yandex.yoctodb.v1.mutable;
 
 import com.google.common.primitives.Ints;
-import net.jcip.annotations.NotThreadSafe;
-import org.jetbrains.annotations.NotNull;
 import com.yandex.yoctodb.DatabaseFormat;
 import com.yandex.yoctodb.mutable.DatabaseBuilder;
 import com.yandex.yoctodb.mutable.DocumentBuilder;
-import com.yandex.yoctodb.util.UnsignedByteArray;
+import com.yandex.yoctodb.util.MessageDigestOutputStreamWrapper;
 import com.yandex.yoctodb.util.OutputStreamWritable;
+import com.yandex.yoctodb.util.UnsignedByteArray;
 import com.yandex.yoctodb.v1.V1DatabaseFormat;
 import com.yandex.yoctodb.v1.mutable.segment.*;
+import net.jcip.annotations.NotThreadSafe;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 /**
@@ -87,8 +90,7 @@ public final class V1DatabaseBuilder
                     case FILTERABLE:
                         index = new V1FilterableIndex(
                                 fieldName,
-                                lengthOption ==
-                                        DocumentBuilder.LengthOption.FIXED
+                                lengthOption == DocumentBuilder.LengthOption.FIXED
                         );
                         break;
                     case FILTERABLE_TRIE_BASED:
@@ -99,15 +101,13 @@ public final class V1DatabaseBuilder
                     case SORTABLE:
                         index = new V1FullIndex(
                                 fieldName,
-                                lengthOption ==
-                                        DocumentBuilder.LengthOption.FIXED
+                                lengthOption == DocumentBuilder.LengthOption.FIXED
                         );
                         break;
                     case FULL:
                         index = new V1FullIndex(
                                 fieldName,
-                                lengthOption ==
-                                        DocumentBuilder.LengthOption.FIXED
+                                lengthOption == DocumentBuilder.LengthOption.FIXED
                         );
                         break;
                     default:
@@ -145,8 +145,10 @@ public final class V1DatabaseBuilder
         return new OutputStreamWritable() {
             @Override
             public long getSizeInBytes() {
-                // Magic and format
-                long size = 4 + 4;
+                long size =
+                        V1DatabaseFormat.MAGIC.length +
+                        Ints.BYTES + // Format length
+                        V1DatabaseFormat.DIGEST_SIZE_IN_BYTES;
 
                 for (OutputStreamWritable writable : writables) {
                     size += writable.getSizeInBytes();
@@ -163,10 +165,35 @@ public final class V1DatabaseBuilder
                 os.write(DatabaseFormat.MAGIC);
                 os.write(Ints.toByteArray(V1DatabaseFormat.FORMAT));
 
+                final MessageDigest md;
+                try {
+                    md = MessageDigest.getInstance(
+                            V1DatabaseFormat.MESSAGE_DIGEST_ALGORITHM);
+                } catch (NoSuchAlgorithmException e) {
+                    throw new RuntimeException(e);
+                }
+
+                md.reset();
+
+                // With digest calculation
+                final MessageDigestOutputStreamWrapper mdos =
+                        new MessageDigestOutputStreamWrapper(os, md);
+
                 // Segments
                 for (OutputStreamWritable writable : writables) {
-                    writable.writeTo(os);
+                    writable.writeTo(mdos);
                 }
+
+                //writing checksum
+                if (V1DatabaseFormat.DIGEST_SIZE_IN_BYTES !=
+                    md.getDigestLength()) {
+                    throw new IllegalArgumentException(
+                            "Wrong digest size (" +
+                            V1DatabaseFormat.DIGEST_SIZE_IN_BYTES +
+                            " != " + md.getDigestLength() + ")");
+                }
+
+                os.write(mdos.digest());
             }
         };
     }
