@@ -27,7 +27,7 @@ import com.yandex.yoctodb.v1.mutable.V1DocumentBuilder;
  */
 @ThreadSafe
 public final class V1DatabaseFormat extends DatabaseFormat {
-    public final static int FORMAT = 2;
+    public final static int FORMAT = 3;
 
     public final static DatabaseReader DATABASE_READER = new V1DatabaseReader();
 
@@ -46,7 +46,7 @@ public final class V1DatabaseFormat extends DatabaseFormat {
 
         private final int code;
 
-        private SegmentType(final int code) {
+        SegmentType(final int code) {
             this.code = code;
         }
 
@@ -61,7 +61,7 @@ public final class V1DatabaseFormat extends DatabaseFormat {
 
         private final int code;
 
-        private MultiMapType(final int code) {
+        MultiMapType(final int code) {
             this.code = code;
         }
 

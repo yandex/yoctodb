@@ -12,19 +12,16 @@ package com.yandex.yoctodb.v1.mutable.segment;
 
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
-import net.jcip.annotations.NotThreadSafe;
-import org.jetbrains.annotations.NotNull;
-import com.yandex.yoctodb.util.MessageDigestOutputStreamWrapper;
 import com.yandex.yoctodb.util.OutputStreamWritable;
 import com.yandex.yoctodb.util.UnsignedByteArrays;
 import com.yandex.yoctodb.util.mutable.ByteArrayIndexedList;
 import com.yandex.yoctodb.util.mutable.impl.VariableLengthByteArrayIndexedList;
 import com.yandex.yoctodb.v1.V1DatabaseFormat;
+import net.jcip.annotations.NotThreadSafe;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 /**
  * Payload segment
@@ -69,24 +66,13 @@ public final class V1PayloadSegment
             public long getSizeInBytes() {
                 //without code and full size (8 bytes)
                 return 8 + // Payload
-                       payloads.getSizeInBytes() +
-                       8 + //checksum
-                       V1DatabaseFormat.DIGEST_SIZE_IN_BYTES;
+                       payloads.getSizeInBytes();
             }
 
             @Override
             public void writeTo(
                     @NotNull
                     final OutputStream os) throws IOException {
-                final MessageDigest md;
-                try {
-                    md = MessageDigest.getInstance(
-                            V1DatabaseFormat.MESSAGE_DIGEST_ALGORITHM);
-                } catch (NoSuchAlgorithmException e) {
-                    throw new RuntimeException(e);
-                }
-                md.reset();
-
                 // full size in bytes
                 os.write(Longs.toByteArray(getSizeInBytes()));
 
@@ -99,20 +85,9 @@ public final class V1PayloadSegment
                         )
                 );
 
-                // With digest calculation
-                final MessageDigestOutputStreamWrapper mdos =
-                        new MessageDigestOutputStreamWrapper(os, md);
-
                 // data
-                mdos.write(Longs.toByteArray(payloads.getSizeInBytes()));
-                payloads.writeTo(mdos);
-
-                //writing checksum
-                if (V1DatabaseFormat.DIGEST_SIZE_IN_BYTES !=
-                       md.getDigestLength())
-                    throw new IllegalArgumentException("Wrong digest size");
-                os.write(Longs.toByteArray(V1DatabaseFormat.DIGEST_SIZE_IN_BYTES));
-                os.write(mdos.digest());
+                os.write(Longs.toByteArray(payloads.getSizeInBytes()));
+                payloads.writeTo(os);
             }
         };
     }
