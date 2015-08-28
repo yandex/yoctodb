@@ -10,10 +10,6 @@
 
 package com.yandex.yoctodb;
 
-import com.yandex.yoctodb.util.buf.Buffer;
-import org.jetbrains.annotations.NotNull;
-import org.junit.Assert;
-import org.junit.Test;
 import com.yandex.yoctodb.immutable.Database;
 import com.yandex.yoctodb.mutable.DatabaseBuilder;
 import com.yandex.yoctodb.mutable.DocumentBuilder;
@@ -22,6 +18,10 @@ import com.yandex.yoctodb.query.Query;
 import com.yandex.yoctodb.query.simple.SimpleDescendingOrder;
 import com.yandex.yoctodb.query.simple.SimpleRangeCondition;
 import com.yandex.yoctodb.util.UnsignedByteArrays;
+import com.yandex.yoctodb.util.buf.Buffer;
+import org.jetbrains.annotations.NotNull;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -89,8 +89,55 @@ public class SimpleDatabaseTest {
 
         final Query q3 = select().where(eq("int", UnsignedByteArrays.from(2)))
                 .and(in("int", UnsignedByteArrays.from(2), UnsignedByteArrays
-                                .from(1)));
+                        .from(1)));
         Assert.assertTrue(db.count(q3) == 1);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void detectCorruptedDatabase() throws IOException {
+        final DatabaseBuilder dbBuilder =
+                DatabaseFormat.getCurrent().newDatabaseBuilder();
+
+        // Document 1
+        dbBuilder.merge(
+                DatabaseFormat
+                        .getCurrent()
+                        .newDocumentBuilder()
+                        .withField(
+                                "text",
+                                "doc1234",
+                                DocumentBuilder.IndexOption.FULL)
+                        .withField(
+                                "int",
+                                1,
+                                DocumentBuilder.IndexOption.FULL)
+                        .withPayload("payload1".getBytes())
+        );
+
+        // Document 2
+        dbBuilder.merge(
+                DatabaseFormat
+                        .getCurrent()
+                        .newDocumentBuilder()
+                        .withField(
+                                "text",
+                                "doc2",
+                                DocumentBuilder.IndexOption.FULL)
+                        .withField(
+                                "int",
+                                2,
+                                DocumentBuilder.IndexOption.FULL)
+                        .withPayload("payload2".getBytes())
+        );
+
+        final ByteArrayOutputStream os = new ByteArrayOutputStream();
+        dbBuilder.buildWritable().writeTo(os);
+        final byte[] data = os.toByteArray();
+        // Corruption
+        data[data.length / 2] = (byte) ~data[data.length / 2];
+        DatabaseFormat.getCurrent()
+                .getDatabaseReader()
+                .from(Buffer.from(data));
     }
 
     @Test
@@ -169,10 +216,10 @@ public class SimpleDatabaseTest {
                         .getDatabaseReader()
                         .from(Buffer.from(os.toByteArray()));
         final Query q1 = select().where(eq("int_field_full", UnsignedByteArrays
-                                                   .from(1)));
+                .from(1)));
         Assert.assertTrue(db.count(q1) == 1);
         final Query q2 = select().where(eq("string_field_full", UnsignedByteArrays
-                                                   .from("doc2")));
+                .from("doc2")));
         Assert.assertTrue(db.count(q2) == 1);
 
     }
@@ -275,7 +322,7 @@ public class SimpleDatabaseTest {
         //less or equals
         for (int i = 0; i < docs; i++) {
             final Query q1 = select().where(lte("id", UnsignedByteArrays.from(
-                                                        i)));
+                    i)));
             Assert.assertEquals(i + 1, db.count(q1));
         }
 
@@ -288,7 +335,7 @@ public class SimpleDatabaseTest {
         //greater or equals
         for (int i = 0; i < docs; i++) {
             final Query q1 = select().where(gte("id", UnsignedByteArrays.from(
-                                                        i)));
+                    i)));
             Assert.assertEquals(docs - i, db.count(q1));
         }
 
@@ -487,7 +534,7 @@ public class SimpleDatabaseTest {
 
         final Query q3 = select().where(eq("int", UnsignedByteArrays.from(2)))
                 .and(in("int", UnsignedByteArrays.from(2), UnsignedByteArrays
-                                .from(1)));
+                        .from(1)));
         Assert.assertTrue(db.count(q3) == 1);
     }
 
@@ -542,7 +589,7 @@ public class SimpleDatabaseTest {
 
         final Query q3 = select().where(eq("int", UnsignedByteArrays.from(2)))
                 .and(in("int", UnsignedByteArrays.from(2), UnsignedByteArrays
-                                .from(1)));
+                        .from(1)));
         Assert.assertTrue(db.count(q3) == 1);
     }
 

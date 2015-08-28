@@ -19,8 +19,6 @@ import com.yandex.yoctodb.v1.V1DatabaseFormat;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import static com.yandex.yoctodb.v1.mutable.segment.Utils.calculateDigest;
-
 /**
  * @author svyatoslav
  *         Date: 08.11.13
@@ -48,8 +46,6 @@ public class V1PayloadSegmentBinaryTest {
         final int payloadCode = byteBuffer.getInt();
         Assert.assertEquals(V1DatabaseFormat.SegmentType.PAYLOAD.getCode(), payloadCode);
 
-        final byte[] digest = calculateDigest(byteBuffer, V1DatabaseFormat.MESSAGE_DIGEST_ALGORITHM);
-
         final long elementsSizeInBytes = byteBuffer.getLong();
         Assert.assertEquals(257, elementsSizeInBytes);
 
@@ -67,13 +63,6 @@ public class V1PayloadSegmentBinaryTest {
             final byte[] currentElementBytes = new byte[(int) (offsets[i + 1] - offsets[i])];
             byteBuffer.get(currentElementBytes);
             Assert.assertEquals(("payload" + i), new String(currentElementBytes));
-        }
-
-        final long digestSize = byteBuffer.getLong();
-        Assert.assertEquals(V1DatabaseFormat.DIGEST_SIZE_IN_BYTES, digestSize);
-        for (int i = 0; i < digestSize; i++) {
-            byte actualDigestByte = byteBuffer.get();
-            Assert.assertEquals(digest[i], actualDigestByte);
         }
 
         //check that input has not remaining

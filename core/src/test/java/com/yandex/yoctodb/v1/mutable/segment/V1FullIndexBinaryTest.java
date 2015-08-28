@@ -24,8 +24,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static com.yandex.yoctodb.v1.mutable.segment.Utils.calculateDigest;
-
 /**
  * @author svyatoslav
  */
@@ -63,8 +61,6 @@ public class V1FullIndexBinaryTest {
 
         int segmentCode = byteBuffer.getInt();
         Assert.assertEquals(V1DatabaseFormat.SegmentType.FIXED_LENGTH_FULL_INDEX.getCode(), segmentCode);
-
-        final byte[] digest = calculateDigest(byteBuffer, V1DatabaseFormat.MESSAGE_DIGEST_ALGORITHM);
 
         final int fieldNameLength = byteBuffer.getInt();
         Assert.assertEquals("fixed_length_field_name".getBytes().length, fieldNameLength);
@@ -142,13 +138,6 @@ public class V1FullIndexBinaryTest {
         }
         Assert.assertArrayEquals(new int[]{1, 0, 1}, documentsToValueIndex);
 
-        long digestSize = byteBuffer.getLong();
-        Assert.assertEquals(V1DatabaseFormat.DIGEST_SIZE_IN_BYTES, digestSize);
-        for (int i = 0; i < digestSize; i++) {
-            byte actualDigestByte = byteBuffer.get();
-            Assert.assertEquals(digest[i], actualDigestByte);
-        }
-
         //check that input has not remaining
         Assert.assertFalse(byteBuffer.hasRemaining());
     }
@@ -186,8 +175,6 @@ public class V1FullIndexBinaryTest {
 
         final int segmentCode = byteBuffer.getInt();
         Assert.assertEquals(V1DatabaseFormat.SegmentType.VARIABLE_LENGTH_FULL_INDEX.getCode(), segmentCode);
-
-        final byte[] digest = calculateDigest(byteBuffer, V1DatabaseFormat.MESSAGE_DIGEST_ALGORITHM);
 
         final int fieldNameLength = byteBuffer.getInt();
         Assert.assertEquals("variable_length_field_name".getBytes().length, fieldNameLength);
@@ -271,13 +258,6 @@ public class V1FullIndexBinaryTest {
             documentsToValueIndex[i] = valueId;
         }
         Assert.assertArrayEquals(new int[]{1, 0, 1}, documentsToValueIndex);
-
-        final long digestSize = byteBuffer.getLong();
-        Assert.assertEquals(V1DatabaseFormat.DIGEST_SIZE_IN_BYTES, digestSize);
-        for (int i = 0; i < digestSize; i++) {
-            byte actualDigestByte = byteBuffer.get();
-            Assert.assertEquals(digest[i], actualDigestByte);
-        }
 
         //check that input has not remaining
         Assert.assertFalse(byteBuffer.hasRemaining());

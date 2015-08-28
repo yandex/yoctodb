@@ -25,25 +25,33 @@ import java.util.Collection;
  * @author incubos
  */
 @ThreadSafe
-public interface DatabaseReader {
+public abstract class DatabaseReader {
     @NotNull
-    Database from(
+    public Database from(
             @NotNull
-            Buffer b) throws IOException;
+            final Buffer buffer) throws IOException {
+        return from(buffer, true);
+    }
 
     @NotNull
-    Database composite(
+    public abstract Database from(
+            @NotNull
+            Buffer b,
+            boolean checksum) throws IOException;
+
+    @NotNull
+    public abstract Database composite(
             @NotNull
             Collection<Database> databases) throws IOException;
 
     @NotNull
-    Database mmap(
+    public abstract Database mmap(
             @NotNull
             File f,
             boolean forceToMemory) throws IOException;
 
     @NotNull
-    Database from(
+    public abstract Database from(
             @NotNull
             FileChannel f) throws IOException;
 }
