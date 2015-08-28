@@ -13,9 +13,6 @@ package com.yandex.yoctodb.v1.immutable.segment;
 import com.yandex.yoctodb.util.buf.Buffer;
 import org.jetbrains.annotations.NotNull;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-
 /**
  * Utility methods for segments
  *
@@ -59,34 +56,5 @@ class Segments {
         from.get(buffer);
 
         return new String(buffer);
-    }
-
-    public static Buffer calculateDigest(
-            @NotNull
-            final Buffer buffer,
-            @NotNull
-            final String messageDigestAlgorithm) {
-        final MessageDigest md;
-        try {
-            md = MessageDigest.getInstance(messageDigestAlgorithm);
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
-        md.reset();
-
-        // get byte buffer without digest length and without digest content
-        final Buffer data =
-                buffer.slice(buffer.remaining() - md.getDigestLength() - 8);
-        final byte[] buf =
-                new byte[Math.min((int) Math.max(buffer.remaining(), 8192L), 8192)];
-        while (data.remaining() >= buf.length) {
-            data.get(buf);
-            md.update(buf);
-        }
-        if (data.hasRemaining()) {
-            md.update(data.toByteArray());
-        }
-
-        return Buffer.from(md.digest());
     }
 }

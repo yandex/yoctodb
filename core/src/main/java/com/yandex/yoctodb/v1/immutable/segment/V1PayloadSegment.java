@@ -10,13 +10,13 @@
 
 package com.yandex.yoctodb.v1.immutable.segment;
 
-import com.yandex.yoctodb.util.buf.Buffer;
-import net.jcip.annotations.Immutable;
-import org.jetbrains.annotations.NotNull;
 import com.yandex.yoctodb.immutable.Payload;
+import com.yandex.yoctodb.util.buf.Buffer;
 import com.yandex.yoctodb.util.immutable.ByteArrayIndexedList;
 import com.yandex.yoctodb.util.immutable.impl.VariableLengthByteArrayIndexedList;
 import com.yandex.yoctodb.v1.V1DatabaseFormat;
+import net.jcip.annotations.Immutable;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
@@ -65,19 +65,9 @@ public final class V1PayloadSegment implements Payload, Segment {
                     public Segment read(
                             @NotNull
                             final Buffer buffer) throws IOException {
-                        final Buffer digest =
-                                Segments.calculateDigest(
-                                        buffer,
-                                        V1DatabaseFormat.MESSAGE_DIGEST_ALGORITHM);
-
                         final ByteArrayIndexedList payloads =
                                 VariableLengthByteArrayIndexedList.from(
                                         Segments.extract(buffer));
-
-                        final Buffer digestActual = Segments.extract(buffer);
-                        if (!digestActual.equals(digest)) {
-                            throw new CorruptSegmentException("checksum error");
-                        }
 
                         return new V1PayloadSegment(payloads);
                     }

@@ -24,8 +24,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static com.yandex.yoctodb.v1.mutable.segment.Utils.calculateDigest;
-
 /**
  * @author svyatoslav
  *         Date: 07.11.13
@@ -78,8 +76,6 @@ public class V1FilterableIndexBinaryTest {
 
         final int segmentTypeCode = byteBuffer.getInt();
         Assert.assertEquals(V1DatabaseFormat.SegmentType.VARIABLE_LENGTH_FILTER.getCode(), segmentTypeCode);
-
-        final byte[] digest = calculateDigest(byteBuffer, V1DatabaseFormat.MESSAGE_DIGEST_ALGORITHM);
 
         final int fieldNameLength = byteBuffer.getInt();
         Assert.assertEquals("variable_length_field_name".getBytes().length, fieldNameLength);
@@ -213,8 +209,6 @@ public class V1FilterableIndexBinaryTest {
 
         final int segmentTypeCode = byteBuffer.getInt();
         Assert.assertEquals(V1DatabaseFormat.SegmentType.FIXED_LENGTH_FILTER.getCode(), segmentTypeCode);
-
-        final byte[] digest = calculateDigest(byteBuffer, V1DatabaseFormat.MESSAGE_DIGEST_ALGORITHM);
 
         final int fieldNameLength = byteBuffer.getInt();
         Assert.assertEquals("fixed_length_field_name".getBytes().length, fieldNameLength);
