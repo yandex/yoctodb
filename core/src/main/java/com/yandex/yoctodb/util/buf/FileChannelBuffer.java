@@ -30,11 +30,6 @@ public final class FileChannelBuffer extends Buffer {
     private final long limit;
     private long position;
 
-    // Temporary buffers
-    private final ByteBuffer byteBuf = ByteBuffer.allocate(1);
-    private final ByteBuffer intBuf = ByteBuffer.allocate(4);
-    private final ByteBuffer longBuf = ByteBuffer.allocate(8);
-
     public FileChannelBuffer(
             @NotNull
             final FileChannel ch) {
@@ -146,7 +141,7 @@ public final class FileChannelBuffer extends Buffer {
     public byte get() {
         assert hasRemaining();
 
-        byteBuf.rewind();
+        final ByteBuffer byteBuf = byteBufCache.get();
         try {
             final int c = ch.read(byteBuf, this.offset + this.position);
             assert c == 1;
@@ -163,7 +158,7 @@ public final class FileChannelBuffer extends Buffer {
     public byte get(final long index) {
         assert 0 <= index && index < limit;
 
-        byteBuf.rewind();
+        final ByteBuffer byteBuf = byteBufCache.get();
         try {
             final int c = ch.read(byteBuf, this.offset + index);
             assert c == 1;
@@ -178,6 +173,7 @@ public final class FileChannelBuffer extends Buffer {
     public int getInt() {
         assert remaining() >= 4;
 
+        final ByteBuffer intBuf = intBufCache.get();
         intBuf.rewind();
         try {
             final int c = ch.read(intBuf, this.offset + this.position);
@@ -195,7 +191,7 @@ public final class FileChannelBuffer extends Buffer {
     public int getInt(final long index) {
         assert index + 4 <= limit;
 
-        intBuf.rewind();
+        final ByteBuffer intBuf = intBufCache.get();
         try {
             final int c = ch.read(intBuf, this.offset + index);
             assert c == 4;
@@ -210,7 +206,7 @@ public final class FileChannelBuffer extends Buffer {
     public long getLong() {
         assert remaining() >= 8;
 
-        longBuf.rewind();
+        final ByteBuffer longBuf = longBufCache.get();
         try {
             final int c = ch.read(longBuf, this.offset + this.position);
             assert c == 8;
@@ -227,7 +223,7 @@ public final class FileChannelBuffer extends Buffer {
     public long getLong(final long index) {
         assert index + 8 <= limit;
 
-        longBuf.rewind();
+        final ByteBuffer longBuf = longBufCache.get();
         try {
             final int c = ch.read(longBuf, this.offset + index);
             assert c == 8;
@@ -249,4 +245,48 @@ public final class FileChannelBuffer extends Buffer {
                 this.offset + from,
                 size);
     }
+
+    // Temporary buffers
+    private final ThreadLocal<ByteBuffer> byteBufCache =
+            new ThreadLocal<ByteBuffer>() {
+                @Override
+                protected ByteBuffer initialValue() {
+                    return ByteBuffer.allocate(1);
+                }
+
+                @Override
+                public ByteBuffer get() {
+                    final ByteBuffer result = super.get();
+                    result.rewind();
+                    return result;
+                }
+            };
+    private final ThreadLocal<ByteBuffer> intBufCache =
+            new ThreadLocal<ByteBuffer>() {
+                @Override
+                protected ByteBuffer initialValue() {
+                    return ByteBuffer.allocate(4);
+                }
+
+                @Override
+                public ByteBuffer get() {
+                    final ByteBuffer result = super.get();
+                    result.rewind();
+                    return result;
+                }
+            };
+    private final ThreadLocal<ByteBuffer> longBufCache =
+            new ThreadLocal<ByteBuffer>() {
+                @Override
+                protected ByteBuffer initialValue() {
+                    return ByteBuffer.allocate(8);
+                }
+
+                @Override
+                public ByteBuffer get() {
+                    final ByteBuffer result = super.get();
+                    result.rewind();
+                    return result;
+                }
+            };
 }
