@@ -1,3 +1,6 @@
+0.0.10
+  * #27: Data race in FileChannelBuffer.get*(index)
+
 0.0.9
   * #18: Using per database checksum instead of per segment ones
 
