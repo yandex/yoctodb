@@ -24,5 +24,5 @@ public interface Payload {
     int getSize();
 
     @NotNull
-    Buffer getPayload(final int i);
+    Buffer getPayload(int i);
 }
