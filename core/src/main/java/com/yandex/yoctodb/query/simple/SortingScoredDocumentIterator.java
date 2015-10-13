@@ -11,19 +11,18 @@
 package com.yandex.yoctodb.query.simple;
 
 import com.google.common.collect.Iterators;
-import com.yandex.yoctodb.util.buf.Buffer;
-import net.jcip.annotations.NotThreadSafe;
-import org.jetbrains.annotations.NotNull;
-import com.yandex.yoctodb.util.immutable.IntToIntArray;
 import com.yandex.yoctodb.immutable.SortableIndex;
 import com.yandex.yoctodb.query.Order;
 import com.yandex.yoctodb.query.QueryContext;
+import com.yandex.yoctodb.util.buf.Buffer;
+import com.yandex.yoctodb.util.immutable.IntToIntArray;
 import com.yandex.yoctodb.util.mutable.BitSet;
+import net.jcip.annotations.NotThreadSafe;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 /**
  * {@link Iterator} implementation producing {@link SimpleScoredDocument}s
@@ -99,8 +98,6 @@ public final class SortingScoredDocumentIterator
     }
 
     private void fillChunk() {
-        assert baseIterator.hasNext();
-
         final IntToIntArray taggedDocuments = baseIterator.next();
         final int[] ids = taggedDocuments.getValues();
         final int count = taggedDocuments.getCount();
@@ -139,18 +136,10 @@ public final class SortingScoredDocumentIterator
 
     @Override
     public SimpleScoredDocument next() {
-        if (!hasNext())
-            throw new NoSuchElementException();
-
-        if (chunk.hasNext()) {
-            return chunk.next().toScoredDocument();
-        } else {
+        if (!chunk.hasNext())
             fillChunk();
 
-            assert chunk.hasNext();
-
-            return chunk.next().toScoredDocument();
-        }
+        return chunk.next().toScoredDocument();
     }
 
     @Override
