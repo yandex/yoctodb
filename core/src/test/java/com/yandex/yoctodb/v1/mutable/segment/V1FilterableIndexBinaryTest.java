@@ -26,7 +26,6 @@ import java.util.List;
 
 /**
  * @author svyatoslav
- *         Date: 07.11.13
  */
 public class V1FilterableIndexBinaryTest {
 

@@ -21,7 +21,6 @@ import java.io.IOException;
 
 /**
  * @author svyatoslav
- *         Date: 08.11.13
  */
 public class V1PayloadSegmentBinaryTest {
 

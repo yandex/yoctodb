@@ -26,7 +26,6 @@ import java.util.Set;
 
 /**
  * @author svyatoslav
- *         Date: 21.11.13
  */
 public class IntIndexToIndexMultiMapTest {
     @Test

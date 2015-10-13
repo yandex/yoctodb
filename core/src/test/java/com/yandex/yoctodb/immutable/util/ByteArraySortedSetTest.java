@@ -27,7 +27,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * @author svyatoslav Date: 17.11.13
+ * @author svyatoslav
  */
 public class ByteArraySortedSetTest {
     @Test
