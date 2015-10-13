@@ -26,7 +26,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * @author svyatoslav Date: 16.11.13
+ * @author svyatoslav
  */
 public class ByteArrayIndexedListTest {
     @Test

@@ -22,7 +22,6 @@ import java.io.IOException;
 
 /**
  * @author svyatoslav
- *         Date: 25.11.13
  */
 public class LongArrayBitSetTest {
     private static final int SIZE = 1024;

@@ -18,7 +18,6 @@ import java.util.Iterator;
 
 /**
  * @author svyatoslav
- *         Date: 21.11.13
  */
 @Immutable
 public interface IndexToIndexMultiMap {
