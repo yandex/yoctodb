@@ -13,10 +13,11 @@ package com.yandex.yoctodb.util.mutable.impl;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.TreeMultimap;
 import com.google.common.primitives.Ints;
-import net.jcip.annotations.NotThreadSafe;
-import org.jetbrains.annotations.NotNull;
+import com.google.common.primitives.Longs;
 import com.yandex.yoctodb.util.mutable.IndexToIndexMultiMap;
 import com.yandex.yoctodb.v1.V1DatabaseFormat;
+import net.jcip.annotations.NotThreadSafe;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -24,6 +25,30 @@ import java.util.Collection;
 
 /**
  * {@link IntIndexToIndexMultiMap} implementation based on {@link Integer}s
+ *
+ * Format:
+ *
+ * <pre>
+ * {@code
+ * type (int)
+ * keys count (int)
+ * offsets
+ *   offset1 (long)
+ *   offset2 (long)
+ *   ...
+ * sets
+ *   set1
+ *     size (int)
+ *     value1 (int)
+ *     value2 (int)
+ *     ...
+ *   set2
+ *     size (int)
+ *     value1 (int)
+ *     value2 (int)
+ *     ...
+ * }
+ * </pre>
  *
  * @author incubos
  */
@@ -46,10 +71,11 @@ public final class IntIndexToIndexMultiMap implements IndexToIndexMultiMap {
         if (map.isEmpty())
             throw new IllegalStateException("Empty multimap");
 
-        return 4 + // type
-                4 + // keys count
-                (4 + 4) * (long) map.keySet().size() + // offsets
-                4L * map.size();    // sets
+        return 4L + // type
+               4L + // keys count
+               8L * map.keySet().size() + // offsets
+               4L * map.keySet().size() + // sizes
+               4L * map.size();    // set elements
     }
 
     @Override
@@ -68,10 +94,10 @@ public final class IntIndexToIndexMultiMap implements IndexToIndexMultiMap {
         os.write(Ints.toByteArray(map.keySet().size()));
 
         // Offsets
-        int offset = 0;
+        long offset = 0L;
         for (Collection<Integer> value : map.asMap().values()) {
-            os.write(Ints.toByteArray(offset));
-            offset += 4 + 4 * value.size();
+            os.write(Longs.toByteArray(offset));
+            offset += 4L + 4L * value.size();
         }
 
         // Sets
@@ -87,7 +113,7 @@ public final class IntIndexToIndexMultiMap implements IndexToIndexMultiMap {
     @Override
     public String toString() {
         return "IntIndexToIndexMultiMap{" +
-                "map=" + map +
-                '}';
+               "map=" + map +
+               '}';
     }
 }

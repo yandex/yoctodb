@@ -27,7 +27,7 @@ import com.yandex.yoctodb.v1.mutable.V1DocumentBuilder;
  */
 @ThreadSafe
 public final class V1DatabaseFormat extends DatabaseFormat {
-    public final static int FORMAT = 3;
+    public final static int FORMAT = 4;
 
     public final static DatabaseReader DATABASE_READER = new V1DatabaseReader();
 

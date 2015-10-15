@@ -68,8 +68,9 @@ public class VariableLengthByteArrayIndexedList
     public Buffer get(final int i) {
         assert 0 <= i && i < elementCount;
 
-        final long start = offsets.getLong(i << 3);
-        final long end = offsets.getLong((i + 1) << 3);
+        final long base = ((long) i) << 3;
+        final long start = offsets.getLong(base);
+        final long end = offsets.getLong(base + 8L);
 
         assert start < end;
 

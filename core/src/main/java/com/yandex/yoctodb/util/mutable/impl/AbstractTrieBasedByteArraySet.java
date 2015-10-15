@@ -10,10 +10,10 @@
 
 package com.yandex.yoctodb.util.mutable.impl;
 
-import net.jcip.annotations.NotThreadSafe;
-import org.jetbrains.annotations.NotNull;
 import com.yandex.yoctodb.util.UnsignedByteArray;
 import com.yandex.yoctodb.util.mutable.TrieBasedByteArraySet;
+import net.jcip.annotations.NotThreadSafe;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -22,13 +22,14 @@ import java.util.*;
  */
 @NotThreadSafe
 abstract class AbstractTrieBasedByteArraySet implements TrieBasedByteArraySet {
-    public static final int COMPRESSION_TRESHOLD = 255;
+    public static final int COMPRESSION_THRESHOLD = 255;
+
     protected Map<UnsignedByteArray, UnsignedByteArray> elements =
             new HashMap<UnsignedByteArray, UnsignedByteArray>();
     protected boolean frozen = false;
     protected TrieNode root = new TrieNode();
     protected Map<UnsignedByteArray, Integer> sortedElements = null;
-    protected int trieSizeInBytes = 0;
+    protected long trieSizeInBytes = 0L;
 
     protected void build() {
         if (frozen)
@@ -36,14 +37,16 @@ abstract class AbstractTrieBasedByteArraySet implements TrieBasedByteArraySet {
 
         // Sorting
         final UnsignedByteArray[] sorted =
-                elements.keySet().toArray(new UnsignedByteArray[elements.size()]);
+                elements.keySet().toArray(
+                        new UnsignedByteArray[elements.size()]);
         Arrays.sort(sorted);
 
         // Releasing resources
         elements = null;
 
         // Copying
-        sortedElements = new LinkedHashMap<UnsignedByteArray, Integer>(sorted.length);
+        sortedElements =
+                new LinkedHashMap<UnsignedByteArray, Integer>(sorted.length);
         int i = 0;
         for (UnsignedByteArray e : sorted) {
             sortedElements.put(e, i++);
@@ -58,7 +61,9 @@ abstract class AbstractTrieBasedByteArraySet implements TrieBasedByteArraySet {
         updateOffsets();
     }
 
-    protected void insertByteArray(UnsignedByteArray byteArray, int position) {
+    protected void insertByteArray(
+            final UnsignedByteArray byteArray,
+            final int position) {
         TrieNode currentNode = root;
         for (byte currentByte : byteArray) {
             if (!currentNode.children.containsKey(currentByte)) {
@@ -75,21 +80,21 @@ abstract class AbstractTrieBasedByteArraySet implements TrieBasedByteArraySet {
         currentNode.setPosition(position);
     }
 
-
     protected void updateOffsets() {
         Queue<TrieNode> queue = new LinkedList<TrieNode>();
         queue.add(root);
         int offset = 0;
-        while (queue.size() > 0) {
-            TrieNode node = queue.poll();
-            if (node.getChildren().size() == 0 || node.getChildren().size() < COMPRESSION_TRESHOLD) {
+        while (!queue.isEmpty()) {
+            final TrieNode node = queue.poll();
+            if (node.getChildren().size() == 0 || node.getChildren().size() < COMPRESSION_THRESHOLD) {
                 node.setCompressed(true);
             }
 
             node.setOffset(offset);
             if (node.isCompressed()) {
-                node.setEnds(offset
-                        + 1  //is terminal node
+                node.setEnds(
+                        offset
+                        + 1 //is terminal node
                         + (node.position >= 0 ? 4 : 0) // position of key in sorted set
                         + 1 //compression
                         + 4 //count of child
@@ -97,13 +102,16 @@ abstract class AbstractTrieBasedByteArraySet implements TrieBasedByteArraySet {
                 );
 
             } else {
-                int countOfJmpsInRange = node.getChildren().size() == 0 ? 0
-                        : ((int) node.getMaxByteJmpValue()) - ((int) node.getMinByteJmpValue()) + 1;
-                node.setEnds(offset
-                        + 1     //is terminal node
+                final int countOfJmpsInRange =
+                        node.getChildren().size() == 0 ?
+                                0 :
+                                ((int) node.getMaxByteJmpValue()) - ((int) node.getMinByteJmpValue()) + 1;
+                node.setEnds(
+                        offset
+                        + 1 //is terminal node
                         + (node.position >= 0 ? 4 : 0) // position of key in sorted set
-                        + 2     //two bytes for min and max jmp value
-                        + 1    //compression
+                        + 2 //two bytes for min and max jmp value
+                        + 1 //compression
                         + 4 * (countOfJmpsInRange)  //jmps destination
                 );
             }
@@ -114,8 +122,11 @@ abstract class AbstractTrieBasedByteArraySet implements TrieBasedByteArraySet {
             }
         }
         trieSizeInBytes = offset;
-    }
 
+        if (trieSizeInBytes > Integer.MAX_VALUE)
+            throw new UnsupportedOperationException(
+                    "Not implemented yet, naughty boy!");
+    }
 
     @NotNull
     @Override
@@ -229,12 +240,12 @@ abstract class AbstractTrieBasedByteArraySet implements TrieBasedByteArraySet {
         @Override
         public String toString() {
             return "TrieNode{" +
-                    "children=" + children +
-                    ", position=" + position +
-                    ", offset=" + offset +
-                    ", ends=" + ends +
-                    ", isCompressed=" + isCompressed +
-                    '}';
+                   "children=" + children +
+                   ", position=" + position +
+                   ", offset=" + offset +
+                   ", ends=" + ends +
+                   ", isCompressed=" + isCompressed +
+                   '}';
         }
     }
 

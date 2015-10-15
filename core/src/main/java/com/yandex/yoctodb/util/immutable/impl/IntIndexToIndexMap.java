@@ -53,7 +53,7 @@ public class IntIndexToIndexMap implements IndexToIndexMap {
     public int get(final int key) {
         assert 0 <= key && key < elementCount;
 
-        return elements.getInt(key << 2);
+        return elements.getInt(((long) key) << 2);
     }
 
     @Override

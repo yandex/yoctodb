@@ -163,6 +163,32 @@ public class SimpleDatabaseTest {
                                 "string_field_sortable",
                                 "string_1",
                                 DocumentBuilder.IndexOption.SORTABLE)
+                                //byte
+                        .withField(
+                                "byte_field_full",
+                                (byte) 1,
+                                DocumentBuilder.IndexOption.FULL)
+                        .withField(
+                                "byte_field_filterable",
+                                (byte) 1,
+                                DocumentBuilder.IndexOption.FILTERABLE)
+                        .withField(
+                                "byte_field_sortable",
+                                (byte) 1,
+                                DocumentBuilder.IndexOption.SORTABLE)
+                                //short
+                        .withField(
+                                "short_field_full",
+                                (short) 1,
+                                DocumentBuilder.IndexOption.FULL)
+                        .withField(
+                                "short_field_filterable",
+                                (short) 1,
+                                DocumentBuilder.IndexOption.FILTERABLE)
+                        .withField(
+                                "short_field_sortable",
+                                (short) 1,
+                                DocumentBuilder.IndexOption.SORTABLE)
                                 //integer
                         .withField(
                                 "int_field_full",
@@ -175,6 +201,19 @@ public class SimpleDatabaseTest {
                         .withField(
                                 "int_field_sortable",
                                 1,
+                                DocumentBuilder.IndexOption.SORTABLE)
+                                //long
+                        .withField(
+                                "long_field_full",
+                                1L,
+                                DocumentBuilder.IndexOption.FULL)
+                        .withField(
+                                "long_field_filterable",
+                                1L,
+                                DocumentBuilder.IndexOption.FILTERABLE)
+                        .withField(
+                                "long_field_sortable",
+                                1L,
                                 DocumentBuilder.IndexOption.SORTABLE)
                                 //boolean
                         .withField(
@@ -436,8 +475,10 @@ public class SimpleDatabaseTest {
                         new SimpleRangeCondition(
                                 "id",
                                 UnsignedByteArrays.from(10),
-                                true, UnsignedByteArrays.from(20),
-                                true)).orderBy(new SimpleDescendingOrder("id"));
+                                true,
+                                UnsignedByteArrays.from(20),
+                                true))
+                        .orderBy(new SimpleDescendingOrder("id"));
         final List<String> results = new ArrayList<String>(docs);
         db.execute(q1, new DocumentProcessor() {
             @Override
