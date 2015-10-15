@@ -48,7 +48,7 @@ public final class IntIndexToIndexMap implements IndexToIndexMap {
 
     @Override
     public long getSizeInBytes() {
-        return 4 + 4L * elements.size();
+        return 4L + 4L * elements.size();
     }
 
     @Override

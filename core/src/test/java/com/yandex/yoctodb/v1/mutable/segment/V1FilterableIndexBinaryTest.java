@@ -86,7 +86,7 @@ public class V1FilterableIndexBinaryTest {
 
         //Reading values
         final long valuesSize = byteBuffer.getLong();
-        Assert.assertEquals(87, valuesSize);
+        Assert.assertEquals(135, valuesSize);
 
         final int maxElement = byteBuffer.getInt();
         Assert.assertEquals(5, maxElement);
@@ -94,18 +94,18 @@ public class V1FilterableIndexBinaryTest {
         final int elementsCount = byteBuffer.getInt();
         Assert.assertEquals(11, elementsCount);
 
-        final int[] elementOffsets = new int[elementsCount + 1];
+        final long[] elementOffsets = new long[elementsCount + 1];
 
         for (int i = 0; i <= elementsCount; i++) {
-            final int currentOffset = byteBuffer.getInt();
+            final long currentOffset = byteBuffer.getLong();
             elementOffsets[i] = currentOffset;
         }
 
-        Assert.assertArrayEquals(new int[]{0, 1, 6, 8, 11, 15, 19, 22, 27, 29, 30, 31}, elementOffsets);
+        Assert.assertArrayEquals(new long[]{0, 1, 6, 8, 11, 15, 19, 22, 27, 29, 30, 31}, elementOffsets);
 
         final List<UnsignedByteArray> elements = new ArrayList<UnsignedByteArray>();
         for (int i = 0; i < elementsCount; i++) {
-            final byte[] currentElementBytes = new byte[elementOffsets[i + 1] - elementOffsets[i]];
+            final byte[] currentElementBytes = new byte[(int) elementOffsets[i + 1] - (int) elementOffsets[i]];
             byteBuffer.get(currentElementBytes);
             elements.add(UnsignedByteArrays.raw(currentElementBytes));
         }

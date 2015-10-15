@@ -37,7 +37,7 @@ public final class VariableLengthByteArraySortedSet
             final Buffer buffer) {
         final int maxElement = buffer.getInt();
         final int size = buffer.getInt();
-        final Buffer offsets = buffer.slice((size + 1) << 2);
+        final Buffer offsets = buffer.slice(((long) (size + 1)) << 3);
         final Buffer elements = buffer.slice();
         elements.position(offsets.remaining());
 
@@ -77,8 +77,9 @@ public final class VariableLengthByteArraySortedSet
             final Buffer that) {
         assert 0 <= ith && ith < size;
 
-        final int leftFrom = offsets.getInt(ith << 2);
-        final int leftEnd = offsets.getInt((ith + 1) << 2);
+        final long base = ((long) ith) << 3;
+        final long leftFrom = offsets.getLong(base);
+        final long leftEnd = offsets.getLong(base + 8L);
 
         assert leftFrom < leftEnd;
 
@@ -99,8 +100,9 @@ public final class VariableLengthByteArraySortedSet
     public Buffer get(final int i) {
         assert 0 <= i && i < size;
 
-        final int start = offsets.getInt(i << 2);
-        final int end = offsets.getInt((i + 1) << 2);
+        final long base = ((long) i) << 3;
+        final long start = offsets.getLong(base);
+        final long end = offsets.getLong(base + 8L);
 
         assert start < end;
 

@@ -23,7 +23,7 @@ import java.util.Iterator;
  * @author svyatoslav
  */
 @Immutable
-public class BitSetBasedIndexToIndexMultiMap implements IndexToIndexMultiMap {
+public class BitSetIndexToIndexMultiMap implements IndexToIndexMultiMap {
     private final int keysCount;
     @NotNull
     private final Buffer elements;
@@ -39,14 +39,14 @@ public class BitSetBasedIndexToIndexMultiMap implements IndexToIndexMultiMap {
         final Buffer elements = buf.slice();
         final int bitSetSizeInBytes = bitSetSizeInLongs << 3;
 
-        return new BitSetBasedIndexToIndexMultiMap(
+        return new BitSetIndexToIndexMultiMap(
                 keysCount,
                 elements.slice(),
                 bitSetSizeInLongs,
                 bitSetSizeInBytes);
     }
 
-    private BitSetBasedIndexToIndexMultiMap(
+    private BitSetIndexToIndexMultiMap(
             final int keysCount,
             @NotNull
             final Buffer elements,

@@ -31,7 +31,8 @@ public class V1FullIndexBinaryTest {
 
     @Test
     public void writingFixedLengthFullIndex() throws IOException {
-        V1FullIndex v1FullIndex = new V1FullIndex("fixed_length_field_name", true);
+        final String fieldName = "fixed_length_field_name";
+        V1FullIndex v1FullIndex = new V1FullIndex(fieldName, true);
 
         //first doc
         Collection<UnsignedByteArray> byteArraysDoc1 = new ArrayList<UnsignedByteArray>();
@@ -63,13 +64,11 @@ public class V1FullIndexBinaryTest {
         Assert.assertEquals(V1DatabaseFormat.SegmentType.FIXED_LENGTH_FULL_INDEX.getCode(), segmentCode);
 
         final int fieldNameLength = byteBuffer.getInt();
-        Assert.assertEquals("fixed_length_field_name".getBytes().length, fieldNameLength);
+        Assert.assertEquals(fieldName.getBytes().length, fieldNameLength);
 
         final byte[] fieldNameBuffer = new byte[fieldNameLength];
         byteBuffer.get(fieldNameBuffer);
-        final String fieldName = new String(fieldNameBuffer);
-        Assert.assertEquals("fixed_length_field_name", fieldName);
-
+        Assert.assertEquals(fieldName, new String(fieldNameBuffer));
 
         //Reading values
         final long valuesSize = byteBuffer.getLong();
@@ -80,7 +79,6 @@ public class V1FullIndexBinaryTest {
 
         final int elementsCount = byteBuffer.getInt();
         Assert.assertEquals(2, elementsCount);
-
 
         final List<UnsignedByteArray> elements = new ArrayList<UnsignedByteArray>();
         for (int i = 0; i < elementsCount; i++) {
@@ -98,18 +96,18 @@ public class V1FullIndexBinaryTest {
 
         //Reading values to document indexes
         final long valuesToDocumentIndexesSize1 = byteBuffer.getLong();
-        Assert.assertEquals(36, valuesToDocumentIndexesSize1);
+        Assert.assertEquals(44, valuesToDocumentIndexesSize1);
         final int code = byteBuffer.getInt();
         Assert.assertEquals(V1DatabaseFormat.MultiMapType.LIST_BASED.getCode(), code);
         final int valuesToDocumentKeysCount = byteBuffer.getInt();
         Assert.assertEquals(2, valuesToDocumentKeysCount);
-        final int[] documentToValueIndexOffsets = new int[valuesToDocumentKeysCount];
+        final long[] documentToValueIndexOffsets = new long[valuesToDocumentKeysCount];
 
         for (int i = 0; i < valuesToDocumentKeysCount; i++) {
-            final int currentOffset = byteBuffer.getInt();
+            final long currentOffset = byteBuffer.getLong();
             documentToValueIndexOffsets[i] = currentOffset;
         }
-        Assert.assertArrayEquals(new int[]{0, 8}, documentToValueIndexOffsets);
+        Assert.assertArrayEquals(new long[]{0, 8}, documentToValueIndexOffsets);
 
         final int[][] valuesToDocumentIndexes = new int[elementsCount][];
         for (int i = 0; i < valuesToDocumentKeysCount; i++) {
@@ -186,7 +184,7 @@ public class V1FullIndexBinaryTest {
 
         //Reading values
         final long valuesSize = byteBuffer.getLong();
-        Assert.assertEquals(29, valuesSize);
+        Assert.assertEquals(41, valuesSize);
 
         final int maxElement = byteBuffer.getInt();
         Assert.assertEquals(5, maxElement);
@@ -194,18 +192,18 @@ public class V1FullIndexBinaryTest {
         final int elementsCount = byteBuffer.getInt();
         Assert.assertEquals(2, elementsCount);
 
-        final int[] elementOffsets = new int[elementsCount + 1];
+        final long[] elementOffsets = new long[elementsCount + 1];
 
         for (int i = 0; i <= elementsCount; i++) {
-            final int currentOffset = byteBuffer.getInt();
+            final long currentOffset = byteBuffer.getLong();
             elementOffsets[i] = currentOffset;
         }
 
-        Assert.assertArrayEquals(new int[]{0, 4, 9}, elementOffsets);
+        Assert.assertArrayEquals(new long[]{0, 4, 9}, elementOffsets);
 
         final List<UnsignedByteArray> elements = new ArrayList<UnsignedByteArray>();
         for (int i = 0; i < elementsCount; i++) {
-            final byte[] currentElementBytes = new byte[elementOffsets[i + 1] - elementOffsets[i]];
+            final byte[] currentElementBytes = new byte[(int) elementOffsets[i + 1] - (int) elementOffsets[i]];
             byteBuffer.get(currentElementBytes);
             elements.add(UnsignedByteArrays.raw(currentElementBytes));
         }
@@ -219,18 +217,18 @@ public class V1FullIndexBinaryTest {
 
         //Reading values to document indexes
         final long valuesToDocumentIndexesSize1 = byteBuffer.getLong();
-        Assert.assertEquals(36, valuesToDocumentIndexesSize1);
+        Assert.assertEquals(44, valuesToDocumentIndexesSize1);
         final int code = byteBuffer.getInt();
         Assert.assertEquals(V1DatabaseFormat.MultiMapType.LIST_BASED.getCode(), code);
         final int valuesToDocumentKeysCount = byteBuffer.getInt();
         Assert.assertEquals(2, valuesToDocumentKeysCount);
-        final int[] documentToValueIndexOffsets = new int[valuesToDocumentKeysCount];
+        final long[] documentToValueIndexOffsets = new long[valuesToDocumentKeysCount];
 
         for (int i = 0; i < valuesToDocumentKeysCount; i++) {
-            final int currentOffset = byteBuffer.getInt();
+            final long currentOffset = byteBuffer.getLong();
             documentToValueIndexOffsets[i] = currentOffset;
         }
-        Assert.assertArrayEquals(new int[]{0, 8}, documentToValueIndexOffsets);
+        Assert.assertArrayEquals(new long[]{0, 8}, documentToValueIndexOffsets);
 
         final int[][] valuesToDocumentIndexes = new int[elementsCount][];
         for (int i = 0; i < valuesToDocumentKeysCount; i++) {

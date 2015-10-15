@@ -82,7 +82,7 @@ public final class FixedLengthByteArraySortedSet
     public Buffer get(final int i) {
         assert 0 <= i && i < size;
 
-        return elements.slice(i * elementSize, elementSize);
+        return elements.slice(((long) i) * elementSize, elementSize);
     }
 
     @Override

@@ -11,6 +11,7 @@
 package com.yandex.yoctodb.util.mutable.impl;
 
 import com.google.common.primitives.Ints;
+import com.google.common.primitives.Longs;
 import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.NotNull;
 import com.yandex.yoctodb.util.UnsignedByteArray;
@@ -51,14 +52,14 @@ public final class VariableLengthByteArraySortedSet
         if (sortedElements.isEmpty())
             throw new IllegalStateException("Empty set");
 
-        int elementSize = 0;
+        long elementSize = 0;
         for (UnsignedByteArray e : sortedElements.keySet())
             elementSize += e.length();
 
         return 4 + // Max element size
                 4 + // Element count
-                4L * (sortedElements.size() + 1) + // Element offsets
-                (long) elementSize; // Element array size
+                8L * (sortedElements.size() + 1) + // Element offsets
+                elementSize; // Element array size
     }
 
     @Override
@@ -79,12 +80,12 @@ public final class VariableLengthByteArraySortedSet
         os.write(Ints.toByteArray(sortedElements.size()));
 
         // Element offsets
-        int elementOffset = 0;
+        long elementOffset = 0;
         for (UnsignedByteArray e : sortedElements.keySet()) {
-            os.write(Ints.toByteArray(elementOffset));
+            os.write(Longs.toByteArray(elementOffset));
             elementOffset += e.length();
         }
-        os.write(Ints.toByteArray(elementOffset));
+        os.write(Longs.toByteArray(elementOffset));
 
         // Elements
         for (UnsignedByteArray e : sortedElements.keySet())

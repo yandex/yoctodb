@@ -26,7 +26,7 @@ public class IndexToIndexMultiMapFactory {
         if (1.0 * uniqueValuesCount * documentsCount / 64.0 <
                 documentsCount * 4.0) {
             // BitSet might be more effective
-            return new BitSetMultiMap(documentsCount);
+            return new BitSetIndexToIndexMultiMap(documentsCount);
         } else {
             return new IntIndexToIndexMultiMap();
         }

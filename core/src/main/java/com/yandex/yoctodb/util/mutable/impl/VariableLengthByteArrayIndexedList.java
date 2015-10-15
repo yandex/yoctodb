@@ -12,10 +12,10 @@ package com.yandex.yoctodb.util.mutable.impl;
 
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
-import net.jcip.annotations.NotThreadSafe;
-import org.jetbrains.annotations.NotNull;
 import com.yandex.yoctodb.util.UnsignedByteArray;
 import com.yandex.yoctodb.util.mutable.ByteArrayIndexedList;
+import net.jcip.annotations.NotThreadSafe;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -50,9 +50,9 @@ public final class VariableLengthByteArrayIndexedList
         if (elements.isEmpty())
             throw new IllegalStateException("Empty list");
 
-        return 4 + // Element count
-                8 * (elements.size() + 1L) + // Element offsets
-                elementSize; // Element array size
+        return 4L + // Element count
+               8L * (elements.size() + 1L) + // Element offsets
+               elementSize; // Element array size
     }
 
     @Override
@@ -81,7 +81,7 @@ public final class VariableLengthByteArrayIndexedList
     @Override
     public String toString() {
         return "VariableLengthByteArrayIndexedList{" +
-                "elementsCount=" + elements.size() +
-                '}';
+               "elementsCount=" + elements.size() +
+               '}';
     }
 }
