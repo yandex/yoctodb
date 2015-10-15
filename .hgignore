@@ -1,0 +1,11 @@
+syntax: glob
+
+.DS_Store
+.idea
+atlassian-ide-plugin.xml
+target/
+*.ipr
+*.iml
+*.iws
+*.orig
+
