@@ -11,10 +11,10 @@
 package com.yandex.yoctodb.util.mutable.impl;
 
 import com.google.common.primitives.Ints;
-import net.jcip.annotations.NotThreadSafe;
-import org.jetbrains.annotations.NotNull;
 import com.yandex.yoctodb.util.UnsignedByteArray;
 import com.yandex.yoctodb.util.mutable.ByteArraySortedSet;
+import net.jcip.annotations.NotThreadSafe;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -44,7 +44,7 @@ public final class FixedLengthByteArraySortedSet
         if (e.length() != elementSize)
             throw new IllegalArgumentException(
                     "Element length <" + e.length() +
-                            "> is not equal to expected <" + elementSize + ">");
+                    "> is not equal to expected <" + elementSize + ">");
 
         return super.add(e);
     }
@@ -58,9 +58,9 @@ public final class FixedLengthByteArraySortedSet
         if (sortedElements.isEmpty())
             throw new IllegalStateException("Empty set");
 
-        return 4 + // Element size
-                4 + // Element count
-                (long) elementSize * sortedElements.size();
+        return 4L + // Element size
+               4L + // Element count
+               ((long) elementSize) * sortedElements.size();
     }
 
     @Override

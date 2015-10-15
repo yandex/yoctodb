@@ -37,7 +37,7 @@ public final class IntIndexToIndexMultiMap implements IndexToIndexMultiMap {
             @NotNull
             final Buffer buf) {
         final int keysCount = buf.getInt();
-        final Buffer offsets = buf.slice(keysCount << 2);
+        final Buffer offsets = buf.slice(((long) keysCount) << 3);
         final Buffer elements =
                 buf.slice().position(offsets.remaining()).slice();
 
@@ -72,12 +72,12 @@ public final class IntIndexToIndexMultiMap implements IndexToIndexMultiMap {
             final int key) {
         assert 0 <= key && key < keysCount;
 
-        final int start = offsets.getInt(key << 2);
+        final long start = offsets.getLong(((long) key) << 3);
 
         final int size = elements.getInt(start);
-        final int from = start + 4;
-        final int to = from + (size << 2);
-        for (int i = from; i < to; i += 4)
+        final long from = start + 4L;
+        final long to = from + (((long) size) << 2);
+        for (long i = from; i < to; i += 4L)
             dest.set(elements.getInt(i));
 
         return size > 0;
@@ -92,18 +92,18 @@ public final class IntIndexToIndexMultiMap implements IndexToIndexMultiMap {
 
         boolean result = false;
 
-        int current = offsets.getInt(fromInclusive << 2);
+        long current = offsets.getLong(((long) fromInclusive) << 3);
         final long remaining = elements.remaining();
 
         assert remaining <= Integer.MAX_VALUE;
 
         while (current < remaining) {
             int size = elements.getInt(current);
-            current += 4;
+            current += 4L;
             result |= size > 0;
             for (; 0 < size; size--) {
                 dest.set(elements.getInt(current));
-                current += 4;
+                current += 4L;
             }
         }
 
@@ -121,14 +121,14 @@ public final class IntIndexToIndexMultiMap implements IndexToIndexMultiMap {
 
         boolean result = false;
 
-        int current = 0;
+        long current = 0L;
         while (remaining > 0) {
             int size = elements.getInt(current);
-            current += 4;
+            current += 4L;
             result |= size > 0;
             for (; 0 < size; size--) {
                 dest.set(elements.getInt(current));
-                current += 4;
+                current += 4L;
             }
             remaining--;
         }
@@ -146,18 +146,18 @@ public final class IntIndexToIndexMultiMap implements IndexToIndexMultiMap {
                fromInclusive < toExclusive &&
                toExclusive <= keysCount;
 
-        int current = offsets.getInt(fromInclusive << 2);
+        long current = offsets.getLong(((long) fromInclusive) << 3);
         int remaining = toExclusive - fromInclusive;
 
         boolean result = false;
 
         while (remaining > 0) {
             int size = elements.getInt(current);
-            current += 4;
+            current += 4L;
             result |= size > 0;
             for (; 0 < size; size--) {
                 dest.set(elements.getInt(current));
-                current += 4;
+                current += 4L;
             }
             remaining--;
         }
@@ -184,7 +184,7 @@ public final class IntIndexToIndexMultiMap implements IndexToIndexMultiMap {
             final BitSet valueFilter) {
         assert 0 <= key && key < keysCount;
 
-        final int start = offsets.getInt(key << 2);
+        final long start = offsets.getLong(((long) key) << 3);
 
         final int size = elements.getInt(start);
 
@@ -193,7 +193,7 @@ public final class IntIndexToIndexMultiMap implements IndexToIndexMultiMap {
         int[] values = null;
         int count = 0;
 
-        int valueOffset = start + 4;
+        long valueOffset = start + 4L;
         for (int i = 0; i < size; i++) {
             final int value = elements.getInt(valueOffset);
             if (valueFilter.get(value)) {
@@ -204,7 +204,7 @@ public final class IntIndexToIndexMultiMap implements IndexToIndexMultiMap {
                 values[count] = value;
                 count++;
             }
-            valueOffset += 4;
+            valueOffset += 4L;
         }
 
         if (values == null) {

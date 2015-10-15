@@ -61,7 +61,7 @@ public class FixedLengthByteArrayIndexedList
     public Buffer get(final int i) {
         assert 0 <= i && i < elementCount;
 
-        return elements.slice(i * elementSize, elementSize);
+        return elements.slice(((long) i) * elementSize, elementSize);
     }
 
     @Override

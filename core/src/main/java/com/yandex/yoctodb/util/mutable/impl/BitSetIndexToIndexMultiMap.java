@@ -14,11 +14,11 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.TreeMultimap;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
-import net.jcip.annotations.NotThreadSafe;
-import org.jetbrains.annotations.NotNull;
 import com.yandex.yoctodb.util.mutable.ArrayBitSet;
 import com.yandex.yoctodb.util.mutable.IndexToIndexMultiMap;
 import com.yandex.yoctodb.v1.V1DatabaseFormat;
+import net.jcip.annotations.NotThreadSafe;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -30,7 +30,7 @@ import java.util.TreeMap;
  * @author svyatoslav
  */
 @NotThreadSafe
-public final class BitSetMultiMap implements IndexToIndexMultiMap {
+public final class BitSetIndexToIndexMultiMap implements IndexToIndexMultiMap {
     private final Map<Integer, ArrayBitSet> map = new TreeMap<Integer, ArrayBitSet>();
     private final Multimap<Integer, Integer> rawMap = TreeMultimap.create();
 
@@ -38,13 +38,13 @@ public final class BitSetMultiMap implements IndexToIndexMultiMap {
     private final int bitSetSizeInLongs;
     private boolean mapFilled = false;
 
-    public BitSetMultiMap(int documentsCount) {
+    public BitSetIndexToIndexMultiMap(final int documentsCount) {
         this.documentsCount = documentsCount;
         this.bitSetSizeInLongs = getBitSetSizeInLongs();
     }
 
     @Override
-    public void add(int key, int value) {
+    public void add(final int key, final int value) {
         if (key < 0)
             throw new IllegalArgumentException("Negative key");
         if (value < 0)
@@ -55,16 +55,20 @@ public final class BitSetMultiMap implements IndexToIndexMultiMap {
 
     @Override
     public long getSizeInBytes() {
-        if (!mapFilled){
+        if (!mapFilled) {
             fillMap();
         }
-        return 4 + //size four bytes
-                4 + //type
-                4 +
-                8L * map.size() * bitSetSizeInLongs;
+
+        return 4L + //size four bytes
+               4L + //type
+               4L +
+               8L * map.size() * bitSetSizeInLongs;
     }
 
-    private LongArrayBitSet fillArray(Collection<Integer> docIds, int size) {
+    private LongArrayBitSet fillArray(
+            @NotNull
+            final Collection<Integer> docIds,
+            final int size) {
         LongArrayBitSet arrayBitSet = (LongArrayBitSet) LongArrayBitSet.zero(
                 size);
         for (int docId : docIds) {
@@ -80,9 +84,7 @@ public final class BitSetMultiMap implements IndexToIndexMultiMap {
     @Override
     public void writeTo(
             @NotNull
-            final
-            OutputStream os) throws IOException {
-
+            final OutputStream os) throws IOException {
         if (!mapFilled) {
             fillMap();
         }
@@ -97,8 +99,7 @@ public final class BitSetMultiMap implements IndexToIndexMultiMap {
 
         // Sets
         for (ArrayBitSet value : map.values()) {
-            long[] words = value.toArray();
-            for (long currentWord : words) {
+            for (long currentWord : value.toArray()) {
                 os.write(Longs.toByteArray(currentWord));
             }
         }
@@ -109,9 +110,10 @@ public final class BitSetMultiMap implements IndexToIndexMultiMap {
         for (Map.Entry<Integer, Collection<Integer>> entry :
                 rawMap.asMap().entrySet()) {
             final int key = entry.getKey();
-            LongArrayBitSet bitSet = fillArray(
-                    entry.getValue(),
-                    documentsCount);
+            final LongArrayBitSet bitSet =
+                    fillArray(
+                            entry.getValue(),
+                            documentsCount);
             map.put(key, bitSet);
         }
     }
@@ -119,8 +121,8 @@ public final class BitSetMultiMap implements IndexToIndexMultiMap {
     @Override
     public String toString() {
         return "BitSetMultiMap{" +
-                "map=" + map +
-                '}';
+               "map=" + map +
+               '}';
     }
 
 
