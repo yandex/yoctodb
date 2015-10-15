@@ -57,14 +57,16 @@ abstract class AbstractByteArraySortedSet
 
         // Sorting
         final UnsignedByteArray[] sorted =
-                elements.keySet().toArray(new UnsignedByteArray[elements.size()]);
+                elements.keySet().toArray(
+                        new UnsignedByteArray[elements.size()]);
         Arrays.sort(sorted);
 
         // Releasing resources
         elements = null;
 
         // Copying
-        sortedElements = new LinkedHashMap<UnsignedByteArray, Integer>(sorted.length);
+        sortedElements =
+                new LinkedHashMap<UnsignedByteArray, Integer>(sorted.length);
         int i = 0;
         for (UnsignedByteArray e : sorted) {
             sortedElements.put(e, i++);

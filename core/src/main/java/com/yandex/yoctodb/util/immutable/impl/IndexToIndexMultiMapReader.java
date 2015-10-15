@@ -10,8 +10,8 @@
 
 package com.yandex.yoctodb.util.immutable.impl;
 
-import com.yandex.yoctodb.util.immutable.IndexToIndexMultiMap;
 import com.yandex.yoctodb.util.buf.Buffer;
+import com.yandex.yoctodb.util.immutable.IndexToIndexMultiMap;
 import com.yandex.yoctodb.v1.V1DatabaseFormat;
 
 /**
@@ -19,12 +19,13 @@ import com.yandex.yoctodb.v1.V1DatabaseFormat;
  */
 public class IndexToIndexMultiMapReader {
 
-    public static IndexToIndexMultiMap from(Buffer byteBuffer) {
+    public static IndexToIndexMultiMap from(
+            final Buffer byteBuffer) {
         final int type = byteBuffer.getInt();
         if (type == V1DatabaseFormat.MultiMapType.LIST_BASED.getCode()) {
             return IntIndexToIndexMultiMap.from(byteBuffer.slice());
         } else if (type == V1DatabaseFormat.MultiMapType.LONG_ARRAY_BIT_SET_BASED.getCode()) {
-            return BitSetBasedIndexToIndexMultiMap.from(byteBuffer.slice());
+            return BitSetIndexToIndexMultiMap.from(byteBuffer.slice());
         } else {
             throw new UnsupportedOperationException(
                     "Unsupported IndexToIndexMultiMap type: " + type);
