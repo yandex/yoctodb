@@ -1,0 +1,41 @@
+0.0.10
+  * #27: Data race in FileChannelBuffer.get*(index)
+
+0.0.9
+  * #18: Using per database checksum instead of per segment ones
+
+0.0.8
+  * #26: Invalid invariant checking in SimpleRangeCondition
+
+0.0.7
+  * #17: Limited range of possible query ASTs
+  * Allow to use not with general conditions
+  * Buffer.get(buf, offset, length) method added
+
+0.0.6
+  * Fixed #17: Implemented `not` and `oneOf` query condition combinators
+
+0.0.5
+  * ATTENTION! Incompatible format changes -- rebuild your databases
+  * #2: Implemented long-based ByteBuffer abstraction
+  * #4: Some asserts became run-time checks
+  * #6: Long-addressed payload segments
+  * #8: Implemented FileChannelBuffer
+  * #12: Added asserts in getSizeInBytes() for int32-only segments
+  * Removed wrong assertions
+  * Using guava 17.0
+  * Using org.jetbrains:annotations
+  * Removed dependency on slf4j-api
+  * Switched to Mozilla Public License Version 2.0
+
+0.0.4
+  * Allowing for empty composite databases
+
+0.0.3
+  * Removed wrong assertion in search without sorts and limits
+
+0.0.2
+  * Skipping documents lacking queried fields
+
+0.0.1
+  * Initial release
