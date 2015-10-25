@@ -48,10 +48,11 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- External -->
-        <annotations.version>13.0</annotations.version>
-        <guava.version>17.0</guava.version>
+        <annotations.version>15.0</annotations.version>
+        <guava.version>18.0</guava.version>
         <jcip-annotations.version>1.0</jcip-annotations.version>
-        <junit.version>4.11</junit.version>
+        <junit.version>4.12</junit.version>
+        <mockito.version>1.10.19</mockito.version>
 
         <!-- Maven -->
         <maven-compiler-plugin.version>2.5.1</maven-compiler-plugin.version>
@@ -88,6 +89,12 @@
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>${junit.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>${mockito.version}</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>
