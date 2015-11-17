@@ -49,13 +49,6 @@ public final class V1PayloadSegment implements Payload, Segment {
         return payloads.get(i);
     }
 
-    @Override
-    public String toString() {
-        return "V1PayloadSegment{" +
-                "documentCount=" + payloads.size() +
-                '}';
-    }
-
     static void registerReader() {
         SegmentRegistry.register(
                 V1DatabaseFormat.SegmentType.PAYLOAD.getCode(),

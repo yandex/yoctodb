@@ -40,8 +40,8 @@ abstract class AbstractSimpleCondition implements TermCondition {
 
     @Override
     public String toString() {
-        return "AbstractSimpleCondition{" +
-                "fieldName='" + fieldName + '\'' +
-                '}';
+        return this.getClass().getSimpleName() +
+               "{fieldName='" + fieldName + '\'' +
+               '}';
     }
 }

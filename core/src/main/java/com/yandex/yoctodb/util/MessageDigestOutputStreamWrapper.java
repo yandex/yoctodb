@@ -48,13 +48,11 @@ public final class MessageDigestOutputStreamWrapper extends OutputStream {
     }
 
     @Override
-    public void write(final byte[] b) throws IOException {
-        digest.update(b);
-        delegate.write(b);
-    }
-
-    @Override
-    public void write(final byte[] b, final int off, final int len)
+    public void write(
+            @NotNull
+            final byte[] b,
+            final int off,
+            final int len)
             throws IOException {
         digest.update(b, off, len);
         delegate.write(b, off, len);

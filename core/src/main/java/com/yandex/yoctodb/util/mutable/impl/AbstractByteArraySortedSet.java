@@ -27,7 +27,7 @@ abstract class AbstractByteArraySortedSet
         implements ByteArraySortedSet {
     protected Map<UnsignedByteArray, UnsignedByteArray> elements =
             new HashMap<UnsignedByteArray, UnsignedByteArray>();
-    protected boolean frozen = false;
+
     protected Map<UnsignedByteArray, Integer> sortedElements = null;
 
     @NotNull
@@ -35,11 +35,8 @@ abstract class AbstractByteArraySortedSet
     public UnsignedByteArray add(
             @NotNull
             final UnsignedByteArray e) {
-        if (frozen)
+        if (sortedElements != null)
             throw new IllegalStateException("The collection is frozen");
-
-        if (e.isEmpty())
-            throw new IllegalArgumentException("Empty element");
 
         final UnsignedByteArray previous = elements.get(e);
         if (previous == null) {
@@ -52,7 +49,7 @@ abstract class AbstractByteArraySortedSet
     }
 
     protected void build() {
-        if (frozen)
+        if (sortedElements != null)
             throw new IllegalStateException("The collection is frozen");
 
         // Sorting
@@ -71,16 +68,13 @@ abstract class AbstractByteArraySortedSet
         for (UnsignedByteArray e : sorted) {
             sortedElements.put(e, i++);
         }
-
-        // Freezing
-        frozen = true;
     }
 
     @Override
     public int indexOf(
             @NotNull
             final UnsignedByteArray e) {
-        if (!frozen)
+        if (sortedElements == null)
             build();
 
         final Integer result = sortedElements.get(e);
@@ -89,13 +83,5 @@ abstract class AbstractByteArraySortedSet
             throw new NoSuchElementException();
 
         return result;
-    }
-
-    @Override
-    public int size() {
-        if (frozen)
-            return sortedElements.size();
-        else
-            return elements.size();
     }
 }

@@ -26,5 +26,5 @@ public interface IndexToIndexMultiMap extends OutputStreamWritable {
      * @param key   unsigned key
      * @param value unsigned value
      */
-    void add(int key, int value);
+    void put(int key, int value);
 }

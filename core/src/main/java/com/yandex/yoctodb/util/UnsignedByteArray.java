@@ -14,6 +14,7 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.UnsignedBytes;
 import com.yandex.yoctodb.util.buf.Buffer;
 import net.jcip.annotations.Immutable;
+import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -31,6 +32,7 @@ import java.util.Iterator;
  * @author incubos
  */
 @Immutable
+@NotThreadSafe
 public final class UnsignedByteArray
         implements Comparable<UnsignedByteArray>,
                    Iterable<Byte>,
