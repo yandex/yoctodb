@@ -11,6 +11,7 @@
 package com.yandex.yoctodb.util.mutable.impl;
 
 import com.google.common.primitives.Ints;
+import com.yandex.yoctodb.util.OutputStreamWritable;
 import com.yandex.yoctodb.util.UnsignedByteArray;
 import com.yandex.yoctodb.util.mutable.ByteArraySortedSet;
 import net.jcip.annotations.NotThreadSafe;
@@ -34,9 +35,6 @@ public final class FixedLengthByteArraySortedSet
     public UnsignedByteArray add(
             @NotNull
             final UnsignedByteArray e) {
-        if (e.isEmpty())
-            throw new IllegalArgumentException("Empty element");
-
         if (elementSize == -1) {
             elementSize = e.length();
         }
@@ -51,12 +49,9 @@ public final class FixedLengthByteArraySortedSet
 
     @Override
     public long getSizeInBytes() {
-        if (!frozen) {
+        if (sortedElements == null) {
             build();
         }
-
-        if (sortedElements.isEmpty())
-            throw new IllegalStateException("Empty set");
 
         return 4L + // Element size
                4L + // Element count
@@ -67,12 +62,9 @@ public final class FixedLengthByteArraySortedSet
     public void writeTo(
             @NotNull
             final OutputStream os) throws IOException {
-        if (!frozen) {
+        if (sortedElements == null) {
             build();
         }
-
-        if (sortedElements.isEmpty())
-            throw new IllegalStateException("Empty set");
 
         // Element size
         os.write(Ints.toByteArray(elementSize));
@@ -81,7 +73,7 @@ public final class FixedLengthByteArraySortedSet
         os.write(Ints.toByteArray(sortedElements.size()));
 
         // Elements
-        for (UnsignedByteArray e : sortedElements.keySet())
+        for (OutputStreamWritable e : sortedElements.keySet())
             e.writeTo(os);
     }
 
@@ -89,7 +81,7 @@ public final class FixedLengthByteArraySortedSet
     public String toString() {
         return "FixedLengthByteArraySortedSet{" +
                "elementsCount=" +
-               (frozen ? sortedElements.size() : elements.size()) +
+               (sortedElements == null ? elements.size() : sortedElements.size()) +
                ", elementSize=" + elementSize +
                '}';
     }

@@ -10,14 +10,13 @@
 
 package com.yandex.yoctodb.query.simple;
 
+import com.yandex.yoctodb.query.*;
+import com.yandex.yoctodb.util.mutable.BitSet;
 import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import com.yandex.yoctodb.query.*;
-import com.yandex.yoctodb.util.mutable.BitSet;
 
 import java.util.Iterator;
-import java.util.List;
 
 /**
  * Where clause
@@ -28,16 +27,11 @@ import java.util.List;
 public final class SimpleOrderClause implements OrderBy {
     @NotNull
     private final SimpleSelect select;
-    @NotNull
-    private final List<Order> sorts;
 
     public SimpleOrderClause(
             @NotNull
-            final SimpleSelect delegate,
-            @NotNull
-            final List<Order> sorts) {
+            final SimpleSelect delegate) {
         this.select = delegate;
-        this.sorts = sorts;
     }
 
     @NotNull
@@ -46,9 +40,7 @@ public final class SimpleOrderClause implements OrderBy {
             @NotNull
             final
             Order order) {
-        sorts.add(order);
-
-        return this;
+        return select.orderBy(order);
     }
 
     // Delegated
@@ -116,9 +108,6 @@ public final class SimpleOrderClause implements OrderBy {
 
     @Override
     public String toString() {
-        return "SimpleOrderClause{" +
-               "select=" + select +
-               ", sorts=" + sorts +
-               '}';
+        return select.toString();
     }
 }

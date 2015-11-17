@@ -52,8 +52,7 @@ public final class V1FilterableIndex
             @NotNull
             final String fieldName,
             final boolean fixedLength) {
-        if (fieldName.isEmpty())
-            throw new IllegalArgumentException("Empty field name");
+        assert !fieldName.isEmpty() : "Empty field name";
 
         this.fieldName = fieldName.getBytes();
         this.fixedLength = fixedLength;
@@ -79,9 +78,6 @@ public final class V1FilterableIndex
         checkNotFrozen();
 
         for (UnsignedByteArray value : values) {
-            if (value.isEmpty())
-                throw new IllegalArgumentException("Empty value");
-
             valueToDocuments.put(this.values.add(value), documentId);
         }
 
@@ -103,15 +99,15 @@ public final class V1FilterableIndex
         // Building the index
         final IndexToIndexMultiMap valueToDocumentsIndex =
                 IndexToIndexMultiMapFactory.buildIndexToIndexMultiMap(
-                        databaseDocumentsCount,
-                        valueToDocuments.size());
+                        valueToDocuments.keySet().size(),
+                        databaseDocumentsCount);
 
         for (Map.Entry<UnsignedByteArray, Collection<Integer>> entry :
                 valueToDocuments.asMap().entrySet()) {
             final int key = values.indexOf(entry.getKey());
 
             for (Integer d : entry.getValue()) {
-                valueToDocumentsIndex.add(key, d);
+                valueToDocumentsIndex.put(key, d);
             }
         }
 

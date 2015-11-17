@@ -11,13 +11,12 @@
 package com.yandex.yoctodb.util.mutable.impl;
 
 import com.google.common.primitives.Ints;
+import com.yandex.yoctodb.util.mutable.IndexToIndexMap;
 import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.NotNull;
-import com.yandex.yoctodb.util.mutable.IndexToIndexMap;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.ByteBuffer;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -42,8 +41,8 @@ public final class IntIndexToIndexMap implements IndexToIndexMap {
 
         if (previous != null)
             throw new IllegalArgumentException(
-                    "Key <" + key + "> was bound to <" + previous +
-                            "> not <" + value + ">");
+                    "Key <" + key + "> was already bound to <" + previous +
+                    ">");
     }
 
     @Override
@@ -74,7 +73,7 @@ public final class IntIndexToIndexMap implements IndexToIndexMap {
     @Override
     public String toString() {
         return "IntIndexToIndexMap{" +
-                "elements=" + elements +
-                '}';
+               "elements=" + elements.size() +
+               '}';
     }
 }

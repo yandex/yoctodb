@@ -10,6 +10,7 @@
 
 package com.yandex.yoctodb.query.simple;
 
+import com.google.common.base.Joiner;
 import com.yandex.yoctodb.query.*;
 import com.yandex.yoctodb.util.mutable.BitSet;
 import com.yandex.yoctodb.util.mutable.impl.ReadOnlyOneBitSet;
@@ -41,7 +42,7 @@ public final class SimpleSelect implements Select {
             @NotNull
             final Condition condition) {
         conditions.add(condition);
-        return new SimpleWhereClause(this, conditions);
+        return new SimpleWhereClause(this);
     }
 
     @NotNull
@@ -50,7 +51,7 @@ public final class SimpleSelect implements Select {
             @NotNull
             final Order order) {
         sorts.add(order);
-        return new SimpleOrderClause(this, sorts);
+        return new SimpleOrderClause(this);
     }
 
     @NotNull
@@ -141,8 +142,8 @@ public final class SimpleSelect implements Select {
     @Override
     public String toString() {
         return "SimpleSelect{" +
-               "conditions=" + conditions +
-               ", sorts=" + sorts +
+               "conditions=" + Joiner.on(',').join(conditions) +
+               ", sorts=" + Joiner.on(',').join(sorts) +
                ", skip=" + skip +
                ", limit=" + limit +
                '}';

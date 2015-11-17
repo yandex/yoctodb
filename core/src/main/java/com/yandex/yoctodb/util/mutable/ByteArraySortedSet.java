@@ -48,6 +48,4 @@ public interface ByteArraySortedSet extends OutputStreamWritable {
     int indexOf(
             @NotNull
             UnsignedByteArray e) throws NoSuchElementException;
-
-    int size();
 }

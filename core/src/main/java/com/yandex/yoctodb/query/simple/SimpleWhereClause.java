@@ -10,14 +10,13 @@
 
 package com.yandex.yoctodb.query.simple;
 
+import com.yandex.yoctodb.query.*;
+import com.yandex.yoctodb.util.mutable.BitSet;
 import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import com.yandex.yoctodb.query.*;
-import com.yandex.yoctodb.util.mutable.BitSet;
 
 import java.util.Iterator;
-import java.util.List;
 
 /**
  * Where clause
@@ -28,16 +27,11 @@ import java.util.List;
 public final class SimpleWhereClause implements Where {
     @NotNull
     private final SimpleSelect select;
-    @NotNull
-    private final List<Condition> conditions;
 
     public SimpleWhereClause(
             @NotNull
-            final SimpleSelect delegate,
-            @NotNull
-            final List<Condition> conditions) {
+            final SimpleSelect delegate) {
         this.select = delegate;
-        this.conditions = conditions;
     }
 
     @NotNull
@@ -45,9 +39,7 @@ public final class SimpleWhereClause implements Where {
     public Where and(
             @NotNull
             final Condition condition) {
-        conditions.add(condition);
-
-        return this;
+        return select.where(condition);
     }
 
     // Delegated
@@ -115,8 +107,6 @@ public final class SimpleWhereClause implements Where {
 
     @Override
     public String toString() {
-        return "SimpleWhereClause{" +
-               "select=" + select +
-               '}';
+        return select.toString();
     }
 }

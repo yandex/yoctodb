@@ -10,8 +10,6 @@
 
 package com.yandex.yoctodb.util.buf;
 
-import com.google.common.primitives.Ints;
-import com.google.common.primitives.Longs;
 import com.yandex.yoctodb.util.UnsignedByteArrays;
 import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.NotNull;
@@ -110,32 +108,7 @@ public abstract class Buffer implements Comparable<Buffer> {
             return false;
         }
 
-        // Adapted from Guava UnsignedBytes
-
-        long left = this.position();
-        long right = that.position();
-        for (;
-             length >= Longs.BYTES;
-             left += Longs.BYTES, right += Longs.BYTES, length -= Longs.BYTES)
-            if (this.getLong(left) != that.getLong(right)) {
-                return false;
-            }
-
-        if (length >= Ints.BYTES) {
-            if (this.getInt(left) != that.getInt(right)) {
-                return false;
-            }
-            left += Ints.BYTES;
-            right += Ints.BYTES;
-            length -= Ints.BYTES;
-        }
-
-        for (; length > 0; left++, right++, length--)
-            if (this.get(left) != that.get(right)) {
-                return false;
-            }
-
-        return true;
+        return compareTo(that) == 0;
     }
 
     @Override
@@ -152,5 +125,19 @@ public abstract class Buffer implements Comparable<Buffer> {
             @NotNull
             final Buffer that) {
         return UnsignedByteArrays.compare(this, that);
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append(getClass().getName());
+        sb.append("[pos=");
+        sb.append(position());
+        sb.append(" lim=");
+        sb.append(limit());
+        sb.append(" rem=");
+        sb.append(remaining());
+        sb.append("]");
+        return sb.toString();
     }
 }

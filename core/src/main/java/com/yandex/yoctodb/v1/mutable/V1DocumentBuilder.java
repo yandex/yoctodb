@@ -29,7 +29,8 @@ import java.util.Map;
 public final class V1DocumentBuilder extends AbstractDocumentBuilder {
     byte[] payload = null;
 
-    final TreeMultimap<String, UnsignedByteArray> fields = TreeMultimap.create();
+    final TreeMultimap<String, UnsignedByteArray> fields =
+            TreeMultimap.create();
     final Map<String, IndexOption> index = new HashMap<String, IndexOption>();
     final Map<String, LengthOption> length = new HashMap<String, LengthOption>();
 
@@ -38,7 +39,7 @@ public final class V1DocumentBuilder extends AbstractDocumentBuilder {
     public DocumentBuilder withPayload(
             @NotNull
             final byte[] payload) {
-        checkNotBuilt();
+        checkNotFrozen();
 
         if (this.payload != null) {
             throw new IllegalStateException("The payload is already set");
@@ -60,7 +61,7 @@ public final class V1DocumentBuilder extends AbstractDocumentBuilder {
             final IndexOption index,
             @NotNull
             final LengthOption length) {
-        checkNotBuilt();
+        checkNotFrozen();
 
         this.fields.put(name, value);
 
@@ -81,27 +82,12 @@ public final class V1DocumentBuilder extends AbstractDocumentBuilder {
 
     @Override
     public void check() {
-        checkNotBuilt();
-
         if (payload == null) {
-            throw new IllegalArgumentException("The payload is not set");
+            throw new IllegalStateException("The payload is not set");
         }
 
         if (fields.isEmpty()) {
-            throw new IllegalArgumentException("No fields in the document");
-        }
-    }
-
-    void markBuilt() {
-        built = true;
-    }
-
-    private boolean built = false;
-
-    private void checkNotBuilt() {
-        if (built) {
-            throw new IllegalStateException(
-                    "The builder can't be used anymore");
+            throw new IllegalStateException("No fields in the document");
         }
     }
 }
