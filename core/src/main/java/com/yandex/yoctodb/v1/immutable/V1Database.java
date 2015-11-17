@@ -139,11 +139,6 @@ public final class V1Database implements QueryContext {
         }
     }
 
-    /**
-     * The same as {@link #execute(com.yandex.yoctodb.query.Query,
-     * com.yandex.yoctodb.query.DocumentProcessor)}, but returns also unlimited
-     * document count
-     */
     @Override
     public int executeAndUnlimitedCount(
             @NotNull
@@ -219,14 +214,5 @@ public final class V1Database implements QueryContext {
         final BitSet result = ONES.get();
         result.set();
         return result;
-    }
-
-    @Override
-    public String toString() {
-        return "V1Database{" +
-               "payload=" + payload +
-               ", filters=" + filters +
-               ", sorters=" + sorters +
-               '}';
     }
 }

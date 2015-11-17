@@ -57,8 +57,7 @@ public final class V1FullIndex
             @NotNull
             final String fieldName,
             final boolean fixedLength) {
-        if (fieldName.isEmpty())
-            throw new IllegalArgumentException("Empty field name");
+        assert !fieldName.isEmpty() : "Empty field name";
 
         this.fieldName = fieldName.getBytes();
         this.fixedLength = fixedLength;
@@ -114,7 +113,7 @@ public final class V1FullIndex
             final int key = values.indexOf(entry.getKey());
 
             for (Integer d : entry.getValue()) {
-                valueToDocumentsIndex.add(key, d);
+                valueToDocumentsIndex.put(key, d);
             }
         }
 

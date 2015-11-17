@@ -58,8 +58,7 @@ public final class V1FullIndex
             final IndexToIndexMultiMap valueToDocuments,
             @NotNull
             final IndexToIndexMap documentToValues) {
-        if (fieldName.isEmpty())
-            throw new IllegalArgumentException("Empty field name");
+        assert !fieldName.isEmpty() : "Empty field name";
 
         // May be constructed only from SegmentReader
         this.fieldName = fieldName;

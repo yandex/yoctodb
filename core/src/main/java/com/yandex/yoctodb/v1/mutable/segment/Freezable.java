@@ -21,11 +21,11 @@ import net.jcip.annotations.NotThreadSafe;
 public abstract class Freezable {
     private boolean frozen = false;
 
-    protected void freeze() {
+    public void freeze() {
         frozen = true;
     }
 
-    protected void checkNotFrozen() {
+    public void checkNotFrozen() {
         if (frozen) {
             throw new IllegalStateException("Already frozen");
         }

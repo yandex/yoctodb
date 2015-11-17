@@ -22,12 +22,13 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * {@link IntIndexToIndexMultiMap} implementation based on {@link Integer}s
- *
+ * <p/>
  * Format:
- *
+ * <p/>
  * <pre>
  * {@code
  * type (int)
@@ -57,7 +58,7 @@ public final class IntIndexToIndexMultiMap implements IndexToIndexMultiMap {
     private final Multimap<Integer, Integer> map = TreeMultimap.create();
 
     @Override
-    public void add(final int key, final int value) {
+    public void put(final int key, final int value) {
         if (key < 0)
             throw new IllegalArgumentException("Negative key");
         if (value < 0)
@@ -68,9 +69,6 @@ public final class IntIndexToIndexMultiMap implements IndexToIndexMultiMap {
 
     @Override
     public long getSizeInBytes() {
-        if (map.isEmpty())
-            throw new IllegalStateException("Empty multimap");
-
         return 4L + // type
                4L + // keys count
                8L * map.keySet().size() + // offsets
@@ -82,9 +80,6 @@ public final class IntIndexToIndexMultiMap implements IndexToIndexMultiMap {
     public void writeTo(
             @NotNull
             final OutputStream os) throws IOException {
-        if (map.isEmpty())
-            throw new IllegalStateException("Empty multimap");
-
         // Type
         os.write(
                 Ints.toByteArray(
@@ -95,9 +90,17 @@ public final class IntIndexToIndexMultiMap implements IndexToIndexMultiMap {
 
         // Offsets
         long offset = 0L;
-        for (Collection<Integer> value : map.asMap().values()) {
+        int index = 0;
+        for (Map.Entry<Integer, Collection<Integer>> entry :
+                map.asMap().entrySet()) {
+            if (entry.getKey() != index) {
+                throw new IllegalStateException("Indexes are not continuous");
+            }
+
             os.write(Longs.toByteArray(offset));
-            offset += 4L + 4L * value.size();
+            offset += 4L + 4L * entry.getValue().size();
+
+            index++;
         }
 
         // Sets
@@ -113,7 +116,8 @@ public final class IntIndexToIndexMultiMap implements IndexToIndexMultiMap {
     @Override
     public String toString() {
         return "IntIndexToIndexMultiMap{" +
-               "map=" + map +
+               "keys=" + map.keySet().size() +
+               ", values" + map.size() +
                '}';
     }
 }

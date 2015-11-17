@@ -33,8 +33,6 @@ public final class FileChannelBuffer extends Buffer {
     public FileChannelBuffer(
             @NotNull
             final FileChannel ch) {
-        assert ch.isOpen();
-
         this.ch = ch;
         this.offset = 0L;
         try {
@@ -50,7 +48,6 @@ public final class FileChannelBuffer extends Buffer {
             final FileChannel ch,
             final long offset,
             final long limit) {
-        assert ch.isOpen();
         assert 0 <= offset;
         assert 0 <= limit;
         try {
