@@ -20,9 +20,22 @@ import org.jetbrains.annotations.NotNull;
  */
 @Immutable
 public interface Order {
-    public static enum SortOrder {
-        ASC,
-        DESC
+    enum SortOrder {
+        ASC {
+            @Override
+            public boolean isAscending() {
+                return true;
+            }
+        },
+        DESC {
+            @Override
+            public boolean isAscending() {
+                return false;
+            }
+        };
+
+        // To make orders exhaustive
+        public abstract boolean isAscending();
     }
 
     @NotNull

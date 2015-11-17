@@ -18,9 +18,14 @@ import org.jetbrains.annotations.NotNull;
  *
  * @author incubos
  */
-class Segments {
+public final class Segments {
     private Segments() {
         //
+    }
+
+    // For test coverage
+    static {
+        new Segments();
     }
 
     /**

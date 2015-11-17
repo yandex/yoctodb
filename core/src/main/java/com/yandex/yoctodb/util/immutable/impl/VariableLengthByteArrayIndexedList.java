@@ -51,12 +51,7 @@ public class VariableLengthByteArrayIndexedList
             final Buffer offsets,
             @NotNull
             final Buffer elements) {
-        if (elementCount <= 0)
-            throw new IllegalArgumentException("Non positive element count");
-        if (!offsets.hasRemaining())
-            throw new IllegalArgumentException("Empty offsets");
-        if (!elements.hasRemaining())
-            throw new IllegalArgumentException("Empty elements");
+        assert elementCount >= 0 : "Negative element count";
 
         this.elementCount = elementCount;
         this.elements = elements;
