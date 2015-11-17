@@ -15,16 +15,27 @@ import com.yandex.yoctodb.util.mutable.IndexToIndexMultiMap;
 /**
  * @author svyatoslav
  */
-public class IndexToIndexMultiMapFactory {
+public final class IndexToIndexMultiMapFactory {
+
+    private IndexToIndexMultiMapFactory() {
+        // Can't instantiate
+    }
+
+    // For test coverage
+    static {
+        new IndexToIndexMultiMapFactory();
+    }
 
     public static IndexToIndexMultiMap buildIndexToIndexMultiMap(
-            final int documentsCount,
-            final int uniqueValuesCount) {
-        assert documentsCount > 0;
-        assert uniqueValuesCount > 0;
+            final int uniqueValuesCount,
+            final int documentsCount) {
+        if (uniqueValuesCount <= 0)
+            throw new IllegalArgumentException("Nonpositive values count");
+        if (documentsCount <= 0)
+            throw new IllegalArgumentException("Nonpositive documents count");
 
-        if (1.0 * uniqueValuesCount * documentsCount / 64.0 <
-                documentsCount * 4.0) {
+        if (((long) uniqueValuesCount) * documentsCount / 64L <
+            documentsCount * 4L) {
             // BitSet might be more effective
             return new BitSetIndexToIndexMultiMap(documentsCount);
         } else {

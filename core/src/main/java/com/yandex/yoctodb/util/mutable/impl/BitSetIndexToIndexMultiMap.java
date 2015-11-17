@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Map;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 /**
@@ -31,71 +32,61 @@ import java.util.TreeMap;
  */
 @NotThreadSafe
 public final class BitSetIndexToIndexMultiMap implements IndexToIndexMultiMap {
-    private final Map<Integer, ArrayBitSet> map = new TreeMap<Integer, ArrayBitSet>();
-    private final Multimap<Integer, Integer> rawMap = TreeMultimap.create();
-
     private final int documentsCount;
-    private final int bitSetSizeInLongs;
-    private boolean mapFilled = false;
+    private Multimap<Integer, Integer> rawMap = TreeMultimap.create();
+
+    private SortedMap<Integer, ArrayBitSet> map = null;
 
     public BitSetIndexToIndexMultiMap(final int documentsCount) {
+        if (documentsCount < 0)
+            throw new IllegalArgumentException("Negative document count");
+
         this.documentsCount = documentsCount;
-        this.bitSetSizeInLongs = getBitSetSizeInLongs();
     }
 
     @Override
-    public void add(final int key, final int value) {
+    public void put(final int key, final int value) {
+        if (map != null)
+            throw new IllegalStateException("The collection is frozen");
+
         if (key < 0)
             throw new IllegalArgumentException("Negative key");
         if (value < 0)
             throw new IllegalArgumentException("Negative value");
+        if (value >= documentsCount)
+            throw new IllegalArgumentException("Value out of bounds");
 
         rawMap.put(key, value);
     }
 
     @Override
     public long getSizeInBytes() {
-        if (!mapFilled) {
-            fillMap();
+        if (map == null) {
+            build();
         }
 
-        return 4L + //size four bytes
-               4L + //type
-               4L +
-               8L * map.size() * bitSetSizeInLongs;
-    }
-
-    private LongArrayBitSet fillArray(
-            @NotNull
-            final Collection<Integer> docIds,
-            final int size) {
-        LongArrayBitSet arrayBitSet = (LongArrayBitSet) LongArrayBitSet.zero(
-                size);
-        for (int docId : docIds) {
-            arrayBitSet.set(docId);
-        }
-        return arrayBitSet;
-    }
-
-    private int getBitSetSizeInLongs() {
-        return LongArrayBitSet.arraySize(documentsCount);
+        return 4L + // Type
+               4L + // Keys count
+               4L + // Bit set size in longs
+               8L * map.size() * LongArrayBitSet.arraySize(documentsCount);
     }
 
     @Override
     public void writeTo(
             @NotNull
             final OutputStream os) throws IOException {
-        if (!mapFilled) {
-            fillMap();
+        if (map == null) {
+            build();
         }
-        //type
+
+        // Type
         os.write(Ints.toByteArray(V1DatabaseFormat.MultiMapType.LONG_ARRAY_BIT_SET_BASED.getCode()));
 
         // Keys count
         os.write(Ints.toByteArray(map.size()));
 
-        //count longs in bit-set
-        os.write(Ints.toByteArray(bitSetSizeInLongs));
+        // Count longs in bit-set
+        os.write(Ints.toByteArray(LongArrayBitSet.arraySize(documentsCount)));
 
         // Sets
         for (ArrayBitSet value : map.values()) {
@@ -105,25 +96,35 @@ public final class BitSetIndexToIndexMultiMap implements IndexToIndexMultiMap {
         }
     }
 
-    private void fillMap() {
-        mapFilled = true;
+    private void build() {
+        map = new TreeMap<Integer, ArrayBitSet>();
+        int index = 0;
         for (Map.Entry<Integer, Collection<Integer>> entry :
                 rawMap.asMap().entrySet()) {
-            final int key = entry.getKey();
-            final LongArrayBitSet bitSet =
-                    fillArray(
-                            entry.getValue(),
-                            documentsCount);
-            map.put(key, bitSet);
+            if (entry.getKey() != index) {
+                throw new IllegalStateException("Indexes are not continuous");
+            }
+
+            final ArrayBitSet docs = LongArrayBitSet.zero(documentsCount);
+            for (int docId : entry.getValue()) {
+                docs.set(docId);
+            }
+
+            map.put(index, docs);
+
+            index++;
         }
+
+        // Releasing resources
+        rawMap = null;
     }
 
     @Override
     public String toString() {
-        return "BitSetMultiMap{" +
-               "map=" + map +
+        return "BitSetIndexToIndexMultiMap{" +
+               "values=" +
+               (map == null ? rawMap.keySet().size() : map.keySet().size()) +
+               ", documentsCount=" + documentsCount +
                '}';
     }
-
-
 }

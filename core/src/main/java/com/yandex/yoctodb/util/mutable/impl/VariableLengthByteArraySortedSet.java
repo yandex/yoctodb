@@ -12,10 +12,11 @@ package com.yandex.yoctodb.util.mutable.impl;
 
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
-import net.jcip.annotations.NotThreadSafe;
-import org.jetbrains.annotations.NotNull;
+import com.yandex.yoctodb.util.OutputStreamWritable;
 import com.yandex.yoctodb.util.UnsignedByteArray;
 import com.yandex.yoctodb.util.mutable.ByteArraySortedSet;
+import net.jcip.annotations.NotThreadSafe;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -28,62 +29,46 @@ import java.io.OutputStream;
 @NotThreadSafe
 public final class VariableLengthByteArraySortedSet
         extends AbstractByteArraySortedSet {
-    private int maxElement = 0;
 
     @NotNull
     @Override
     public UnsignedByteArray add(
             @NotNull
             final UnsignedByteArray e) {
-        if (e.isEmpty())
-            throw new IllegalArgumentException("Empty element");
-
-        maxElement = Math.max(maxElement, e.length());
-
         return super.add(e);
     }
 
     @Override
     public long getSizeInBytes() {
-        if (!frozen) {
+        if (sortedElements == null) {
             build();
         }
 
-        if (sortedElements.isEmpty())
-            throw new IllegalStateException("Empty set");
-
         long elementSize = 0;
-        for (UnsignedByteArray e : sortedElements.keySet())
-            elementSize += e.length();
+        for (OutputStreamWritable e : sortedElements.keySet())
+            elementSize += e.getSizeInBytes();
 
-        return 4 + // Max element size
-                4 + // Element count
-                8L * (sortedElements.size() + 1) + // Element offsets
-                elementSize; // Element array size
+        return 4L + // Element count
+               8L * (sortedElements.size() + 1) + // Element offsets
+               elementSize; // Element array size
     }
 
     @Override
     public void writeTo(
             @NotNull
             final OutputStream os) throws IOException {
-        if (!frozen) {
+        if (sortedElements == null) {
             build();
         }
-
-        if (sortedElements.isEmpty())
-            throw new IllegalStateException("Empty set");
-
-        // Max element
-        os.write(Ints.toByteArray(maxElement));
 
         // Element count
         os.write(Ints.toByteArray(sortedElements.size()));
 
         // Element offsets
         long elementOffset = 0;
-        for (UnsignedByteArray e : sortedElements.keySet()) {
+        for (OutputStreamWritable e : sortedElements.keySet()) {
             os.write(Longs.toByteArray(elementOffset));
-            elementOffset += e.length();
+            elementOffset += e.getSizeInBytes();
         }
         os.write(Longs.toByteArray(elementOffset));
 
@@ -96,8 +81,7 @@ public final class VariableLengthByteArraySortedSet
     public String toString() {
         return "VariableLengthByteArraySortedSet{" +
                "elementsCount=" +
-               (frozen ? sortedElements.size() : elements.size()) +
-               ", maxElement=" + maxElement +
+               (sortedElements == null ? elements.size() : sortedElements.size()) +
                '}';
     }
 }
