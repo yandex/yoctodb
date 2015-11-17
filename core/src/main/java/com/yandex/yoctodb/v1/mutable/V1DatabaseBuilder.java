@@ -60,7 +60,7 @@ public final class V1DatabaseBuilder
         builder.check();
 
         // Marking document as built
-        builder.markBuilt();
+        builder.freeze();
 
         // Updating the indexes
 
@@ -69,12 +69,9 @@ public final class V1DatabaseBuilder
         for (Map.Entry<String, Collection<UnsignedByteArray>> e :
                 builder.fields.asMap().entrySet()) {
             final String fieldName = e.getKey();
-            if (fieldName.isEmpty())
-                throw new IllegalArgumentException("Empty field name");
+            assert !fieldName.isEmpty() : "Empty field name";
 
             final Collection<UnsignedByteArray> values = e.getValue();
-            if (values.isEmpty())
-                throw new IllegalArgumentException("Empty values");
 
             final IndexSegment existingIndex = indexes.get(fieldName);
             if (existingIndex == null) {
@@ -93,11 +90,6 @@ public final class V1DatabaseBuilder
                                 lengthOption == DocumentBuilder.LengthOption.FIXED
                         );
                         break;
-                    case FILTERABLE_TRIE_BASED:
-                        index = new V1TrieBasedFilterableIndex(
-                                fieldName
-                        );
-                        break;
                     case SORTABLE:
                         index = new V1FullIndex(
                                 fieldName,
@@ -114,6 +106,7 @@ public final class V1DatabaseBuilder
                         throw new UnsupportedOperationException(
                                 "Unsupported index option: " + indexOption);
                 }
+
                 indexes.put(fieldName, index);
                 index.addDocument(currentDocumentId, values);
             } else {
@@ -148,7 +141,7 @@ public final class V1DatabaseBuilder
                 long size =
                         V1DatabaseFormat.MAGIC.length +
                         Ints.BYTES + // Format length
-                        V1DatabaseFormat.DIGEST_SIZE_IN_BYTES;
+                        V1DatabaseFormat.getDigestSizeInBytes();
 
                 for (OutputStreamWritable writable : writables) {
                     size += writable.getSizeInBytes();
@@ -168,7 +161,7 @@ public final class V1DatabaseBuilder
                 final MessageDigest md;
                 try {
                     md = MessageDigest.getInstance(
-                            V1DatabaseFormat.MESSAGE_DIGEST_ALGORITHM);
+                            V1DatabaseFormat.getMessageDigestAlgorithm());
                 } catch (NoSuchAlgorithmException e) {
                     throw new RuntimeException(e);
                 }
@@ -184,12 +177,12 @@ public final class V1DatabaseBuilder
                     writable.writeTo(mdos);
                 }
 
-                //writing checksum
-                if (V1DatabaseFormat.DIGEST_SIZE_IN_BYTES !=
+                // Writing checksum
+                if (V1DatabaseFormat.getDigestSizeInBytes() !=
                     md.getDigestLength()) {
-                    throw new IllegalArgumentException(
+                    throw new IllegalStateException(
                             "Wrong digest size (" +
-                            V1DatabaseFormat.DIGEST_SIZE_IN_BYTES +
+                            V1DatabaseFormat.getDigestSizeInBytes() +
                             " != " + md.getDigestLength() + ")");
                 }
 

@@ -12,8 +12,13 @@ package com.yandex.yoctodb.util;
 
 import org.junit.Test;
 
+import java.util.Iterator;
+
+import static com.yandex.yoctodb.util.UnsignedByteArrays.from;
+import static com.yandex.yoctodb.util.UnsignedByteArrays.raw;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static com.yandex.yoctodb.util.UnsignedByteArrays.*;
 
 /**
  * Tests for {@link UnsignedByteArrays}
@@ -118,5 +123,14 @@ public class UnsignedByteArraysTest {
         assertTrue(from(Long.MIN_VALUE).compareTo(from(Long.MAX_VALUE)) < 0);
         assertTrue(from(Long.MIN_VALUE).compareTo(from(0L)) < 0);
         assertTrue(from(0L).compareTo(from(Long.MAX_VALUE)) < 0);
+    }
+
+    @Test
+    public void iterable() {
+        final Iterator<Byte> iter = raw(new byte[]{1, 2, 3}).iterator();
+        assertEquals(1, iter.next().byteValue());
+        assertEquals(2, iter.next().byteValue());
+        assertEquals(3, iter.next().byteValue());
+        assertFalse(iter.hasNext());
     }
 }

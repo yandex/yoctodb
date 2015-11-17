@@ -17,20 +17,19 @@ import com.yandex.yoctodb.query.DocumentProcessor;
 import com.yandex.yoctodb.query.Query;
 import com.yandex.yoctodb.query.simple.SimpleDescendingOrder;
 import com.yandex.yoctodb.query.simple.SimpleRangeCondition;
-import com.yandex.yoctodb.util.UnsignedByteArrays;
 import com.yandex.yoctodb.util.buf.Buffer;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.yandex.yoctodb.query.QueryBuilder.*;
+import static com.yandex.yoctodb.util.UnsignedByteArrays.from;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests for building and searching a simple database
@@ -38,6 +37,7 @@ import static com.yandex.yoctodb.query.QueryBuilder.*;
  * @author incubos
  */
 public class SimpleDatabaseTest {
+    private final int DOCS = 128;
 
     @Test
     public void buildDatabase() throws IOException {
@@ -82,15 +82,15 @@ public class SimpleDatabaseTest {
                 DatabaseFormat.getCurrent()
                         .getDatabaseReader()
                         .from(Buffer.from(os.toByteArray()));
-        final Query q1 = select().where(eq("int", UnsignedByteArrays.from(1)));
-        Assert.assertTrue(db.count(q1) == 1);
-        final Query q2 = select().where(eq("int", UnsignedByteArrays.from(2)));
-        Assert.assertTrue(db.count(q2) == 1);
+        final Query q1 = select().where(eq("int", from(1)));
+        assertTrue(db.count(q1) == 1);
+        final Query q2 = select().where(eq("int", from(2)));
+        assertTrue(db.count(q2) == 1);
 
-        final Query q3 = select().where(eq("int", UnsignedByteArrays.from(2)))
-                .and(in("int", UnsignedByteArrays.from(2), UnsignedByteArrays
-                        .from(1)));
-        Assert.assertTrue(db.count(q3) == 1);
+        final Query q3 = select().where(eq("int", from(2)))
+                .and(in("int", from(2),
+                        from(1)));
+        assertTrue(db.count(q3) == 1);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -250,17 +250,49 @@ public class SimpleDatabaseTest {
 
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
         dbBuilder.buildWritable().writeTo(os);
+
         final Database db =
                 DatabaseFormat.getCurrent()
                         .getDatabaseReader()
                         .from(Buffer.from(os.toByteArray()));
-        final Query q1 = select().where(eq("int_field_full", UnsignedByteArrays
-                .from(1)));
-        Assert.assertTrue(db.count(q1) == 1);
-        final Query q2 = select().where(eq("string_field_full", UnsignedByteArrays
-                .from("doc2")));
-        Assert.assertTrue(db.count(q2) == 1);
 
+        final Collection<Integer> docs = new LinkedList<Integer>();
+        final DocumentProcessor processor =
+                new DocumentProcessor() {
+                    @Override
+                    public boolean process(
+                            final int document,
+                            @NotNull
+                            final Database database) {
+                        docs.add(document);
+                        return true;
+                    }
+                };
+
+        final Query q1 =
+                select().where(eq("int_field_full", from(1)));
+
+        assertTrue(db.count(q1) == 1);
+
+        db.execute(q1, processor);
+        assertEquals(Collections.singletonList(0), docs);
+
+        docs.clear();
+        assertEquals(1, db.executeAndUnlimitedCount(q1, processor));
+        assertEquals(Collections.singletonList(0), docs);
+
+        final Query q2 =
+                select().where(eq("string_field_full", from("doc2")));
+
+        assertTrue(db.count(q2) == 1);
+
+        docs.clear();
+        db.execute(q2, processor);
+        assertEquals(Collections.singletonList(1), docs);
+
+        docs.clear();
+        assertEquals(1, db.executeAndUnlimitedCount(q2, processor));
+        assertEquals(Collections.singletonList(1), docs);
     }
 
     @Test
@@ -310,29 +342,60 @@ public class SimpleDatabaseTest {
 
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
         dbBuilder.buildWritable().writeTo(os);
+
         final Database db =
                 DatabaseFormat.getCurrent()
                         .getDatabaseReader()
                         .from(Buffer.from(os.toByteArray()));
-        final Query q2 = select().where(eq("int", UnsignedByteArrays.from(2)));
-        Assert.assertTrue(db.count(q2) == 1);
 
-        final Query q3 = select().where(eq("int", UnsignedByteArrays.from(2)))
+        final Collection<Integer> docs = new LinkedList<Integer>();
+        final DocumentProcessor processor =
+                new DocumentProcessor() {
+                    @Override
+                    public boolean process(
+                            final int document,
+                            @NotNull
+                            final Database database) {
+                        docs.add(document);
+                        return true;
+                    }
+                };
+
+        final Query q1 = select().where(eq("int", from(2)));
+
+        assertTrue(db.count(q1) == 1);
+
+        db.execute(q1, processor);
+        assertEquals(Collections.singletonList(1), docs);
+
+        docs.clear();
+        assertEquals(1, db.executeAndUnlimitedCount(q1, processor));
+        assertEquals(Collections.singletonList(1), docs);
+
+        final Query q2 = select().where(eq("int", from(2)))
                 .and(
                         in(
                                 "int",
-                                UnsignedByteArrays.from(2),
-                                UnsignedByteArrays.from(1)));
-        Assert.assertTrue(db.count(q3) == 1);
+                                from(2),
+                                from(1)));
+
+        assertTrue(db.count(q2) == 1);
+
+        docs.clear();
+        db.execute(q2, processor);
+        assertEquals(Collections.singletonList(1), docs);
+
+        docs.clear();
+        assertEquals(1, db.executeAndUnlimitedCount(q2, processor));
+        assertEquals(Collections.singletonList(1), docs);
     }
 
     @Test
     public void countTest() throws IOException {
         final DatabaseBuilder dbBuilder =
                 DatabaseFormat.getCurrent().newDatabaseBuilder();
-        final int docs = 128;
 
-        for (int i = 0; i < docs; i++) {
+        for (int i = 0; i < DOCS; i++) {
             dbBuilder.merge(
                     DatabaseFormat
                             .getCurrent()
@@ -353,51 +416,86 @@ public class SimpleDatabaseTest {
                         .from(Buffer.from(os.toByteArray()));
 
         //less
-        for (int i = 0; i < docs; i++) {
-            final Query q1 = select().where(lt("id", UnsignedByteArrays.from(i)));
-            Assert.assertEquals(i, db.count(q1));
+        for (int i = 0; i < DOCS; i++) {
+            final Query q1 = select().where(lt("id", from(i)));
+            assertEquals(i, db.count(q1));
         }
 
         //less or equals
-        for (int i = 0; i < docs; i++) {
-            final Query q1 = select().where(lte("id", UnsignedByteArrays.from(
+        for (int i = 0; i < DOCS; i++) {
+            final Query q1 = select().where(lte("id", from(
                     i)));
-            Assert.assertEquals(i + 1, db.count(q1));
+            assertEquals(i + 1, db.count(q1));
         }
 
         //greater
-        for (int i = 0; i < docs; i++) {
-            final Query q1 = select().where(gt("id", UnsignedByteArrays.from(i)));
-            Assert.assertEquals(docs - i - 1, db.count(q1));
+        for (int i = 0; i < DOCS; i++) {
+            final Query q1 = select().where(gt("id", from(i)));
+            assertEquals(DOCS - i - 1, db.count(q1));
         }
 
         //greater or equals
-        for (int i = 0; i < docs; i++) {
-            final Query q1 = select().where(gte("id", UnsignedByteArrays.from(
+        for (int i = 0; i < DOCS; i++) {
+            final Query q1 = select().where(gte("id", from(
                     i)));
-            Assert.assertEquals(docs - i, db.count(q1));
+            assertEquals(DOCS - i, db.count(q1));
         }
 
         // skip
-        final Query qSkip = select().skip(docs / 4);
-        Assert.assertEquals(docs - docs / 4, db.count(qSkip));
+        final Query qSkip = select().skip(DOCS / 4);
+        assertEquals(DOCS - DOCS / 4, db.count(qSkip));
 
         // limit
-        final Query qLimit = select().limit(docs / 2);
-        Assert.assertEquals(docs / 2, db.count(qLimit));
+        final Query qLimit = select().limit(DOCS / 2);
+        assertEquals(DOCS / 2, db.count(qLimit));
 
         // skip and limit
-        final Query qSkipLimit = select().skip(docs / 3).limit(docs / 2);
-        Assert.assertEquals(docs / 2, db.count(qSkipLimit));
+        final Query qSkipLimit = select().skip(DOCS / 3).limit(DOCS / 2);
+        assertEquals(DOCS / 2, db.count(qSkipLimit));
     }
 
     @Test
-    public void sortTest() throws IOException {
+    public void filterLong() throws IOException {
         final DatabaseBuilder dbBuilder =
                 DatabaseFormat.getCurrent().newDatabaseBuilder();
-        final int docs = 128;
 
-        for (int i = 0; i < docs; i++) {
+        for (int i = 0; i < DOCS; i++) {
+            dbBuilder.merge(
+                    DatabaseFormat
+                            .getCurrent()
+                            .newDocumentBuilder()
+                            .withField(
+                                    "f",
+                                    String.format("%07d", i) +
+                                    "veryLongFilterableFieldValue",
+                                    DocumentBuilder.IndexOption.FILTERABLE)
+                            .withPayload(("payload" + i).getBytes())
+            );
+        }
+
+        final ByteArrayOutputStream os = new ByteArrayOutputStream();
+        dbBuilder.buildWritable().writeTo(os);
+        final Database db =
+                DatabaseFormat.getCurrent()
+                        .getDatabaseReader()
+                        .from(Buffer.from(os.toByteArray()));
+
+        final Query q =
+                select().where(
+                        eq(
+                                "f",
+                                from(
+                                        String.format("%07d", DOCS / 2) +
+                                        "veryLongFilterableFieldValue")));
+        assertEquals(1, db.count(q));
+    }
+
+    @Test
+    public void sort() throws IOException {
+        final DatabaseBuilder dbBuilder =
+                DatabaseFormat.getCurrent().newDatabaseBuilder();
+
+        for (int i = 0; i < DOCS; i++) {
             dbBuilder.merge(
                     DatabaseFormat
                             .getCurrent()
@@ -418,10 +516,10 @@ public class SimpleDatabaseTest {
                         .from(Buffer.from(os.toByteArray()));
 
         final Query q1 =
-                select().where(gte("id", UnsignedByteArrays.from(0)))
-                        .and(lte("id", UnsignedByteArrays.from(docs)))
+                select().where(gte("id", from(0)))
+                        .and(lte("id", from(DOCS)))
                         .orderBy(desc("id"));
-        final List<String> results = new ArrayList<String>(docs);
+        final List<String> results = new ArrayList<String>(DOCS);
         db.execute(q1, new DocumentProcessor() {
             @Override
             public boolean process(
@@ -437,20 +535,127 @@ public class SimpleDatabaseTest {
         });
 
         // Checking
-        int i = docs - 1;
+        int i = DOCS - 1;
         for (String result : results) {
-            Assert.assertEquals("payload" + i, result);
+            assertEquals("payload" + i, result);
             i--;
         }
     }
 
     @Test
-    public void rangeQueryTest() throws IOException {
+    public void sortNaturally() throws IOException {
         final DatabaseBuilder dbBuilder =
                 DatabaseFormat.getCurrent().newDatabaseBuilder();
-        final int docs = 128;
 
-        for (int i = 0; i < docs; i++) {
+        for (int i = 0; i < DOCS; i++) {
+            dbBuilder.merge(
+                    DatabaseFormat
+                            .getCurrent()
+                            .newDocumentBuilder()
+                            .withField(
+                                    "f",
+                                    0,
+                                    DocumentBuilder.IndexOption.FULL)
+                            .withPayload(("payload" + i).getBytes())
+            );
+        }
+
+        final ByteArrayOutputStream os = new ByteArrayOutputStream();
+        dbBuilder.buildWritable().writeTo(os);
+        final Database db =
+                DatabaseFormat.getCurrent()
+                        .getDatabaseReader()
+                        .from(Buffer.from(os.toByteArray()));
+
+        final Query q1 =
+                select().where(eq("f", from(0)))
+                        .orderBy(desc("f"));
+        final List<String> results = new ArrayList<String>(DOCS);
+        db.execute(q1, new DocumentProcessor() {
+            @Override
+            public boolean process(
+                    final int document,
+                    @NotNull
+                    final Database database) {
+                final Buffer payload = database.getDocument(document);
+                final byte[] buf = new byte[(int) payload.remaining()];
+                payload.get(buf);
+                results.add(new String(buf));
+                return true;
+            }
+        });
+
+        // Checking
+        int i = 0;
+        for (String result : results) {
+            assertEquals("payload" + i, result);
+            i++;
+        }
+    }
+
+    @Test
+    public void complexSort() throws IOException {
+        final DatabaseBuilder dbBuilder =
+                DatabaseFormat.getCurrent().newDatabaseBuilder();
+
+        for (int i = 0; i < DOCS; i++) {
+            dbBuilder.merge(
+                    DatabaseFormat
+                            .getCurrent()
+                            .newDocumentBuilder()
+                            .withField(
+                                    "f1",
+                                    i / 2,
+                                    DocumentBuilder.IndexOption.SORTABLE)
+                            .withField(
+                                    "f2",
+                                    i,
+                                    DocumentBuilder.IndexOption.SORTABLE)
+                            .withPayload(("payload" + i).getBytes())
+            );
+        }
+
+        final ByteArrayOutputStream os = new ByteArrayOutputStream();
+        dbBuilder.buildWritable().writeTo(os);
+        final Database db =
+                DatabaseFormat.getCurrent()
+                        .getDatabaseReader()
+                        .from(Buffer.from(os.toByteArray()));
+
+        final Query q =
+                select().orderBy(desc("f1")).and(asc("f2"));
+
+        final List<String> results = new ArrayList<String>(DOCS);
+        db.execute(q, new DocumentProcessor() {
+            @Override
+            public boolean process(
+                    final int document,
+                    @NotNull
+                    final Database database) {
+                final Buffer payload = database.getDocument(document);
+                final byte[] buf = new byte[(int) payload.remaining()];
+                payload.get(buf);
+                results.add(new String(buf));
+                return true;
+            }
+        });
+
+        final List<String> expected = new ArrayList<String>(DOCS);
+        for (int i = DOCS - 2; i >= 0; i -= 2) {
+            expected.add("payload" + i);
+            expected.add("payload" + (i + 1));
+        }
+
+        // Checking
+        assertEquals(expected, results);
+    }
+
+    @Test
+    public void rangeQuery() throws IOException {
+        final DatabaseBuilder dbBuilder =
+                DatabaseFormat.getCurrent().newDatabaseBuilder();
+
+        for (int i = 0; i < DOCS; i++) {
             dbBuilder.merge(
                     DatabaseFormat
                             .getCurrent()
@@ -474,12 +679,12 @@ public class SimpleDatabaseTest {
                 select().where(
                         new SimpleRangeCondition(
                                 "id",
-                                UnsignedByteArrays.from(10),
+                                from(10),
                                 true,
-                                UnsignedByteArrays.from(20),
+                                from(20),
                                 true))
                         .orderBy(new SimpleDescendingOrder("id"));
-        final List<String> results = new ArrayList<String>(docs);
+        final List<String> results = new ArrayList<String>(DOCS);
         db.execute(q1, new DocumentProcessor() {
             @Override
             public boolean process(
@@ -497,16 +702,16 @@ public class SimpleDatabaseTest {
         // Checking
         int i = 20;
         for (String result : results) {
-            Assert.assertEquals("payload" + i, result);
+            assertEquals("payload" + i, result);
             i--;
         }
 
         final Query q2 =
                 select().where(new SimpleRangeCondition("id",
-                        UnsignedByteArrays.from(1000),
-                        true, UnsignedByteArrays.from(2000),
+                        from(1000),
+                        true, from(2000),
                         true)).orderBy(new SimpleDescendingOrder("id"));
-        final List<String> results2 = new ArrayList<String>(docs);
+        final List<String> results2 = new ArrayList<String>(DOCS);
         db.execute(q2, new DocumentProcessor() {
             @Override
             public boolean process(
@@ -520,63 +725,7 @@ public class SimpleDatabaseTest {
                 return true;
             }
         });
-        Assert.assertTrue(results2.isEmpty());
-    }
-
-
-    @Test
-    public void buildDatabaseWithTrieIndex() throws IOException {
-        final DatabaseBuilder dbBuilder =
-                DatabaseFormat.getCurrent().newDatabaseBuilder();
-
-        // Document 1
-        dbBuilder.merge(
-                DatabaseFormat
-                        .getCurrent()
-                        .newDocumentBuilder()
-                        .withField(
-                                "text",
-                                "doc1234",
-                                DocumentBuilder.IndexOption.FILTERABLE_TRIE_BASED)
-                        .withField("text", "doc123456", DocumentBuilder.IndexOption.FILTERABLE_TRIE_BASED)
-                        .withField(
-                                "int",
-                                1,
-                                DocumentBuilder.IndexOption.FILTERABLE_TRIE_BASED)
-                        .withPayload("payload1".getBytes())
-        );
-
-        // Document 2
-        dbBuilder.merge(
-                DatabaseFormat
-                        .getCurrent()
-                        .newDocumentBuilder()
-                        .withField(
-                                "text",
-                                "doc2",
-                                DocumentBuilder.IndexOption.FILTERABLE_TRIE_BASED)
-                        .withField(
-                                "int",
-                                2,
-                                DocumentBuilder.IndexOption.FILTERABLE_TRIE_BASED)
-                        .withPayload("payload2".getBytes())
-        );
-
-        final ByteArrayOutputStream os = new ByteArrayOutputStream();
-        dbBuilder.buildWritable().writeTo(os);
-        final Database db =
-                DatabaseFormat.getCurrent()
-                        .getDatabaseReader()
-                        .from(Buffer.from(os.toByteArray()));
-        final Query q1 = select().where(eq("int", UnsignedByteArrays.from(1)));
-        Assert.assertTrue(db.count(q1) == 1);
-        final Query q2 = select().where(eq("int", UnsignedByteArrays.from(2)));
-        Assert.assertTrue(db.count(q2) == 1);
-
-        final Query q3 = select().where(eq("int", UnsignedByteArrays.from(2)))
-                .and(in("int", UnsignedByteArrays.from(2), UnsignedByteArrays
-                        .from(1)));
-        Assert.assertTrue(db.count(q3) == 1);
+        assertTrue(results2.isEmpty());
     }
 
     @Test
@@ -623,15 +772,15 @@ public class SimpleDatabaseTest {
                 DatabaseFormat.getCurrent()
                         .getDatabaseReader()
                         .from(Buffer.from(os.toByteArray()));
-        final Query q1 = select().where(eq("int", UnsignedByteArrays.from(1)));
-        Assert.assertTrue(db.count(q1) == 1);
-        final Query q2 = select().where(eq("int", UnsignedByteArrays.from(2)));
-        Assert.assertTrue(db.count(q2) == 1);
+        final Query q1 = select().where(eq("int", from(1)));
+        assertTrue(db.count(q1) == 1);
+        final Query q2 = select().where(eq("int", from(2)));
+        assertTrue(db.count(q2) == 1);
 
-        final Query q3 = select().where(eq("int", UnsignedByteArrays.from(2)))
-                .and(in("int", UnsignedByteArrays.from(2), UnsignedByteArrays
-                        .from(1)));
-        Assert.assertTrue(db.count(q3) == 1);
+        final Query q3 = select().where(eq("int", from(2)))
+                .and(in("int", from(2),
+                        from(1)));
+        assertTrue(db.count(q3) == 1);
     }
 
     @Test
@@ -679,8 +828,8 @@ public class SimpleDatabaseTest {
                         .from(Buffer.from(os.toByteArray()));
 
         final Query q1 =
-                select().where(not(eq("int", UnsignedByteArrays.from(1))));
-        Assert.assertEquals(1, db.count(q1));
+                select().where(not(eq("int", from(1))));
+        assertEquals(1, db.count(q1));
         final List<Integer> ids1 = new LinkedList<Integer>();
         db.execute(q1, new DocumentProcessor() {
             @Override
@@ -691,12 +840,12 @@ public class SimpleDatabaseTest {
                 return true;
             }
         });
-        Assert.assertEquals(Arrays.asList(1), ids1);
+        assertEquals(Collections.singletonList(1), ids1);
 
         final Query q2 =
-                select().where(not(eq("int", UnsignedByteArrays.from(1))))
-                        .and(eq("text", UnsignedByteArrays.from("doc2")));
-        Assert.assertEquals(1, db.count(q2));
+                select().where(not(eq("int", from(1))))
+                        .and(eq("text", from("doc2")));
+        assertEquals(1, db.count(q2));
         final List<Integer> ids2 = new LinkedList<Integer>();
         db.execute(q2, new DocumentProcessor() {
             @Override
@@ -707,12 +856,12 @@ public class SimpleDatabaseTest {
                 return true;
             }
         });
-        Assert.assertEquals(Arrays.asList(1), ids2);
+        assertEquals(Collections.singletonList(1), ids2);
 
         final Query q3 =
-                select().where(not(eq("int", UnsignedByteArrays.from(1))))
-                        .and(not(eq("int", UnsignedByteArrays.from(2))));
-        Assert.assertEquals(0, db.count(q3));
+                select().where(not(eq("int", from(1))))
+                        .and(not(eq("int", from(2))));
+        assertEquals(0, db.count(q3));
     }
 
     @Test
@@ -762,8 +911,182 @@ public class SimpleDatabaseTest {
         final Query q =
                 select().where(
                         oneOf(
-                                eq("int", UnsignedByteArrays.from(1)),
-                                eq("text", UnsignedByteArrays.from("doc2"))));
-        Assert.assertEquals(2, db.count(q));
+                                eq("int", from(1)),
+                                eq("text", from("doc2"))));
+        assertEquals(2, db.count(q));
+    }
+
+    @Test
+    public void empty() throws IOException {
+        final DatabaseBuilder dbBuilder =
+                DatabaseFormat.getCurrent().newDatabaseBuilder();
+
+        dbBuilder.merge(
+                DatabaseFormat
+                        .getCurrent()
+                        .newDocumentBuilder()
+                        .withField(
+                                "id",
+                                0,
+                                DocumentBuilder.IndexOption.FULL)
+                        .withPayload("payload".getBytes())
+        );
+
+        final ByteArrayOutputStream os = new ByteArrayOutputStream();
+        dbBuilder.buildWritable().writeTo(os);
+        final Database db =
+                DatabaseFormat.getCurrent()
+                        .getDatabaseReader()
+                        .from(Buffer.from(os.toByteArray()));
+
+        final Query query = select().where(eq("id", from(1)));
+
+        assertEquals(0, db.count(query));
+
+        final List<Integer> ids = new LinkedList<Integer>();
+        final DocumentProcessor processor = new DocumentProcessor() {
+            @Override
+            public boolean process(
+                    int document,
+                    @NotNull Database database) {
+                ids.add(document);
+                return true;
+            }
+        };
+
+        db.execute(query, processor);
+        assertEquals(0, ids.size());
+
+        assertEquals(0, db.executeAndUnlimitedCount(query, processor));
+        assertEquals(0, ids.size());
+    }
+
+    @Test
+    public void skipAndLimit() throws IOException {
+        final DatabaseBuilder dbBuilder =
+                DatabaseFormat.getCurrent().newDatabaseBuilder();
+
+        for (int i = 0; i < DOCS; i++) {
+            dbBuilder.merge(
+                    DatabaseFormat
+                            .getCurrent()
+                            .newDocumentBuilder()
+                            .withField(
+                                    "id",
+                                    i,
+                                    DocumentBuilder.IndexOption.FULL)
+                            .withPayload(("payload" + i).getBytes())
+            );
+        }
+
+        final ByteArrayOutputStream os = new ByteArrayOutputStream();
+        dbBuilder.buildWritable().writeTo(os);
+        final Database db =
+                DatabaseFormat.getCurrent()
+                        .getDatabaseReader()
+                        .from(Buffer.from(os.toByteArray()));
+
+        final AtomicInteger ids = new AtomicInteger(DOCS / 4);
+        final DocumentProcessor processor = new DocumentProcessor() {
+            @Override
+            public boolean process(
+                    final int document,
+                    final @NotNull Database database) {
+                assertEquals(
+                        ids.getAndIncrement(),
+                        document);
+                return true;
+            }
+        };
+
+        // skip
+        final Query qSkip = select().skip(DOCS / 4);
+
+        db.execute(qSkip, processor);
+        assertEquals(DOCS, ids.get());
+
+        ids.set(DOCS / 4);
+        assertEquals(
+                DOCS,
+                db.executeAndUnlimitedCount(qSkip, processor));
+        assertEquals(DOCS, ids.get());
+
+        assertEquals(DOCS - DOCS / 4, db.count(qSkip));
+
+        // limit
+        final Query qLimit = select().limit(DOCS / 3);
+
+        ids.set(0);
+        db.execute(qLimit, processor);
+        assertEquals(DOCS / 3, ids.get());
+
+        ids.set(0);
+        assertEquals(
+                DOCS,
+                db.executeAndUnlimitedCount(qLimit, processor));
+        assertEquals(DOCS / 3, ids.get());
+
+        assertEquals(DOCS / 3, db.count(qLimit));
+
+        // skip and limit
+        final Query qSkipLimit = select().skip(DOCS / 3).limit(DOCS / 2);
+
+        ids.set(DOCS / 3);
+        db.execute(qSkipLimit, processor);
+        assertEquals(5 * DOCS / 6, ids.get());
+
+        ids.set(DOCS / 3);
+        assertEquals(
+                DOCS,
+                db.executeAndUnlimitedCount(qSkipLimit, processor));
+        assertEquals(5 * DOCS / 6, ids.get());
+
+        assertEquals(DOCS / 2, db.count(qSkipLimit));
+    }
+
+    @Test
+    public void stopOnFirst() throws IOException {
+        final DatabaseBuilder dbBuilder =
+                DatabaseFormat.getCurrent().newDatabaseBuilder();
+
+        for (int i = 0; i < DOCS; i++) {
+            dbBuilder.merge(
+                    DatabaseFormat
+                            .getCurrent()
+                            .newDocumentBuilder()
+                            .withField(
+                                    "id",
+                                    i,
+                                    DocumentBuilder.IndexOption.FULL)
+                            .withPayload(("payload" + i).getBytes())
+            );
+        }
+
+        final ByteArrayOutputStream os = new ByteArrayOutputStream();
+        dbBuilder.buildWritable().writeTo(os);
+        final Database db =
+                DatabaseFormat.getCurrent()
+                        .getDatabaseReader()
+                        .from(Buffer.from(os.toByteArray()));
+
+        final Collection<Integer> ids = new LinkedList<Integer>();
+        final DocumentProcessor processor = new DocumentProcessor() {
+            @Override
+            public boolean process(
+                    final int document,
+                    final @NotNull Database database) {
+                ids.add(document);
+                return false;
+            }
+        };
+
+        final Query select = select();
+
+        db.execute(select, processor);
+        assertEquals(Collections.singletonList(0), ids);
+
+        ids.clear();
+        assertEquals(DOCS, db.executeAndUnlimitedCount(select, processor));
+        assertEquals(Collections.singletonList(0), ids);
     }
 }

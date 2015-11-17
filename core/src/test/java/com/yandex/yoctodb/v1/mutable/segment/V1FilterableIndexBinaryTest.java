@@ -86,10 +86,7 @@ public class V1FilterableIndexBinaryTest {
 
         //Reading values
         final long valuesSize = byteBuffer.getLong();
-        Assert.assertEquals(135, valuesSize);
-
-        final int maxElement = byteBuffer.getInt();
-        Assert.assertEquals(5, maxElement);
+        Assert.assertEquals(131, valuesSize);
 
         final int elementsCount = byteBuffer.getInt();
         Assert.assertEquals(11, elementsCount);

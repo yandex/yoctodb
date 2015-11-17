@@ -25,7 +25,6 @@ import com.yandex.yoctodb.util.immutable.ByteArraySortedSet;
 @Immutable
 public final class VariableLengthByteArraySortedSet
         extends AbstractByteArraySortedSet {
-    private final int maxElement;
     private final int size;
     @NotNull
     private final Buffer offsets;
@@ -35,36 +34,25 @@ public final class VariableLengthByteArraySortedSet
     public static ByteArraySortedSet from(
             @NotNull
             final Buffer buffer) {
-        final int maxElement = buffer.getInt();
         final int size = buffer.getInt();
         final Buffer offsets = buffer.slice(((long) (size + 1)) << 3);
         final Buffer elements = buffer.slice();
         elements.position(offsets.remaining());
 
         return new VariableLengthByteArraySortedSet(
-                maxElement,
                 size,
                 offsets.slice(),
                 elements.slice());
     }
 
     private VariableLengthByteArraySortedSet(
-            final int maxElement,
             final int size,
             @NotNull
             final Buffer offsets,
             @NotNull
             final Buffer elements) {
-        if (maxElement <= 0)
-            throw new IllegalArgumentException("Non positive max element");
-        if (size <= 0)
-            throw new IllegalArgumentException("Non positive size");
-        if (!offsets.hasRemaining())
-            throw new IllegalArgumentException("Empty offsets");
-        if (!elements.hasRemaining())
-            throw new IllegalArgumentException("Empty elements");
+        assert size >= 0 : "Negative size";
 
-        this.maxElement = maxElement;
         this.size = size;
         this.offsets = offsets;
         this.elements = elements;
@@ -112,8 +100,7 @@ public final class VariableLengthByteArraySortedSet
     @Override
     public String toString() {
         return "VariableLengthByteArraySortedSet{" +
-               "maxElement=" + maxElement +
-               ", size=" + size +
+               "size=" + size +
                '}';
     }
 }

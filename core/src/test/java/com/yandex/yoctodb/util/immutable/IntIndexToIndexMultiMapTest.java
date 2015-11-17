@@ -13,7 +13,6 @@ package com.yandex.yoctodb.util.immutable;
 import com.yandex.yoctodb.util.buf.Buffer;
 import org.junit.Assert;
 import org.junit.Test;
-import com.yandex.yoctodb.util.immutable.IndexToIndexMultiMap;
 import com.yandex.yoctodb.util.immutable.impl.IntIndexToIndexMultiMap;
 import com.yandex.yoctodb.util.mutable.BitSet;
 import com.yandex.yoctodb.util.mutable.impl.LongArrayBitSet;
@@ -61,13 +60,13 @@ public class IntIndexToIndexMultiMapTest {
                 new com.yandex.yoctodb.util.mutable.impl.IntIndexToIndexMultiMap();
         for (int i = 0; i < keys; i++) {
             //same elements
-            indexToIndexMultiMap.add(i, (keys - i) % values);
-            indexToIndexMultiMap.add(i, (keys - i) % values);
-            indexToIndexMultiMap.add(i, (keys - i) % values);
-            indexToIndexMultiMap.add(i, (keys - i) % values);
+            indexToIndexMultiMap.put(i, (keys - i) % values);
+            indexToIndexMultiMap.put(i, (keys - i) % values);
+            indexToIndexMultiMap.put(i, (keys - i) % values);
+            indexToIndexMultiMap.put(i, (keys - i) % values);
 
-            indexToIndexMultiMap.add(i, (2 * keys - i) % values);
-            indexToIndexMultiMap.add(i, (3 * keys - i) % values);
+            indexToIndexMultiMap.put(i, (2 * keys - i) % values);
+            indexToIndexMultiMap.put(i, (3 * keys - i) % values);
         }
 
         final ByteArrayOutputStream os = new ByteArrayOutputStream();

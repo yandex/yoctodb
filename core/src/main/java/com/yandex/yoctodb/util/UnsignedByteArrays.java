@@ -28,6 +28,11 @@ public class UnsignedByteArrays {
         //
     }
 
+    // For test coverage
+    static {
+        new UnsignedByteArrays();
+    }
+
     private static final Charset UTF8 = Charsets.UTF_8;
 
     @NotNull

@@ -184,10 +184,7 @@ public class V1FullIndexBinaryTest {
 
         //Reading values
         final long valuesSize = byteBuffer.getLong();
-        Assert.assertEquals(41, valuesSize);
-
-        final int maxElement = byteBuffer.getInt();
-        Assert.assertEquals(5, maxElement);
+        Assert.assertEquals(37, valuesSize);
 
         final int elementsCount = byteBuffer.getInt();
         Assert.assertEquals(2, elementsCount);

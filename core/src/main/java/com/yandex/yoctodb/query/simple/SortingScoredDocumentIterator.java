@@ -21,6 +21,7 @@ import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -68,19 +69,12 @@ public final class SortingScoredDocumentIterator
         }
 
         // Building base iterator
-        switch (orders[0]) {
-            case ASC:
-                baseIterator = indexes[0].ascending(docs);
-                break;
-            case DESC:
-                baseIterator = indexes[0].descending(docs);
-                break;
-            default:
-                throw new IllegalArgumentException(
-                        "Unsupported sort order: " + orders[0]);
-        }
+        if (orders[0].isAscending())
+            baseIterator = indexes[0].ascending(docs);
+        else
+            baseIterator = indexes[0].descending(docs);
 
-        this.chunk = Iterators.emptyIterator();
+        this.chunk = Collections.emptyIterator();
     }
 
     @Override

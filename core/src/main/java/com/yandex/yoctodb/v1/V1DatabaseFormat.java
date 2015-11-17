@@ -20,6 +20,8 @@ import com.yandex.yoctodb.v1.immutable.V1DatabaseReader;
 import com.yandex.yoctodb.v1.mutable.V1DatabaseBuilder;
 import com.yandex.yoctodb.v1.mutable.V1DocumentBuilder;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 /**
  * First {@link DatabaseFormat} implementation
  *
@@ -31,8 +33,33 @@ public final class V1DatabaseFormat extends DatabaseFormat {
 
     public final static DatabaseReader DATABASE_READER = new V1DatabaseReader();
 
-    public final static String MESSAGE_DIGEST_ALGORITHM = "MD5";
-    public final static long DIGEST_SIZE_IN_BYTES = 16;
+    private final static AtomicReference<String> messageDigestAlgorithm =
+            new AtomicReference<String>("MD5");
+
+    @NotNull
+    public static String getMessageDigestAlgorithm() {
+        return messageDigestAlgorithm.get();
+    }
+
+    public static void setMessageDigestAlgorithm(
+            @NotNull
+            final String algorithm) {
+        messageDigestAlgorithm.set(algorithm);
+    }
+
+    private final static AtomicReference<Integer> digestSize =
+            new AtomicReference<Integer>(16); // MD5 size
+
+    @NotNull
+    public static Integer getDigestSizeInBytes() {
+        return digestSize.get();
+    }
+
+    public static void setDigestSizeInBytes(final int size) {
+        assert size > 0;
+
+        digestSize.set(size);
+    }
 
     // Segment types
     public enum SegmentType {

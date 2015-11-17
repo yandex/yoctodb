@@ -52,6 +52,6 @@ public final class IdScoredDocument
     public int compareTo(
             @NotNull
             final IdScoredDocument o) {
-        return Integer.compare(id, o.id);
+        throw new UnsupportedOperationException("Comparing is not supported");
     }
 }

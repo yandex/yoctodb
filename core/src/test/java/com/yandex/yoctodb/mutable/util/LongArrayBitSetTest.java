@@ -12,13 +12,14 @@ package com.yandex.yoctodb.mutable.util;
 
 import com.google.common.primitives.Longs;
 import com.yandex.yoctodb.util.buf.Buffer;
-import org.junit.Assert;
 import org.junit.Test;
 import com.yandex.yoctodb.util.mutable.BitSet;
 import com.yandex.yoctodb.util.mutable.impl.LongArrayBitSet;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+
+import static org.junit.Assert.*;
 
 /**
  * @author svyatoslav
@@ -27,13 +28,42 @@ public class LongArrayBitSetTest {
     private static final int SIZE = 1024;
 
     @Test
+    public void inverse() {
+        for (int i = 1; i < SIZE; i++) {
+            final BitSet bs = LongArrayBitSet.one(i);
+            assertFalse(bs.inverse());
+            assertTrue(bs.inverse());
+            assertEquals(i, bs.cardinality());
+        }
+    }
+
+    @Test
+    public void or() {
+        for (int i = 1; i < SIZE; i++) {
+            final BitSet bs1 = LongArrayBitSet.one(i);
+            final BitSet bs2 = LongArrayBitSet.zero(i);
+            assertEquals(i, bs1.cardinality());
+            assertEquals(0, bs2.cardinality());
+            bs2.or(bs1);
+            assertEquals(i, bs2.cardinality());
+        }
+    }
+
+    @Test
+    public void empty() {
+        for (int i = 1; i < SIZE; i++) {
+            assertTrue(LongArrayBitSet.zero(i).isEmpty());
+        }
+    }
+
+    @Test
     public void simpleAndTest() {
         for (int i = 1; i < SIZE; i++) {
             final BitSet bs1 = LongArrayBitSet.one(i);
             final BitSet bs2 = LongArrayBitSet.one(i);
-            Assert.assertEquals(i, bs1.cardinality());
+            assertEquals(i, bs1.cardinality());
             bs1.and(bs2);
-            Assert.assertEquals(i, bs1.cardinality());
+            assertEquals(i, bs1.cardinality());
         }
     }
 
@@ -43,7 +73,7 @@ public class LongArrayBitSetTest {
             final BitSet bs1 = LongArrayBitSet.one(i);
             final LongArrayBitSet bs2 = (LongArrayBitSet) LongArrayBitSet.one(i);
 
-            Assert.assertEquals(i, bs1.cardinality());
+            assertEquals(i, bs1.cardinality());
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             for (long word : bs2.toArray()) {
                 os.write(Longs.toByteArray(word));
@@ -51,7 +81,7 @@ public class LongArrayBitSetTest {
             Buffer bs2BB = Buffer.from(os.toByteArray());
 
             bs1.or(bs2BB, 0, bs2.toArray().length);
-            Assert.assertEquals(i, bs1.cardinality());
+            assertEquals(i, bs1.cardinality());
         }
     }
 
@@ -59,9 +89,9 @@ public class LongArrayBitSetTest {
     public void clearTest() {
         for (int size = 1; size <= SIZE; size++) {
             final BitSet bitSet = LongArrayBitSet.one(size);
-            Assert.assertEquals(size, bitSet.cardinality());
+            assertEquals(size, bitSet.cardinality());
             bitSet.clear();
-            Assert.assertEquals(0, bitSet.cardinality());
+            assertEquals(0, bitSet.cardinality());
         }
     }
 
@@ -71,21 +101,21 @@ public class LongArrayBitSetTest {
         for (int i = 0; i < s.getSize(); i += 2)
             s.set(i);
         for (int i = 0; i < s.getSize(); i += 2) {
-            Assert.assertEquals(i, s.nextSetBit(i));
+            assertEquals(i, s.nextSetBit(i));
         }
     }
 
     @Test
     public void zerosIteratorTest() {
         final BitSet s = LongArrayBitSet.zero(SIZE);
-        Assert.assertEquals(-1, s.nextSetBit(0));
+        assertEquals(-1, s.nextSetBit(0));
     }
 
     @Test
     public void onesIteratorTest() {
         final BitSet s = LongArrayBitSet.one(SIZE);
         for (int i = 0; i < s.getSize(); i ++) {
-            Assert.assertEquals(i, s.nextSetBit(i));
+            assertEquals(i, s.nextSetBit(i));
         }
     }
 

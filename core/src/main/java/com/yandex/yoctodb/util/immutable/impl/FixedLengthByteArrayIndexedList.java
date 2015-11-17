@@ -44,12 +44,8 @@ public class FixedLengthByteArrayIndexedList
             final int elementSize,
             final int elementCount,
             final Buffer elements) {
-        if (elementSize <= 0)
-            throw new IllegalArgumentException("Non positive element size");
-        if (elementCount <= 0)
-            throw new IllegalArgumentException("Non positive element count");
-        if (!elements.hasRemaining())
-            throw new IllegalArgumentException("Empty elements");
+        assert elementSize >= 0 : "Negative element size";
+        assert elementCount >= 0 : "Negative element count";
 
         this.elementSize = elementSize;
         this.elementCount = elementCount;
