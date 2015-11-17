@@ -25,9 +25,14 @@ import java.util.concurrent.ConcurrentMap;
  * @author incubos
  */
 @ThreadSafe
-public class SegmentRegistry {
+public final class SegmentRegistry {
     private SegmentRegistry() {
         // Can't construct
+    }
+
+    // For test coverage
+    static {
+        new SegmentRegistry();
     }
 
     // Segment readers
@@ -64,6 +69,5 @@ public class SegmentRegistry {
         V1FilterableIndex.registerReader();
         V1FullIndex.registerReader();
         V1PayloadSegment.registerReader();
-        V1TrieBasedFilterableIndex.registerReader();
     }
 }
