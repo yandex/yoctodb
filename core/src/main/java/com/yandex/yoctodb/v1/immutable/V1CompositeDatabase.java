@@ -11,16 +11,15 @@
 package com.yandex.yoctodb.v1.immutable;
 
 import com.google.common.collect.Iterators;
-import com.yandex.yoctodb.util.buf.Buffer;
-import net.jcip.annotations.Immutable;
-import org.jetbrains.annotations.NotNull;
 import com.yandex.yoctodb.immutable.Database;
 import com.yandex.yoctodb.query.DocumentProcessor;
 import com.yandex.yoctodb.query.Query;
-import com.yandex.yoctodb.query.QueryContext;
 import com.yandex.yoctodb.query.ScoredDocument;
+import com.yandex.yoctodb.util.buf.Buffer;
 import com.yandex.yoctodb.util.mutable.BitSet;
 import com.yandex.yoctodb.util.mutable.impl.ReadOnlyOneBitSet;
+import net.jcip.annotations.Immutable;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -41,39 +40,42 @@ public final class V1CompositeDatabase implements Database {
         }
     };
     @NotNull
-    private final Collection<V1Database> databases;
+    private final List<V1Database> databases;
+    private final int[] documentOffsets;
+    private final int documentCount;
 
     public V1CompositeDatabase(
             @NotNull
             final Collection<V1Database> databases) {
         this.databases = new ArrayList<V1Database>(databases);
+
+        this.documentOffsets = new int[databases.size()];
+        int documentCount = 0;
+        for (int i = 0; i < documentOffsets.length; i++) {
+            documentOffsets[i] = documentCount;
+            documentCount += this.databases.get(i).getDocumentCount();
+        }
+        this.documentCount = documentCount;
     }
 
     @Override
     public int getDocumentCount() {
-        int result = 0;
-        for (V1Database database : databases) {
-            result += database.getDocumentCount();
-        }
-        return result;
+        return this.documentCount;
     }
 
     @NotNull
     @Override
     public Buffer getDocument(final int i) {
-        assert 0 <= i && i < getDocumentCount();
+        assert 0 <= i && i < this.documentCount;
 
-        int id = i;
-        for (V1Database database : databases) {
-            final int count = database.getDocumentCount();
-            if (id < count) {
-                return database.getDocument(id);
-            } else {
-                id -= count;
-            }
-        }
+        final int offsetIndex = Arrays.binarySearch(documentOffsets, i);
+        final int dbIndex;
+        if (offsetIndex >= 0)
+            dbIndex = offsetIndex;
+        else
+            dbIndex = -offsetIndex - 2;
 
-        throw new IllegalStateException("Couldn't find document");
+        return databases.get(dbIndex).getDocument(i - documentOffsets[dbIndex]);
     }
 
     @Override
@@ -113,34 +115,9 @@ public final class V1CompositeDatabase implements Database {
         } else {
             iterator =
                     Iterators.concat(
-                            new Iterator<Iterator<? extends ScoredDocument<?>>>() {
-                                private final Iterator<V1Database> dbs =
-                                        databases.iterator();
-
-                                @Override
-                                public boolean hasNext() {
-                                    return dbs.hasNext();
-                                }
-
-                                @Override
-                                public Iterator<? extends ScoredDocument<?>> next() {
-                                    final QueryContext ctx = dbs.next();
-                                    final BitSet docs = query.filteredUnlimited(
-                                            ctx);
-                                    if (docs == null) {
-                                        return Iterators.emptyIterator();
-                                    } else {
-                                        return query.sortedUnlimited(docs, ctx);
-                                    }
-                                }
-
-                                @Override
-                                public void remove() {
-                                    throw new UnsupportedOperationException(
-                                            "Removal is not supported");
-                                }
-                            }
-                    );
+                            new FilterResultIterator(
+                                    query,
+                                    databases.iterator()));
         }
 
         // Skipping values
@@ -240,30 +217,9 @@ public final class V1CompositeDatabase implements Database {
 
             iterator =
                     Iterators.concat(
-                            new Iterator<Iterator<? extends ScoredDocument<?>>>() {
-                                private final Iterator<DatabaseDocs> dbs =
-                                        results.iterator();
-
-                                @Override
-                                public boolean hasNext() {
-                                    return dbs.hasNext();
-                                }
-
-                                @Override
-                                public Iterator<? extends ScoredDocument<?>> next() {
-                                    final DatabaseDocs db = dbs.next();
-                                    return query.sortedUnlimited(
-                                            db.docs,
-                                            db.ctx);
-                                }
-
-                                @Override
-                                public void remove() {
-                                    throw new UnsupportedOperationException(
-                                            "Removal is not supported");
-                                }
-                            }
-                    );
+                            new SortResultIterator(
+                                    query,
+                                    results.iterator()));
         }
 
         // Skipping values
@@ -289,22 +245,6 @@ public final class V1CompositeDatabase implements Database {
         }
 
         return result;
-    }
-
-    private static final class DatabaseDocs {
-        @NotNull
-        public final QueryContext ctx;
-        @NotNull
-        public final BitSet docs;
-
-        private DatabaseDocs(
-                @NotNull
-                final QueryContext ctx,
-                @NotNull
-                final BitSet docs) {
-            this.ctx = ctx;
-            this.docs = docs;
-        }
     }
 
     @Override
