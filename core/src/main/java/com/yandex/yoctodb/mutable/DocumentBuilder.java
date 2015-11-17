@@ -23,9 +23,10 @@ import com.yandex.yoctodb.util.UnsignedByteArray;
 public interface DocumentBuilder {
     enum IndexOption {
         FILTERABLE,
-        FILTERABLE_TRIE_BASED,
         SORTABLE,
-        FULL
+        FULL,
+        // For unit tests
+        UNSUPPORTED
     }
 
     enum LengthOption {
