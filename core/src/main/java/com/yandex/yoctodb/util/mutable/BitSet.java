@@ -108,7 +108,7 @@ public interface BitSet {
     boolean or(
             @NotNull
             Buffer longArrayBitSetInByteBuffer,
-            int startPosition,
+            long startPosition,
             int bitSetSizeInLongs);
 
     /**

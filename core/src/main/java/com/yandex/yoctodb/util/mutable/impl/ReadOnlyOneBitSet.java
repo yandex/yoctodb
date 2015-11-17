@@ -25,8 +25,6 @@ public final class ReadOnlyOneBitSet implements BitSet {
     private final int size;
 
     public ReadOnlyOneBitSet(final int size) {
-        assert size > 0;
-
         this.size = size;
     }
 
@@ -83,7 +81,7 @@ public final class ReadOnlyOneBitSet implements BitSet {
     public boolean or(
             @NotNull
             final Buffer longArrayBitSetInByteBuffer,
-            final int startPosition,
+            final long startPosition,
             final int bitSetSizeInLongs) {
         throw new UnsupportedOperationException();
     }
