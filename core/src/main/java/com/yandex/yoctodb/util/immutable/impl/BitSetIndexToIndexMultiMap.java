@@ -28,7 +28,7 @@ public class BitSetIndexToIndexMultiMap implements IndexToIndexMultiMap {
     @NotNull
     private final Buffer elements;
     private final int bitSetSizeInLongs;
-    private final int bitSetSizeInBytes;
+    private final long bitSetSizeInBytes;
 
     @NotNull
     public static IndexToIndexMultiMap from(
@@ -37,29 +37,22 @@ public class BitSetIndexToIndexMultiMap implements IndexToIndexMultiMap {
         final int keysCount = buf.getInt();
         final int bitSetSizeInLongs = buf.getInt();
         final Buffer elements = buf.slice();
-        final int bitSetSizeInBytes = bitSetSizeInLongs << 3;
 
         return new BitSetIndexToIndexMultiMap(
                 keysCount,
                 elements.slice(),
-                bitSetSizeInLongs,
-                bitSetSizeInBytes);
+                bitSetSizeInLongs);
     }
 
     private BitSetIndexToIndexMultiMap(
             final int keysCount,
             @NotNull
             final Buffer elements,
-            final int bitSetSizeInLongs,
-            final int bitSetSizeInBytes) {
-        if (keysCount <= 0)
-            throw new IllegalArgumentException("No keys");
-        if (!elements.hasRemaining())
-            throw new IllegalArgumentException("No elements");
-
+            final int bitSetSizeInLongs) {
+        assert keysCount >= 0 : "Negative keys count";
         this.keysCount = keysCount;
         this.bitSetSizeInLongs = bitSetSizeInLongs;
-        this.bitSetSizeInBytes = bitSetSizeInBytes;
+        this.bitSetSizeInBytes = ((long) bitSetSizeInLongs) << 3;
         this.elements = elements;
     }
 
@@ -70,7 +63,8 @@ public class BitSetIndexToIndexMultiMap implements IndexToIndexMultiMap {
             final int key) {
         assert 0 <= key && key < keysCount;
 
-        final int start = key * bitSetSizeInBytes;
+        final long start = key * bitSetSizeInBytes;
+
         return dest.or(elements, start, bitSetSizeInLongs);
     }
 
@@ -83,7 +77,7 @@ public class BitSetIndexToIndexMultiMap implements IndexToIndexMultiMap {
 
         boolean result = false;
 
-        int current = fromInclusive * bitSetSizeInBytes;
+        long current = fromInclusive * bitSetSizeInBytes;
         final long remaining = elements.remaining();
 
         assert remaining <= Integer.MAX_VALUE;
@@ -128,7 +122,7 @@ public class BitSetIndexToIndexMultiMap implements IndexToIndexMultiMap {
                 toExclusive <= keysCount;
 
         int remaining = toExclusive - fromInclusive;
-        int current = fromInclusive * bitSetSizeInBytes;
+        long current = fromInclusive * bitSetSizeInBytes;
         boolean result = false;
 
         while (remaining > 0) {

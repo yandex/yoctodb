@@ -10,9 +10,9 @@
 
 package com.yandex.yoctodb.util.mutable.impl;
 
+import com.yandex.yoctodb.util.buf.Buffer;
 import com.yandex.yoctodb.util.mutable.ArrayBitSet;
 import com.yandex.yoctodb.util.mutable.BitSet;
-import com.yandex.yoctodb.util.buf.Buffer;
 import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.NotNull;
 
@@ -20,7 +20,7 @@ import java.util.Arrays;
 
 /**
  * {@link BitSet} implementation based on {@code long} array.
- *
+ * <p/>
  * Based on Lucene {@code FixedBitSet}.
  *
  * @author incubos
@@ -42,7 +42,7 @@ public final class LongArrayBitSet implements ArrayBitSet {
         return (size >>> 6) + 1;
     }
 
-    public static BitSet one(final int size) {
+    public static ArrayBitSet one(final int size) {
         final LongArrayBitSet result = new LongArrayBitSet(size);
         // Filling with ones
         Arrays.fill(result.words, 0, result.words.length - 1, -1L);
@@ -54,7 +54,7 @@ public final class LongArrayBitSet implements ArrayBitSet {
         return result;
     }
 
-    public static BitSet zero(final int size) {
+    public static ArrayBitSet zero(final int size) {
         return new LongArrayBitSet(size);
     }
 
@@ -141,17 +141,13 @@ public final class LongArrayBitSet implements ArrayBitSet {
         assert size == set.getSize();
 
         boolean notEmpty = false;
-        if (set instanceof ArrayBitSet) {
-            final long[] from = ((ArrayBitSet) set).toArray();
-            for (int i = 0; i < words.length; i++) {
-                final long word = words[i] & from[i];
-                words[i] = word;
-                if (word != 0) {
-                    notEmpty = true;
-                }
+        final long[] from = ((ArrayBitSet) set).toArray();
+        for (int i = 0; i < words.length; i++) {
+            final long word = words[i] & from[i];
+            words[i] = word;
+            if (word != 0) {
+                notEmpty = true;
             }
-        } else {
-            throw new UnsupportedOperationException();
         }
 
         return notEmpty;
@@ -164,17 +160,13 @@ public final class LongArrayBitSet implements ArrayBitSet {
         assert size == set.getSize();
 
         boolean notEmpty = false;
-        if (set instanceof ArrayBitSet) {
-            final long[] from = ((ArrayBitSet) set).toArray();
-            for (int i = 0; i < words.length; i++) {
-                final long word = words[i] | from[i];
-                words[i] = word;
-                if (word != 0) {
-                    notEmpty = true;
-                }
+        final long[] from = ((ArrayBitSet) set).toArray();
+        for (int i = 0; i < words.length; i++) {
+            final long word = words[i] | from[i];
+            words[i] = word;
+            if (word != 0) {
+                notEmpty = true;
             }
-        } else {
-            throw new UnsupportedOperationException();
         }
 
         return notEmpty;
@@ -184,10 +176,10 @@ public final class LongArrayBitSet implements ArrayBitSet {
     public boolean or(
             @NotNull
             final Buffer longArrayBitSetInByteBuffer,
-            final int startPosition,
+            final long startPosition,
             final int bitSetSizeInLongs) {
         boolean notEmpty = false;
-        int currentPosition = startPosition;
+        long currentPosition = startPosition;
 
         assert words.length == bitSetSizeInLongs;
 
@@ -195,7 +187,7 @@ public final class LongArrayBitSet implements ArrayBitSet {
             final long currentWord =
                     longArrayBitSetInByteBuffer.getLong(
                             currentPosition);
-            currentPosition += 8;
+            currentPosition += Long.BYTES;
             final long word = words[i] | currentWord;
             words[i] = word;
             if (word != 0) {
@@ -223,7 +215,7 @@ public final class LongArrayBitSet implements ArrayBitSet {
     public int nextSetBit(final int fromIndexInclusive) {
         assert 0 <= fromIndexInclusive;
 
-        if (fromIndexInclusive >= size){
+        if (fromIndexInclusive >= size) {
             return -1;
         }
 
