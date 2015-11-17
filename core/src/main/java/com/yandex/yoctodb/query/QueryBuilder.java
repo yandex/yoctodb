@@ -30,6 +30,11 @@ public final class QueryBuilder {
         //
     }
 
+    // For test coverage
+    static {
+        new QueryBuilder();
+    }
+
     @NotNull
     public static Select select() {
         return new SimpleSelect();

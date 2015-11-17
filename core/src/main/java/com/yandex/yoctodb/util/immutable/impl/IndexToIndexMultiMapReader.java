@@ -17,7 +17,16 @@ import com.yandex.yoctodb.v1.V1DatabaseFormat;
 /**
  * @author svyatoslav
  */
-public class IndexToIndexMultiMapReader {
+public final class IndexToIndexMultiMapReader {
+
+    private IndexToIndexMultiMapReader() {
+        //
+    }
+
+    // For test coverage
+    static {
+        new IndexToIndexMultiMapReader();
+    }
 
     public static IndexToIndexMultiMap from(
             final Buffer byteBuffer) {

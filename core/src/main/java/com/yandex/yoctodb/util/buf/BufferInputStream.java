@@ -1,4 +1,4 @@
-package com.yandex.yoctodb.util;
+package com.yandex.yoctodb.util.buf;
 
 import com.yandex.yoctodb.util.buf.Buffer;
 import net.jcip.annotations.NotThreadSafe;

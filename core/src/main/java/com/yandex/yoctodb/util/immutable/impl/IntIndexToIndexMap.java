@@ -28,10 +28,7 @@ public class IntIndexToIndexMap implements IndexToIndexMap {
             final int elementCount,
             @NotNull
             final Buffer elements) {
-        if (elementCount <= 0)
-            throw new IllegalArgumentException("Non positive element count");
-        if (!elements.hasRemaining())
-            throw new IllegalArgumentException("Empty elements");
+        assert elementCount >= 0 : "Negative element count";
 
         this.elementCount = elementCount;
         this.elements = elements;

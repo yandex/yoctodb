@@ -16,11 +16,10 @@ import com.yandex.yoctodb.mutable.DatabaseBuilder;
 import com.yandex.yoctodb.mutable.DocumentBuilder;
 import com.yandex.yoctodb.query.DocumentProcessor;
 import com.yandex.yoctodb.query.Query;
-import com.yandex.yoctodb.util.UnsignedByteArrays;
+import com.yandex.yoctodb.util.buf.Buffer;
 import org.jetbrains.annotations.NotNull;
 import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.*;
@@ -29,8 +28,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.yandex.yoctodb.query.QueryBuilder.*;
+import static com.yandex.yoctodb.util.UnsignedByteArrays.from;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Tests for a synchronized composite database
@@ -60,7 +62,7 @@ public class CompositeFileDatabaseTest {
                                 buildDatabase1("1.dat"),
                                 "r").getChannel());
 
-        Assert.assertEquals(DOCS, db1.getDocumentCount());
+        assertEquals(DOCS, db1.getDocumentCount());
 
         final Database db2 =
                 READER.from(
@@ -68,15 +70,40 @@ public class CompositeFileDatabaseTest {
                                 buildDatabase2("2.dat"),
                                 "r").getChannel());
 
-        Assert.assertEquals(DOCS, db2.getDocumentCount());
+        assertEquals(DOCS, db2.getDocumentCount());
 
         final Database db = READER.composite(Arrays.asList(db1, db2));
 
-        Assert.assertEquals(2 * DOCS, db.getDocumentCount());
+        assertEquals(2 * DOCS, db.getDocumentCount());
     }
 
     @Test
-    public void sortAndLimit() throws IOException {
+    public void accessDocuments() throws IOException {
+        final Database db =
+                READER.composite(
+                        Arrays.asList(
+                                READER.from(
+                                        new RandomAccessFile(
+                                                buildDatabase1("1.dat"),
+                                                "r").getChannel()),
+                                READER.from(
+                                        new RandomAccessFile(
+                                                buildDatabase2("2.dat"),
+                                                "r").getChannel())));
+        for (int i = 0; i < DOCS; i++) {
+            assertEquals(
+                    Buffer.from(("payload1=" + i).getBytes()),
+                    db.getDocument(i));
+        }
+        for (int i = DOCS; i < DOCS << 1; i++) {
+            assertEquals(
+                    Buffer.from(("payload2=" + (i - DOCS)).getBytes()),
+                    db.getDocument(i));
+        }
+    }
+
+    @Test
+    public void skipAndLimit() throws IOException {
         final Database db =
                 READER.composite(
                         Arrays.asList(
@@ -91,93 +118,254 @@ public class CompositeFileDatabaseTest {
 
         // skip
         final Query qSkip = select().skip(DOCS / 4);
-        Assert.assertEquals(2 * DOCS - DOCS / 4, db.count(qSkip));
+        final AtomicInteger idSkip = new AtomicInteger(DOCS / 4);
+        assertEquals(
+                2 * DOCS,
+                db.executeAndUnlimitedCount(
+                        qSkip,
+                        new DocumentProcessor() {
+                            @Override
+                            public boolean process(
+                                    final int document,
+                                    @NotNull
+                                    final Database database) {
+                                assertEquals(
+                                        idSkip.getAndIncrement() % DOCS,
+                                        document);
+                                return true;
+                            }
+                        }));
+        assertEquals(2 * DOCS - DOCS / 4, db.count(qSkip));
 
         // limit
         final Query qLimit = select().limit(DOCS / 3);
-        Assert.assertEquals(DOCS / 3, db.count(qLimit));
+        final AtomicInteger idLimit = new AtomicInteger();
+        assertEquals(
+                2 * DOCS,
+                db.executeAndUnlimitedCount(
+                        qLimit,
+                        new DocumentProcessor() {
+                            @Override
+                            public boolean process(
+                                    final int document,
+                                    @NotNull
+                                    final Database database) {
+                                assertEquals(
+                                        idLimit.getAndIncrement(),
+                                        document);
+                                return true;
+                            }
+                        }));
+        assertEquals(DOCS / 3, db.count(qLimit));
 
         // skip and limit
         final Query qSkipLimit = select().skip(DOCS / 3).limit(DOCS);
-        Assert.assertEquals(DOCS, db.count(qSkipLimit));
+        final AtomicInteger idSkipLimit = new AtomicInteger(DOCS / 3);
+        assertEquals(
+                2 * DOCS,
+                db.executeAndUnlimitedCount(
+                        qSkipLimit,
+                        new DocumentProcessor() {
+                            @Override
+                            public boolean process(
+                                    final int document,
+                                    @NotNull
+                                    final Database database) {
+                                assertEquals(
+                                        idSkipLimit.getAndIncrement() % DOCS,
+                                        document);
+                                return true;
+                            }
+                        }));
+        assertEquals(DOCS, db.count(qSkipLimit));
     }
 
     @Test
     public void filter() throws IOException {
-        final Database db =
-                READER.composite(
-                        Arrays.asList(
-                                READER.from(
-                                        new RandomAccessFile(
-                                                buildDatabase1("1.dat"),
-                                                "r").getChannel()),
-                                READER.from(
-                                        new RandomAccessFile(
-                                                buildDatabase2("2.dat"),
-                                                "r").getChannel())));
+        final Database db1 =
+                READER.from(
+                        new RandomAccessFile(
+                                buildDatabase1("1.dat"),
+                                "r").getChannel());
+        final Database db2 =
+                READER.from(
+                        new RandomAccessFile(
+                                buildDatabase2("2.dat"),
+                                "r").getChannel());
 
-        for (int i = 0; i < DOCS; i++)
-            Assert.assertEquals(
+        final Database db = READER.composite(Arrays.asList(db1, db2));
+
+        for (int i = 0; i < DOCS; i++) {
+            final Query q = select().where(eq("index", from(i)));
+
+            final Iterator<Database> dbs = Arrays.asList(db1, db2).iterator();
+            assertEquals(
                     2,
-                    db.count(select().where(eq("index", UnsignedByteArrays.from(
-                                                       i))))
-            );
+                    db.executeAndUnlimitedCount(
+                            q,
+                            new DocumentProcessor() {
+                                @Override
+                                public boolean process(
+                                        final int document,
+                                        @NotNull
+                                        final Database database) {
+                                    assertEquals(dbs.next(), database);
+                                    return true;
+                                }
+                            }));
 
-        Assert.assertEquals(
+            assertEquals(2, db.count(q));
+        }
+
+        final Query qDatabase1Docs =
+                select()
+                        .where(eq("field1", from("1")))
+                        .and(eq("field2", from("2")));
+        final AtomicInteger idDatabase1Docs = new AtomicInteger();
+        assertEquals(
                 DOCS,
-                db.count(
-                        select()
-                                .where(eq("field1", UnsignedByteArrays.from(
-                                                  "1")))
-                                .and(eq("field2", UnsignedByteArrays.from("2")))
-                )
-        );
-        Assert.assertEquals(
+                db.executeAndUnlimitedCount(
+                        qDatabase1Docs,
+                        new DocumentProcessor() {
+                            @Override
+                            public boolean process(
+                                    final int document,
+                                    @NotNull
+                                    final Database database) {
+                                assertEquals(db1, database);
+                                assertEquals(
+                                        idDatabase1Docs.getAndIncrement(),
+                                        document);
+                                return true;
+                            }
+                        }));
+        assertEquals(DOCS, db.count(qDatabase1Docs));
+
+        final Query qDatabase2Docs =
+                select()
+                        .where(eq("field1", from("2")))
+                        .and(eq("field2", from("1")));
+        final AtomicInteger idDatabase2Docs = new AtomicInteger();
+        assertEquals(
                 DOCS,
-                db.count(
-                        select()
-                                .where(eq("field1", UnsignedByteArrays.from(
-                                                  "2")))
-                                .and(eq("field2", UnsignedByteArrays.from("1")))
-                )
-        );
-        Assert.assertEquals(
+                db.executeAndUnlimitedCount(
+                        qDatabase2Docs,
+                        new DocumentProcessor() {
+                            @Override
+                            public boolean process(
+                                    final int document,
+                                    @NotNull
+                                    final Database database) {
+                                assertEquals(db2, database);
+                                assertEquals(
+                                        idDatabase2Docs.getAndIncrement(),
+                                        document);
+                                return true;
+                            }
+                        }));
+        assertEquals(DOCS, db.count(qDatabase2Docs));
+
+        final Query qZero1 =
+                select()
+                        .where(eq("field1", from("1")))
+                        .and(eq("field2", from("1")));
+        assertEquals(
                 0,
-                db.count(
-                        select()
-                                .where(eq("field1", UnsignedByteArrays.from(
-                                                  "1")))
-                                .and(eq("field2", UnsignedByteArrays.from("1")))
-                )
-        );
-        Assert.assertEquals(
+                db.executeAndUnlimitedCount(
+                        qZero1,
+                        new DocumentProcessor() {
+                            @Override
+                            public boolean process(
+                                    final int document,
+                                    @NotNull
+                                    final Database database) {
+                                return true;
+                            }
+                        }));
+        assertEquals(0, db.count(qZero1));
+
+        final Query qZero2 =
+                select()
+                        .where(eq("field1", from("2")))
+                        .and(eq("field2", from("2")));
+        assertEquals(
                 0,
-                db.count(
-                        select()
-                                .where(eq("field1", UnsignedByteArrays.from(
-                                                  "2")))
-                                .and(eq("field2", UnsignedByteArrays.from("2")))
-                )
-        );
+                db.executeAndUnlimitedCount(
+                        qZero2,
+                        new DocumentProcessor() {
+                            @Override
+                            public boolean process(
+                                    final int document,
+                                    @NotNull
+                                    final Database database) {
+                                return true;
+                            }
+                        }));
+        assertEquals(0, db.count(qZero2));
+    }
+
+    @Test
+    public void filterDatabase() throws IOException {
+        final Database db1 =
+                READER.from(
+                        new RandomAccessFile(
+                                buildDatabase1("1.dat"),
+                                "r").getChannel());
+        final Database db2 =
+                READER.from(
+                        new RandomAccessFile(
+                                buildDatabase2("2.dat"),
+                                "r").getChannel());
+        final Database db = READER.composite(Arrays.asList(db1, db2));
+
+        final Query query =
+                select()
+                        .where(eq("field1", from("2")))
+                        .skip(DOCS / 4)
+                        .limit(DOCS / 4);
+
+        final AtomicInteger docs = new AtomicInteger();
+        final AtomicInteger expected = new AtomicInteger(DOCS + DOCS / 4);
+        final DocumentProcessor processor =
+                new DocumentProcessor() {
+                    @Override
+                    public boolean process(
+                            final int document,
+                            @NotNull final Database database) {
+                        assertEquals(db2, database);
+                        assertEquals(
+                                expected.getAndIncrement() - DOCS,
+                                document);
+                        return docs.incrementAndGet() < DOCS / 4;
+                    }
+                };
+
+        db.execute(query, processor);
+        assertEquals(DOCS / 4, docs.get());
+
+        docs.set(0);
+        expected.set(DOCS + DOCS / 4);
+        assertEquals(DOCS, db.executeAndUnlimitedCount(query, processor));
     }
 
     @Test
     public void sort() throws IOException {
-        final Database db =
-                READER.composite(
-                        Arrays.asList(
-                                READER.from(
-                                        new RandomAccessFile(
-                                                buildDatabase1("1.dat"),
-                                                "r").getChannel()),
-                                READER.from(
-                                        new RandomAccessFile(
-                                                buildDatabase2("2.dat"),
-                                                "r").getChannel())));
+        final Database db1 =
+                READER.from(
+                        new RandomAccessFile(
+                                buildDatabase1("1.dat"),
+                                "r").getChannel());
+        final Database db2 =
+                READER.from(
+                        new RandomAccessFile(
+                                buildDatabase2("2.dat"),
+                                "r").getChannel());
+        final Database db = READER.composite(Arrays.asList(db1, db2));
+
+        final Query query = select().orderBy(asc("relevance"));
 
         final List<Integer> docs = new ArrayList<Integer>(2 * DOCS);
-        db.execute(
-                select().orderBy(asc("relevance")),
+        final DocumentProcessor processor =
                 new DocumentProcessor() {
                     @Override
                     public boolean process(
@@ -187,16 +375,29 @@ public class CompositeFileDatabaseTest {
                         docs.add(document);
                         return true;
                     }
-                }
-        );
+                };
 
-        Assert.assertEquals(2 * DOCS, docs.size());
+        db.execute(query, processor);
+        assertEquals(2 * DOCS, docs.size());
 
-        final Iterator<Integer> docsIterator = docs.iterator();
-        for (int i = DOCS - 1; i >= 0; i--)
-            Assert.assertEquals(i, docsIterator.next().intValue());
-        for (int i = 0; i < DOCS; i++)
-            Assert.assertEquals(i, docsIterator.next().intValue());
+        {
+            final Iterator<Integer> docsIterator = docs.iterator();
+            for (int i = DOCS - 1; i >= 0; i--)
+                assertEquals(i, docsIterator.next().intValue());
+            for (int i = 0; i < DOCS; i++)
+                assertEquals(i, docsIterator.next().intValue());
+        }
+
+        docs.clear();
+        assertEquals(2 * DOCS, db.executeAndUnlimitedCount(query, processor));
+
+        {
+            final Iterator<Integer> docsIterator = docs.iterator();
+            for (int i = DOCS - 1; i >= 0; i--)
+                assertEquals(i, docsIterator.next().intValue());
+            for (int i = 0; i < DOCS; i++)
+                assertEquals(i, docsIterator.next().intValue());
+        }
     }
 
     @Test
@@ -215,10 +416,12 @@ public class CompositeFileDatabaseTest {
         final Database db = READER.composite(Arrays.asList(db1, db2));
 
         for (int i = 0; i < DOCS; i++) {
+            final Query query =
+                    select().where(eq("index", from(i)))
+                            .orderBy(asc("relevance"));
+
             final List<Integer> docs = new ArrayList<Integer>(2);
-            db.execute(
-                    select().where(eq("index", UnsignedByteArrays.from(i)))
-                            .orderBy(asc("relevance")),
+            final DocumentProcessor processor =
                     new DocumentProcessor() {
                         @Override
                         public boolean process(
@@ -232,11 +435,49 @@ public class CompositeFileDatabaseTest {
                             }
                             return true;
                         }
-                    }
-            );
+                    };
 
-            Assert.assertEquals(2, docs.size());
-            Assert.assertEquals(Arrays.asList(-i, i), docs);
+            db.execute(query, processor);
+
+            assertEquals(2, docs.size());
+            assertEquals(Arrays.asList(-i, i), docs);
+
+            docs.clear();
+
+            assertEquals(2, db.executeAndUnlimitedCount(query, processor));
+            assertEquals(Arrays.asList(-i, i), docs);
+        }
+
+        for (int i = 0; i < DOCS; i++) {
+            final Query query =
+                    select().where(eq("index", from(i)))
+                            .orderBy(desc("relevance"));
+            final List<Integer> docs = new ArrayList<Integer>(2);
+            final DocumentProcessor processor =
+                    new DocumentProcessor() {
+                        @Override
+                        public boolean process(
+                                final int document,
+                                @NotNull
+                                final Database database) {
+                            if (database == db1) {
+                                docs.add(document);
+                            } else {
+                                docs.add(-document);
+                            }
+                            return true;
+                        }
+                    };
+
+            db.execute(query, processor);
+
+            assertEquals(2, docs.size());
+            assertEquals(Arrays.asList(-i, i), docs);
+
+            docs.clear();
+
+            assertEquals(2, db.executeAndUnlimitedCount(query, processor));
+            assertEquals(Arrays.asList(-i, i), docs);
         }
     }
 
@@ -255,18 +496,18 @@ public class CompositeFileDatabaseTest {
 
         final Database db = READER.composite(Arrays.asList(db1, db2));
 
-        final List<Integer> docs = new ArrayList<Integer>();
-
-        db.execute(
+        final Query query =
                 select().where(
                         in(
                                 "relevance",
-                                UnsignedByteArrays.from(DOCS),
+                                from(DOCS),
                                 true,
-                                UnsignedByteArrays.from(2 * DOCS),
-                                false)
-                )
-                        .orderBy(desc("relevance")),
+                                from(2 * DOCS),
+                                false))
+                        .orderBy(desc("relevance"));
+
+        final List<Integer> docs = new ArrayList<Integer>();
+        final DocumentProcessor processor =
                 new DocumentProcessor() {
                     @Override
                     public boolean process(
@@ -280,10 +521,14 @@ public class CompositeFileDatabaseTest {
                         }
                         return true;
                     }
-                }
-        );
+                };
 
-        Assert.assertEquals(0, docs.size());
+        db.execute(query, processor);
+
+        assertEquals(0, docs.size());
+
+        assertEquals(0, db.executeAndUnlimitedCount(query, processor));
+        assertEquals(0, docs.size());
     }
 
     @Test
@@ -301,18 +546,18 @@ public class CompositeFileDatabaseTest {
 
         final Database db = READER.composite(Arrays.asList(db1, db2));
 
-        final List<Integer> docs = new ArrayList<Integer>();
-
-        db.execute(
+        final Query query =
                 select().where(
                         in(
                                 "relevance",
-                                UnsignedByteArrays.from(-2 * DOCS),
+                                from(-2 * DOCS),
                                 true,
-                                UnsignedByteArrays.from(-DOCS),
-                                false)
-                )
-                        .orderBy(desc("relevance")),
+                                from(-DOCS),
+                                false))
+                        .orderBy(desc("relevance"));
+
+        final List<Integer> docs = new ArrayList<Integer>();
+        final DocumentProcessor processor =
                 new DocumentProcessor() {
                     @Override
                     public boolean process(
@@ -326,14 +571,18 @@ public class CompositeFileDatabaseTest {
                         }
                         return true;
                     }
-                }
-        );
+                };
 
-        Assert.assertEquals(0, docs.size());
+        db.execute(query, processor);
+
+        assertEquals(0, docs.size());
+
+        assertEquals(0, db.executeAndUnlimitedCount(query, processor));
+        assertEquals(0, docs.size());
     }
 
     @Test
-    public void unindexedFieldSearh() throws IOException {
+    public void unindexedFieldSearch() throws IOException {
         final Database db1 =
                 READER.from(
                         new RandomAccessFile(
@@ -349,16 +598,17 @@ public class CompositeFileDatabaseTest {
 
         final List<Integer> docs = new ArrayList<Integer>();
 
-        db.execute(
+        final Query query =
                 select().where(
                         in(
                                 "unindexed_field",
-                                UnsignedByteArrays.from(-2 * DOCS),
+                                from(-2 * DOCS),
                                 true,
-                                UnsignedByteArrays.from(-DOCS),
-                                false)
-                )
-                        .orderBy(desc("relevance")),
+                                from(-DOCS),
+                                false))
+                        .orderBy(desc("relevance"));
+
+        final DocumentProcessor processor =
                 new DocumentProcessor() {
                     @Override
                     public boolean process(
@@ -372,44 +622,50 @@ public class CompositeFileDatabaseTest {
                         }
                         return true;
                     }
-                }
-        );
+                };
 
-        Assert.assertEquals(0, docs.size());
+        db.execute(query, processor);
+
+        assertEquals(0, docs.size());
+
+        assertEquals(0, db.executeAndUnlimitedCount(query, processor));
+        assertEquals(0, docs.size());
     }
 
-
     @Test
-    public void emptyCompositeDatabaseFieldSearh() throws IOException {
+    public void emptyCompositeDatabaseFieldSearch() throws IOException {
         final Database db = READER.composite(new ArrayList<Database>());
 
-        final List<Integer> docs = new ArrayList<Integer>();
-
-        db.execute(
+        final Query query =
                 select().where(
                         in(
                                 "field1",
-                                UnsignedByteArrays.from(-2 * DOCS),
+                                from(-2 * DOCS),
                                 true,
-                                UnsignedByteArrays.from(-DOCS),
-                                false)
-                )
-                        .orderBy(desc("relevance")),
+                                from(-DOCS),
+                                false))
+                        .orderBy(desc("relevance"));
+
+        final List<Integer> docs = new ArrayList<Integer>();
+
+        final DocumentProcessor processor =
                 new DocumentProcessor() {
                     @Override
                     public boolean process(
                             final int document,
-                            @NotNull
-                            final Database database) {
+                            final @NotNull Database database) {
                         docs.add(document);
                         return true;
                     }
-                }
-        );
+                };
 
-        Assert.assertEquals(0, docs.size());
+        db.execute(query, processor);
+
+        assertEquals(0, docs.size());
+
+        assertEquals(0, db.executeAndUnlimitedCount(query, processor));
+        assertEquals(0, docs.size());
     }
-
 
     @Test
     public void noSortNoLimitSearch() throws IOException {
@@ -426,16 +682,16 @@ public class CompositeFileDatabaseTest {
 
         final Database db = READER.composite(Arrays.asList(db1, db2));
 
+        final Query query = select().where(gt("index", from(-1)));
+
         final List<Integer> docs = new ArrayList<Integer>();
 
-        db.execute(
-                select().where(gt("index", UnsignedByteArrays.from(-1))),
+        final DocumentProcessor processor =
                 new DocumentProcessor() {
                     @Override
                     public boolean process(
                             final int document,
-                            @NotNull
-                            final Database database) {
+                            final @NotNull Database database) {
                         if (database == db1) {
                             docs.add(-document);
                         } else {
@@ -443,10 +699,16 @@ public class CompositeFileDatabaseTest {
                         }
                         return true;
                     }
-                }
-        );
+                };
 
-        Assert.assertEquals(DOCS * 2, docs.size());
+        db.execute(query, processor);
+
+        assertEquals(DOCS * 2, docs.size());
+
+        docs.clear();
+
+        assertEquals(DOCS * 2, db.executeAndUnlimitedCount(query, processor));
+        assertEquals(DOCS * 2, docs.size());
     }
 
     private File buildDatabase1(final String name) throws IOException {
@@ -457,23 +719,23 @@ public class CompositeFileDatabaseTest {
         for (int i = 0; i < DOCS; i++) {
             builder.merge(
                     FORMAT.newDocumentBuilder()
-                          .withField(
-                                  "field1",
-                                  "1",
-                                  DocumentBuilder.IndexOption.FILTERABLE)
-                          .withField(
-                                  "field2",
-                                  "2",
-                                  DocumentBuilder.IndexOption.FILTERABLE)
-                          .withField(
-                                  "index",
-                                  i,
-                                  DocumentBuilder.IndexOption.FULL)
-                          .withField(
-                                  "relevance",
-                                  -i,
-                                  DocumentBuilder.IndexOption.SORTABLE)
-                          .withPayload(("payload1=" + i).getBytes())
+                            .withField(
+                                    "field1",
+                                    "1",
+                                    DocumentBuilder.IndexOption.FILTERABLE)
+                            .withField(
+                                    "field2",
+                                    "2",
+                                    DocumentBuilder.IndexOption.FILTERABLE)
+                            .withField(
+                                    "index",
+                                    i,
+                                    DocumentBuilder.IndexOption.FULL)
+                            .withField(
+                                    "relevance",
+                                    -i,
+                                    DocumentBuilder.IndexOption.SORTABLE)
+                            .withPayload(("payload1=" + i).getBytes())
             );
         }
 
@@ -496,23 +758,23 @@ public class CompositeFileDatabaseTest {
         for (int i = 0; i < DOCS; i++) {
             builder.merge(
                     FORMAT.newDocumentBuilder()
-                          .withField(
-                                  "field1",
-                                  "2",
-                                  DocumentBuilder.IndexOption.FILTERABLE)
-                          .withField(
-                                  "field2",
-                                  "1",
-                                  DocumentBuilder.IndexOption.FILTERABLE)
-                          .withField(
-                                  "index",
-                                  i,
-                                  DocumentBuilder.IndexOption.FULL)
-                          .withField(
-                                  "relevance",
-                                  i,
-                                  DocumentBuilder.IndexOption.SORTABLE)
-                          .withPayload(("payload2=" + i).getBytes())
+                            .withField(
+                                    "field1",
+                                    "2",
+                                    DocumentBuilder.IndexOption.FILTERABLE)
+                            .withField(
+                                    "field2",
+                                    "1",
+                                    DocumentBuilder.IndexOption.FILTERABLE)
+                            .withField(
+                                    "index",
+                                    i,
+                                    DocumentBuilder.IndexOption.FULL)
+                            .withField(
+                                    "relevance",
+                                    i,
+                                    DocumentBuilder.IndexOption.SORTABLE)
+                            .withPayload(("payload2=" + i).getBytes())
             );
         }
 

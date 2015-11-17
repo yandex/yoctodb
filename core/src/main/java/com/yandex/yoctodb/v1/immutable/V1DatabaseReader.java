@@ -48,7 +48,7 @@ public class V1DatabaseReader extends DatabaseReader {
         final MessageDigest md;
         try {
             md = MessageDigest.getInstance(
-                    V1DatabaseFormat.MESSAGE_DIGEST_ALGORITHM);
+                    V1DatabaseFormat.getMessageDigestAlgorithm());
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
@@ -88,20 +88,20 @@ public class V1DatabaseReader extends DatabaseReader {
                     V1DatabaseFormat.FORMAT + ".");
         }
 
-        if (buffer.remaining() < V1DatabaseFormat.DIGEST_SIZE_IN_BYTES) {
+        if (buffer.remaining() < V1DatabaseFormat.getDigestSizeInBytes()) {
             throw new IllegalArgumentException("Too small buffer");
         }
 
         final Buffer body =
                 buffer.slice(
                         buffer.remaining() -
-                        V1DatabaseFormat.DIGEST_SIZE_IN_BYTES);
+                        V1DatabaseFormat.getDigestSizeInBytes());
 
         if (checksum) {
             final Buffer originalDigest =
                     buffer.slice(
                             buffer.position() + body.remaining(),
-                            V1DatabaseFormat.DIGEST_SIZE_IN_BYTES);
+                            V1DatabaseFormat.getDigestSizeInBytes());
             final Buffer currentDigest = calculateDigest(body);
             if (!currentDigest.equals(originalDigest)) {
                 throw new IllegalArgumentException(
@@ -124,43 +124,36 @@ public class V1DatabaseReader extends DatabaseReader {
             final Segment segment = SegmentRegistry.read(type, segmentBuffer);
 
             if (segment instanceof Payload) {
-                if (payload != null) {
-                    throw new IllegalArgumentException(
-                            "Duplicate payload found");
-                }
+                assert payload == null : "Duplicate payload found";
 
                 payload = (Payload) segment;
             }
 
             if (segment instanceof FilterableIndex) {
                 final FilterableIndex index = (FilterableIndex) segment;
-                if (filters.containsKey(index.getFieldName())) {
-                    throw new IllegalArgumentException(
-                            "Duplicate filterable index for field <" +
-                            index.getFieldName() + ">");
-                } else {
-                    filters.put(index.getFieldName(), index);
-                }
+                final String name = index.getFieldName();
+
+                assert !filters.containsKey(name) :
+                        "Duplicate filterable index for field <" + name + ">";
+
+                filters.put(name, index);
             }
 
             if (segment instanceof SortableIndex) {
                 final SortableIndex index = (SortableIndex) segment;
-                if (sorters.containsKey(index.getFieldName())) {
-                    throw new IllegalArgumentException(
-                            "Duplicate sortable index for field <" +
-                            index.getFieldName() + ">");
-                } else {
-                    sorters.put(index.getFieldName(), index);
-                }
+                final String name = index.getFieldName();
+
+                assert !sorters.containsKey(name) :
+                        "Duplicate sortable index for field <" + name + ">";
+
+                sorters.put(name, index);
             }
 
             // Skipping read index
             body.position(body.position() + size);
         }
 
-        if (payload == null) {
-            throw new IllegalArgumentException("No payload found");
-        }
+        assert payload != null : "No payload found";
 
         return new V1Database(payload, filters, sorters);
     }
@@ -186,15 +179,9 @@ public class V1DatabaseReader extends DatabaseReader {
             @NotNull
             final File f,
             final boolean forceToMemory) throws IOException {
-        if (!f.exists()) {
-            throw new IllegalArgumentException(
-                    "File doesn't exist: " + f);
-        }
-
-        if (f.length() > Integer.MAX_VALUE) {
-            throw new IllegalArgumentException(
-                    "mmapping of files >2 GB is not supported yet");
-        }
+        assert f.exists() : "File doesn't exist: " + f;
+        assert f.length() <= Integer.MAX_VALUE :
+                "mmapping of files >2 GB is not supported yet";
 
         // Mapping the file
         final MappedByteBuffer buffer;
@@ -213,9 +200,6 @@ public class V1DatabaseReader extends DatabaseReader {
         // Forcing data loading
         if (forceToMemory) {
             buffer.load();
-            if (!buffer.isLoaded())
-                System.err.println(
-                        "Couldn't force loading of file into memory: " + f);
         }
 
         // Setting byte order

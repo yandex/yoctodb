@@ -7,7 +7,6 @@ import java.nio.ByteBuffer;
 
 import static org.junit.Assert.*;
 
-
 /**
  * Tests for {@link com.yandex.yoctodb.util.buf.Buffer}
  *
@@ -24,6 +23,25 @@ public abstract class BufferTest {
 
     protected Buffer bufferOf(String s) {
         return bufferOf(s.getBytes(Charsets.US_ASCII));
+    }
+
+    @Test
+    public void testEqual() {
+        final Buffer buf1 = bufferOf("superMegaBuffer");
+        assertEquals(buf1, buf1);
+        final Buffer buf2 = bufferOf("superMegaBuffer");
+        assertEquals(buf1.hashCode(), buf2.hashCode());
+        assertEquals(buf1, buf2);
+    }
+
+    @Test
+    public void testNotEqual() {
+        final Buffer buf1 = bufferOf("superMegaBuffer1");
+        assertNotEquals(buf1, "Some string");
+        final Buffer buf2 = bufferOf("superMegaBuffer2");
+        assertNotEquals(buf1.hashCode(), buf2.hashCode());
+        assertNotEquals(buf1, buf2);
+        assertNotEquals(bufferOf("short"), bufferOf("long"));
     }
 
     @Test
@@ -77,5 +95,13 @@ public abstract class BufferTest {
         assertEquals(
                 ByteBuffer.wrap(ALPHABET_BYTES, 0, 10),
                 ByteBuffer.wrap(bytes, 128, 10));
+    }
+
+    @Test
+    public void testToString() {
+        final Buffer buf = bufferOf(ALPHABET);
+        assertTrue(
+                buf.toString().contains(
+                        Integer.toString(ALPHABET_BYTES.length)));
     }
 }

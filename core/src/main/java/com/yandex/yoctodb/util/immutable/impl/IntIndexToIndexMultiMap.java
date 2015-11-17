@@ -53,12 +53,7 @@ public final class IntIndexToIndexMultiMap implements IndexToIndexMultiMap {
             final Buffer offsets,
             @NotNull
             final Buffer elements) {
-        if (keysCount <= 0)
-            throw new IllegalArgumentException("Non positive keys count");
-        if (!offsets.hasRemaining())
-            throw new IllegalArgumentException("Empty offsets");
-        if (!elements.hasRemaining())
-            throw new IllegalArgumentException("Empty elements");
+        assert keysCount >= 0 : "Negative keys count";
 
         this.keysCount = keysCount;
         this.offsets = offsets;
