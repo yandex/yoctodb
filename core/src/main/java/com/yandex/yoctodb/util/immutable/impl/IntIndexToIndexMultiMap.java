@@ -242,8 +242,6 @@ public final class IntIndexToIndexMultiMap implements IndexToIndexMultiMap {
                 final IntToIntArray result = next;
                 next = null;
 
-                advance();
-
                 return result;
             }
 
@@ -287,8 +285,6 @@ public final class IntIndexToIndexMultiMap implements IndexToIndexMultiMap {
 
                 final IntToIntArray result = next;
                 next = null;
-
-                advance();
 
                 return result;
             }

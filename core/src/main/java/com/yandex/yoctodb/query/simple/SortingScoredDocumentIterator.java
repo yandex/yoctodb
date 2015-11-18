@@ -74,6 +74,8 @@ public final class SortingScoredDocumentIterator
         else
             baseIterator = indexes[0].descending(docs);
 
+        assert baseIterator.hasNext();
+
         this.chunk = Collections.emptyIterator();
     }
 
@@ -85,14 +87,14 @@ public final class SortingScoredDocumentIterator
     private int withOrder(
             final Order.SortOrder order,
             final int value) {
-        if (order == Order.SortOrder.DESC)
-            return -value;
-        else
-            return value;
+        return order.isAscending() ? value : -value;
     }
 
     private void fillChunk() {
+        assert !chunk.hasNext();
+
         final IntToIntArray taggedDocuments = baseIterator.next();
+        final int firstValueIndex = taggedDocuments.getKey();
         final int[] ids = taggedDocuments.getValues();
         final int count = taggedDocuments.getCount();
 
@@ -103,10 +105,7 @@ public final class SortingScoredDocumentIterator
         for (int i = 0; i < count; i++) {
             final int id = ids[i];
             final int[] sortValueIndexes = new int[indexes.length];
-            sortValueIndexes[0] =
-                    withOrder(
-                            orders[0],
-                            taggedDocuments.getKey());
+            sortValueIndexes[0] = firstValueIndex;
             for (int s = 1; s < sortValueIndexes.length; s++)
                 sortValueIndexes[s] =
                         withOrder(
@@ -141,6 +140,9 @@ public final class SortingScoredDocumentIterator
         throw new UnsupportedOperationException("Removal is not supported");
     }
 
+    /**
+     * Score based on sort value indexes
+     */
     private final class LocalScore implements Comparable<LocalScore> {
         @NotNull
         private final int[] sortValueIndexes;
@@ -186,6 +188,9 @@ public final class SortingScoredDocumentIterator
         }
     }
 
+    /**
+     * Document scored using {@link LocalScore}
+     */
     private final class LocalScoredDocument
             implements Comparable<LocalScoredDocument> {
         @NotNull
