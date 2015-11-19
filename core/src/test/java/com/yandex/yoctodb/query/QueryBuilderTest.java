@@ -86,11 +86,6 @@ public class QueryBuilderTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void emptyFieldName() {
-        in("", from(1), true, from(1), true);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
     public void emptyValues() {
         in("f");
     }

@@ -19,11 +19,6 @@ import org.junit.Test;
  * @author incubos
  */
 public class SimpleAscendingOrderTest {
-    @Test(expected = IllegalArgumentException.class)
-    public void emptyField() {
-        new SimpleAscendingOrder("");
-    }
-
     @Test
     public void nonDefaultToString() {
         Assert.assertTrue(
