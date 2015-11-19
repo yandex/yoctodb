@@ -69,8 +69,6 @@ public final class V1DatabaseBuilder
         for (Map.Entry<String, Collection<UnsignedByteArray>> e :
                 builder.fields.asMap().entrySet()) {
             final String fieldName = e.getKey();
-            assert !fieldName.isEmpty() : "Empty field name";
-
             final Collection<UnsignedByteArray> values = e.getValue();
 
             final IndexSegment existingIndex = indexes.get(fieldName);
@@ -91,7 +89,7 @@ public final class V1DatabaseBuilder
                         );
                         break;
                     case SORTABLE:
-                        index = new V1FullIndex(
+                        index = new V1SortableIndex(
                                 fieldName,
                                 lengthOption == DocumentBuilder.LengthOption.FIXED
                         );

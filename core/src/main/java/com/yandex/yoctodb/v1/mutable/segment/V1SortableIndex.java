@@ -15,13 +15,13 @@ import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Index supporting filtering and sorting by specific field
+ * Index supporting sorting by specific field
  *
  * @author incubos
  */
 @NotThreadSafe
-public final class V1FullIndex extends AbstractV1FullIndex {
-    public V1FullIndex(
+public final class V1SortableIndex extends AbstractV1FullIndex {
+    public V1SortableIndex(
             @NotNull
             final String fieldName,
             final boolean fixedLength) {
@@ -29,8 +29,8 @@ public final class V1FullIndex extends AbstractV1FullIndex {
                 fieldName,
                 fixedLength,
                 fixedLength ?
-                        V1DatabaseFormat.SegmentType.FIXED_LENGTH_FULL_INDEX :
-                        V1DatabaseFormat.SegmentType.VARIABLE_LENGTH_FULL_INDEX);
+                        V1DatabaseFormat.SegmentType.FIXED_LENGTH_SORTABLE_INDEX :
+                        V1DatabaseFormat.SegmentType.VARIABLE_LENGTH_SORTABLE_INDEX);
 
     }
 }

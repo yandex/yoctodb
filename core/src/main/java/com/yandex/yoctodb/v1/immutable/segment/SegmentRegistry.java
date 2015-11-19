@@ -67,6 +67,7 @@ public final class SegmentRegistry {
     static {
         // Register readers for default segments
         V1FilterableIndex.registerReader();
+        V1SortableIndex.registerReader();
         V1FullIndex.registerReader();
         V1PayloadSegment.registerReader();
     }
