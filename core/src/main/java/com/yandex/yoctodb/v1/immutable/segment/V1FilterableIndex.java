@@ -45,8 +45,6 @@ public final class V1FilterableIndex implements FilterableIndex, Segment {
             final ByteArraySortedSet values,
             @NotNull
             final IndexToIndexMultiMap valueToDocuments) {
-        assert !fieldName.isEmpty() : "Empty field name";
-
         // May be constructed only from SegmentReader
         this.fieldName = fieldName;
         this.values = values;

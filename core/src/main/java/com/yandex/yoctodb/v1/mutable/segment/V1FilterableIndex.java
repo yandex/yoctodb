@@ -52,8 +52,6 @@ public final class V1FilterableIndex
             @NotNull
             final String fieldName,
             final boolean fixedLength) {
-        assert !fieldName.isEmpty() : "Empty field name";
-
         this.fieldName = fieldName.getBytes();
         this.fixedLength = fixedLength;
         if (fixedLength) {
@@ -114,18 +112,12 @@ public final class V1FilterableIndex
         return new OutputStreamWritable() {
             @Override
             public long getSizeInBytes() {
-                //without code and full size (8 bytes)
-                final long result =
-                        4 + // Field name
-                        fieldName.length +
-                        8 + // Values
-                        values.getSizeInBytes() +
-                        8 + // Value to documents
-                        valueToDocumentsIndex.getSizeInBytes();
-
-                assert result <= Integer.MAX_VALUE : "Segment reached 2GB";
-
-                return result;
+                return 4L + // Field name
+                       fieldName.length +
+                       8 + // Values
+                       values.getSizeInBytes() +
+                       8 + // Value to documents
+                       valueToDocumentsIndex.getSizeInBytes();
             }
 
             @Override

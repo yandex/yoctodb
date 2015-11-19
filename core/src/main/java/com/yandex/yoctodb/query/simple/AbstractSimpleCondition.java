@@ -27,9 +27,6 @@ abstract class AbstractSimpleCondition implements TermCondition {
     AbstractSimpleCondition(
             @NotNull
             final String fieldName) {
-        if (fieldName.isEmpty())
-            throw new IllegalArgumentException("Empty field name");
-
         this.fieldName = fieldName;
     }
 
