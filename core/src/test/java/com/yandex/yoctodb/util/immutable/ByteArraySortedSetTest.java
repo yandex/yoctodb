@@ -10,14 +10,12 @@
 
 package com.yandex.yoctodb.util.immutable;
 
-import com.yandex.yoctodb.util.buf.Buffer;
-import org.junit.Assert;
-import org.junit.Test;
 import com.yandex.yoctodb.util.UnsignedByteArray;
 import com.yandex.yoctodb.util.UnsignedByteArrays;
-import com.yandex.yoctodb.util.immutable.ByteArraySortedSet;
+import com.yandex.yoctodb.util.buf.Buffer;
 import com.yandex.yoctodb.util.immutable.impl.FixedLengthByteArraySortedSet;
 import com.yandex.yoctodb.util.immutable.impl.VariableLengthByteArraySortedSet;
+import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -26,10 +24,15 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import static com.yandex.yoctodb.util.UnsignedByteArrays.from;
+import static org.junit.Assert.assertEquals;
+
 /**
  * @author svyatoslav
  */
 public class ByteArraySortedSetTest {
+    private final int SIZE = 128;
+
     @Test
     public void buildingFromFixedLengthByteArraySortedSetTest()
             throws IOException {
@@ -46,13 +49,13 @@ public class ByteArraySortedSetTest {
         final ByteArraySortedSet ss =
                 FixedLengthByteArraySortedSet.from(bb);
 
-        Assert.assertEquals(elements.size(), ss.size());
+        assertEquals(elements.size(), ss.size());
 
         //sorting to compare
         Collections.sort(elements);
 
         for (int i = 0; i < elements.size(); i++) {
-            Assert.assertEquals(
+            assertEquals(
                     elements.get(i).toByteBuffer(),
                     ss.get(i));
         }
@@ -68,7 +71,7 @@ public class ByteArraySortedSetTest {
 
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
         fixedLengthByteArrayIndexedList.writeTo(os);
-        Assert.assertEquals(
+        assertEquals(
                 os.size(),
                 fixedLengthByteArrayIndexedList.getSizeInBytes());
 
@@ -91,13 +94,13 @@ public class ByteArraySortedSetTest {
         final ByteArraySortedSet ss =
                 VariableLengthByteArraySortedSet.from(bb);
 
-        Assert.assertEquals(elements.size(), ss.size());
+        assertEquals(elements.size(), ss.size());
 
         //sorting to compare
         Collections.sort(elements);
 
         for (int i = 0; i < elements.size(); i++) {
-            Assert.assertEquals(
+            assertEquals(
                     elements.get(i).toByteBuffer(),
                     ss.get(i));
         }
@@ -113,7 +116,7 @@ public class ByteArraySortedSetTest {
 
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
         fixedLengthByteArrayIndexedList.writeTo(os);
-        Assert.assertEquals(
+        assertEquals(
                 os.size(),
                 fixedLengthByteArrayIndexedList.getSizeInBytes());
 
@@ -122,71 +125,72 @@ public class ByteArraySortedSetTest {
 
     @Test
     public void lessThanTest() throws IOException {
-        final int size = 128;
-        //elements
         final List<UnsignedByteArray> elements = new ArrayList<UnsignedByteArray>();
-        for (int i = 0; i < size; i++) {
-            elements.add(UnsignedByteArrays.from(i));
+        for (int i = 0; i < SIZE; i++) {
+            elements.add(from(i));
         }
         final Buffer bb =
                 prepareDataFromVariableLengthByteArraySortedSet(elements);
         final ByteArraySortedSet ss =
                 VariableLengthByteArraySortedSet.from(bb);
-        for (int i = 0; i < size; i++) {
-            final int index =
-                    ss.indexOf(UnsignedByteArrays.from(i).toByteBuffer());
-            Assert.assertEquals(i, index);
+        for (int i = 0; i < SIZE; i++) {
+            final Buffer buffer = from(i).toByteBuffer();
 
-            final int indexWithOrEquals =
-                    ss.indexOfLessThan(
-                            UnsignedByteArrays.from(i).toByteBuffer(),
-                            true,
-                            0);
-            Assert.assertEquals(i, indexWithOrEquals);
+            assertEquals(i, ss.indexOf(buffer));
+
+            assertEquals(
+                    i,
+                    ss.indexOfLessThan(buffer, true, 0));
 
             final int indexWithoutOrEquals =
-                    ss.indexOfLessThan(
-                            UnsignedByteArrays.from(i).toByteBuffer(),
-                            false,
-                            0);
-            Assert.assertEquals(i, indexWithoutOrEquals + 1);
+                    ss.indexOfLessThan(buffer, false, 0);
+
+            if (i == 0) {
+                assertEquals(-1, indexWithoutOrEquals);
+            } else {
+                assertEquals(i - 1, indexWithoutOrEquals);
+            }
         }
+
+        assertEquals(
+                -1,
+                ss.indexOfLessThan(from(0).toByteBuffer(), false, 1));
     }
 
     @Test
     public void greaterThanTest() throws IOException {
-        final int size = 128;
-        //elements
         final List<UnsignedByteArray> elements = new ArrayList<UnsignedByteArray>();
-        for (int i = 0; i < size; i++) {
-            elements.add(UnsignedByteArrays.from(i));
+        for (int i = 0; i < SIZE; i++) {
+            elements.add(from(i));
         }
         final Buffer bb =
                 prepareDataFromVariableLengthByteArraySortedSet(elements);
         final ByteArraySortedSet ss =
                 VariableLengthByteArraySortedSet.from(bb);
-        for (int i = 0; i < size; i++) {
-            final int index =
-                    ss.indexOf(UnsignedByteArrays.from(i).toByteBuffer());
-            Assert.assertEquals(i, index);
+        for (int i = 0; i < SIZE; i++) {
+            final Buffer buffer = from(i).toByteBuffer();
 
-            final int indexWithOrEquals =
-                    ss.indexOfGreaterThan(
-                            UnsignedByteArrays.from(i).toByteBuffer(),
-                            true,
-                            size - 1);
-            Assert.assertEquals(i, indexWithOrEquals);
+            assertEquals(i, ss.indexOf(buffer));
+
+            assertEquals(
+                    i,
+                    ss.indexOfGreaterThan(buffer, true, SIZE - 1));
 
             final int indexWithoutOrEquals =
-                    ss.indexOfGreaterThan(
-                            UnsignedByteArrays.from(i).toByteBuffer(),
-                            false,
-                            size - 1);
-            if (i == size - 1) {
-                Assert.assertEquals(-1, indexWithoutOrEquals);
+                    ss.indexOfGreaterThan(buffer, false, SIZE - 1);
+
+            if (i == SIZE - 1) {
+                assertEquals(-1, indexWithoutOrEquals);
             } else {
-                Assert.assertEquals(i, indexWithoutOrEquals - 1);
+                assertEquals(i + 1, indexWithoutOrEquals);
             }
         }
+
+        assertEquals(
+                -1,
+                ss.indexOfGreaterThan(
+                        from(SIZE - 1).toByteBuffer(),
+                        false,
+                        SIZE - 2));
     }
 }

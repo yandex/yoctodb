@@ -362,7 +362,8 @@ public class CompositeFileDatabaseTest {
                                 "r").getChannel());
         final Database db = READER.composite(Arrays.asList(db1, db2));
 
-        final Query query = select().orderBy(asc("relevance"));
+        final Query query =
+                select().orderBy(asc("relevance")).and(desc("index"));
 
         final List<Integer> docs = new ArrayList<Integer>(2 * DOCS);
         final DocumentProcessor processor =
