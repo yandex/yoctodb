@@ -17,7 +17,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Unit tests for {@link SegmentRegistry}
