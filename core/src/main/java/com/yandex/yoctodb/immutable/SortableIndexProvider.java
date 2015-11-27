@@ -10,13 +10,16 @@
 
 package com.yandex.yoctodb.immutable;
 
-import net.jcip.annotations.Immutable;
+import org.jetbrains.annotations.NotNull;
 
 /**
- * An immutable database
+ * Provides {@link SortableIndex}es
  *
  * @author incubos
  */
-@Immutable
-public interface Database extends DocumentProvider, ExecutionEngine {
+public interface SortableIndexProvider {
+    @NotNull
+    SortableIndex getSorter(
+            @NotNull
+            String fieldName);
 }

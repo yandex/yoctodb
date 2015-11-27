@@ -10,13 +10,11 @@
 
 package com.yandex.yoctodb.immutable;
 
-import net.jcip.annotations.Immutable;
-
 /**
- * An immutable database
+ * {@link Database} with support for indexed filtering and sorting
  *
  * @author incubos
  */
-@Immutable
-public interface Database extends DocumentProvider, ExecutionEngine {
+public interface IndexedDatabase
+        extends Database, FilterableIndexProvider, SortableIndexProvider {
 }

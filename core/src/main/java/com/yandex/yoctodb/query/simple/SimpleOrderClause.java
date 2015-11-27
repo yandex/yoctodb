@@ -10,8 +10,10 @@
 
 package com.yandex.yoctodb.query.simple;
 
+import com.yandex.yoctodb.immutable.IndexedDatabase;
 import com.yandex.yoctodb.query.*;
 import com.yandex.yoctodb.util.mutable.BitSet;
+import com.yandex.yoctodb.query.BitSetPool;
 import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -88,22 +90,26 @@ public final class SimpleOrderClause implements OrderBy {
         return select.limit(limit);
     }
 
-    @Override
     @Nullable
+    @Override
     public BitSet filteredUnlimited(
             @NotNull
-            final QueryContext ctx) {
-        return select.filteredUnlimited(ctx);
+            final IndexedDatabase database,
+            @NotNull
+            final BitSetPool bitSetPool) {
+        return select.filteredUnlimited(database, bitSetPool);
     }
 
-    @Override
     @NotNull
+    @Override
     public Iterator<? extends ScoredDocument<?>> sortedUnlimited(
             @NotNull
             final BitSet docs,
             @NotNull
-            final QueryContext ctx) {
-        return select.sortedUnlimited(docs, ctx);
+            final IndexedDatabase database,
+            @NotNull
+            final BitSetPool bitSetPool) {
+        return select.sortedUnlimited(docs, database, bitSetPool);
     }
 
     @Override

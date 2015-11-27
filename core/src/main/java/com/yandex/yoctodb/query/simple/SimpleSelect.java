@@ -11,8 +11,10 @@
 package com.yandex.yoctodb.query.simple;
 
 import com.google.common.base.Joiner;
+import com.yandex.yoctodb.immutable.IndexedDatabase;
 import com.yandex.yoctodb.query.*;
 import com.yandex.yoctodb.util.mutable.BitSet;
+import com.yandex.yoctodb.query.BitSetPool;
 import com.yandex.yoctodb.util.mutable.impl.ReadOnlyOneBitSet;
 import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.NotNull;
@@ -87,33 +89,45 @@ public final class SimpleSelect implements Select {
     @Override
     public BitSet filteredUnlimited(
             @NotNull
-            final QueryContext ctx) {
+            final IndexedDatabase database,
+            @NotNull
+            final BitSetPool bitSetPool) {
         if (conditions.isEmpty()) {
-            return new ReadOnlyOneBitSet(ctx.getDocumentCount());
+            return new ReadOnlyOneBitSet(bitSetPool.getBitSetSize());
         } else if (conditions.size() == 1) {
             final Condition c = conditions.iterator().next();
-            final BitSet result = ctx.getZeroBitSet();
-            if (c.set(ctx, result)) {
+            final BitSet result = bitSetPool.borrowSet();
+            result.clear();
+            if (c.set(database, result)) {
                 return result;
             } else {
+                bitSetPool.returnSet(result);
                 return null;
             }
         } else {
             // Searching
-            final BitSet result = ctx.getOneBitSet();
-            final BitSet conditionResult = ctx.getZeroBitSet();
-            final Iterator<Condition> iter = conditions.iterator();
-            while (iter.hasNext()) {
-                final Condition c = iter.next();
-                if (!c.set(ctx, conditionResult)) {
-                    return null;
+            final BitSet result = bitSetPool.borrowSet();
+            result.set();
+            final BitSet conditionResult = bitSetPool.borrowSet();
+            conditionResult.clear();
+            try {
+                final Iterator<Condition> iter = conditions.iterator();
+                while (iter.hasNext()) {
+                    final Condition c = iter.next();
+                    if (!c.set(database, conditionResult)) {
+                        bitSetPool.returnSet(result);
+                        return null;
+                    }
+                    if (!result.and(conditionResult)) {
+                        bitSetPool.returnSet(result);
+                        return null;
+                    }
+                    if (iter.hasNext()) {
+                        conditionResult.clear();
+                    }
                 }
-                if (!result.and(conditionResult)) {
-                    return null;
-                }
-                if (iter.hasNext()) {
-                    conditionResult.clear();
-                }
+            } finally {
+                bitSetPool.returnSet(conditionResult);
             }
 
             assert !result.isEmpty();
@@ -128,14 +142,16 @@ public final class SimpleSelect implements Select {
             @NotNull
             final BitSet docs,
             @NotNull
-            final QueryContext ctx) {
+            final IndexedDatabase database,
+            @NotNull
+            final BitSetPool bitSetPool) {
         assert !docs.isEmpty();
 
         // Shortcut if there is not sorting
         if (sorts.isEmpty()) {
-            return new IdScoredDocumentIterator(ctx, docs);
+            return new IdScoredDocumentIterator(database, docs);
         } else {
-            return new SortingScoredDocumentIterator(ctx, docs, sorts);
+            return new SortingScoredDocumentIterator(database, docs, sorts);
         }
     }
 

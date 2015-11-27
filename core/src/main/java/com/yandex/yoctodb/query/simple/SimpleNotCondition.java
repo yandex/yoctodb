@@ -10,8 +10,8 @@
 
 package com.yandex.yoctodb.query.simple;
 
+import com.yandex.yoctodb.immutable.FilterableIndexProvider;
 import com.yandex.yoctodb.query.Condition;
-import com.yandex.yoctodb.query.QueryContext;
 import com.yandex.yoctodb.util.mutable.BitSet;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
@@ -35,10 +35,10 @@ public final class SimpleNotCondition implements Condition {
     @Override
     public boolean set(
             @NotNull
-            final QueryContext ctx,
+            final FilterableIndexProvider indexProvider,
             @NotNull
             final BitSet to) {
-        delegate.set(ctx, to);
+        delegate.set(indexProvider, to);
         return to.inverse();
     }
 }

@@ -13,10 +13,9 @@ package com.yandex.yoctodb.query.simple;
 import com.yandex.yoctodb.DatabaseFormat;
 import com.yandex.yoctodb.mutable.DatabaseBuilder;
 import com.yandex.yoctodb.mutable.DocumentBuilder;
-import com.yandex.yoctodb.query.QueryContext;
 import com.yandex.yoctodb.util.buf.Buffer;
 import com.yandex.yoctodb.util.mutable.impl.ReadOnlyOneBitSet;
-import com.yandex.yoctodb.util.mutable.impl.ReadOnlyZeroBitSet;
+import com.yandex.yoctodb.v1.immutable.V1Database;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
@@ -32,7 +31,7 @@ import static com.yandex.yoctodb.query.QueryBuilder.asc;
  */
 public class SortingScoredDocumentIteratorTest {
 
-    private QueryContext buildQueryContext() throws IOException {
+    private V1Database buildQueryContext() throws IOException {
         final DatabaseBuilder dbBuilder =
                 DatabaseFormat.getCurrent().newDatabaseBuilder();
 
@@ -71,14 +70,14 @@ public class SortingScoredDocumentIteratorTest {
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
         dbBuilder.buildWritable().writeTo(os);
 
-        return (QueryContext) DatabaseFormat.getCurrent()
+        return (V1Database) DatabaseFormat.getCurrent()
                 .getDatabaseReader()
                 .from(Buffer.from(os.toByteArray()));
     }
 
     @Test(expected = UnsupportedOperationException.class)
     public void unsupportedRemove() throws IOException {
-        final QueryContext db = buildQueryContext();
+        final V1Database db = buildQueryContext();
         final SortingScoredDocumentIterator iterator =
                 new SortingScoredDocumentIterator(
                         db,

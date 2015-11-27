@@ -8,15 +8,20 @@
  * A copy of the License is also available at http://mozilla.org/MPL/2.0/.
  */
 
-package com.yandex.yoctodb.immutable;
+package com.yandex.yoctodb.query;
 
-import net.jcip.annotations.Immutable;
+import org.jetbrains.annotations.NotNull;
 
 /**
- * An immutable database
+ * Pool of {@link BitSetPool}s
  *
  * @author incubos
  */
-@Immutable
-public interface Database extends DocumentProvider, ExecutionEngine {
+public interface BitSetPoolPool {
+    @NotNull
+    BitSetPool borrowPool();
+
+    void returnPool(
+            @NotNull
+            BitSetPool pool);
 }

@@ -10,6 +10,7 @@
 
 package com.yandex.yoctodb.query;
 
+import com.yandex.yoctodb.immutable.IndexedDatabase;
 import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -28,19 +29,22 @@ public interface Query {
     /**
      * Calculate filtering result not taking into account skip/limit
      *
-     * @param ctx query context
+     * @param database      database
+     * @param bitSetPool {@link BitSet} factory
      * @return read-only filtering result or {@code null} if empty
      */
     @Nullable
     BitSet filteredUnlimited(
             @NotNull
-            QueryContext ctx);
+            IndexedDatabase database,
+            @NotNull
+            BitSetPool bitSetPool);
 
     /**
      * Return sorted results not taking into account skip/limit
      *
-     * @param docs documents to sort
-     * @param ctx query context
+     * @param database      database
+     * @param bitSetPool {@link BitSet} factory
      * @return sorted results
      */
     @NotNull
@@ -48,7 +52,9 @@ public interface Query {
             @NotNull
             BitSet docs,
             @NotNull
-            QueryContext ctx);
+            IndexedDatabase database,
+            @NotNull
+            BitSetPool bitSetPool);
 
     int getSkip();
 

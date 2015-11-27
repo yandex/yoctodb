@@ -48,7 +48,8 @@ public class SortResultIterator
         final DatabaseDocs db = dbs.next();
         return query.sortedUnlimited(
                 db.docs,
-                db.ctx);
+                db.ctx.getDatabase(),
+                db.ctx.getBitSetPool());
     }
 
     @Override

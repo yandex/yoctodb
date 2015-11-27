@@ -10,7 +10,6 @@
 
 package com.yandex.yoctodb.v1.immutable;
 
-import com.yandex.yoctodb.query.QueryContext;
 import com.yandex.yoctodb.util.mutable.BitSet;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,16 +20,16 @@ import org.jetbrains.annotations.NotNull;
  */
 public final class DatabaseDocs {
     @NotNull
-    public final QueryContext ctx;
+    public final V1QueryContext ctx;
     @NotNull
     public final BitSet docs;
 
     public DatabaseDocs(
             @NotNull
-            final QueryContext ctx,
+            final V1QueryContext ctx,
             @NotNull
             final BitSet docs) {
-        assert ctx.getDocumentCount() == docs.getSize();
+        assert ctx.getDatabase().getDocumentCount() == docs.getSize();
         assert !docs.isEmpty();
 
         this.ctx = ctx;

@@ -14,7 +14,12 @@ import com.yandex.yoctodb.util.UnsignedByteArrays;
 import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 
 /**
@@ -43,6 +48,45 @@ public abstract class Buffer implements Comparable<Buffer> {
             @NotNull
             final FileChannel file) {
         return new FileChannelBuffer(file);
+    }
+
+    @NotNull
+    public static Buffer mmap(
+            @NotNull
+            final File f,
+            final boolean forceToMemory) throws IOException {
+        assert f.exists() : "File doesn't exist: " + f;
+        assert f.length() <= Integer.MAX_VALUE :
+                "mmapping of files >2 GB is not supported yet";
+
+        // Mapping the file
+        final MappedByteBuffer buffer;
+        final RandomAccessFile raf = new RandomAccessFile(f, "r");
+        try {
+            final FileChannel ch = raf.getChannel();
+            try {
+                buffer = ch.map(FileChannel.MapMode.READ_ONLY, 0, f.length());
+            } finally {
+                ch.close();
+            }
+        } finally {
+            raf.close();
+        }
+
+        // Forcing data loading
+        if (forceToMemory) {
+            buffer.load();
+        }
+
+        // Setting byte order
+        return Buffer.from(buffer.order(ByteOrder.BIG_ENDIAN));
+    }
+
+    @NotNull
+    public static Buffer mmap(
+            @NotNull
+            final File f) throws IOException {
+        return mmap(f, true);
     }
 
     public abstract long position();
@@ -103,11 +147,6 @@ public abstract class Buffer implements Comparable<Buffer> {
         }
 
         final Buffer that = (Buffer) ob;
-        long length = this.remaining();
-        if (length != that.remaining()) {
-            return false;
-        }
-
         return compareTo(that) == 0;
     }
 
@@ -129,15 +168,13 @@ public abstract class Buffer implements Comparable<Buffer> {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder();
-        sb.append(getClass().getName());
-        sb.append("[pos=");
-        sb.append(position());
-        sb.append(" lim=");
-        sb.append(limit());
-        sb.append(" rem=");
-        sb.append(remaining());
-        sb.append("]");
-        return sb.toString();
+        return getClass().getName() +
+               "[pos=" +
+               position() +
+               " lim=" +
+               limit() +
+               " rem=" +
+               remaining() +
+               "]";
     }
 }

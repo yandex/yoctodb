@@ -15,15 +15,11 @@ import com.yandex.yoctodb.util.buf.Buffer;
 import com.yandex.yoctodb.v1.V1DatabaseFormat;
 import com.yandex.yoctodb.v1.immutable.segment.Segment;
 import com.yandex.yoctodb.v1.immutable.segment.SegmentRegistry;
+import com.yandex.yoctodb.v1.query.ThreadLocalCachedBitSetPoolPool;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.ByteOrder;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -73,6 +69,7 @@ public class V1DatabaseReader extends DatabaseReader {
     public Database from(
             @NotNull
             final Buffer buffer,
+            final int bitSetsPerRequest,
             final boolean checksum) throws IOException {
         // Checking the magic
         for (int i = 0; i < V1DatabaseFormat.MAGIC.length; i++)
@@ -155,14 +152,21 @@ public class V1DatabaseReader extends DatabaseReader {
 
         assert payload != null : "No payload found";
 
-        return new V1Database(payload, filters, sorters);
+        return new V1Database(
+                payload,
+                filters,
+                sorters,
+                new ThreadLocalCachedBitSetPoolPool(
+                        payload.getSize(),
+                        bitSetsPerRequest));
     }
 
     @NotNull
     @Override
     public Database composite(
             @NotNull
-            final Collection<Database> databases) throws IOException {
+            final Collection<Database> databases,
+            final int bitSetsPerRequest) throws IOException {
         final Collection<V1Database> dbs =
                 new ArrayList<V1Database>(databases.size());
 
@@ -170,49 +174,6 @@ public class V1DatabaseReader extends DatabaseReader {
             dbs.add((V1Database) database);
         }
 
-        return new V1CompositeDatabase(dbs);
-    }
-
-    @NotNull
-    @Override
-    public Database mmap(
-            @NotNull
-            final File f,
-            final boolean forceToMemory) throws IOException {
-        assert f.exists() : "File doesn't exist: " + f;
-        assert f.length() <= Integer.MAX_VALUE :
-                "mmapping of files >2 GB is not supported yet";
-
-        // Mapping the file
-        final MappedByteBuffer buffer;
-        final RandomAccessFile raf = new RandomAccessFile(f, "r");
-        try {
-            final FileChannel ch = raf.getChannel();
-            try {
-                buffer = ch.map(FileChannel.MapMode.READ_ONLY, 0, f.length());
-            } finally {
-                ch.close();
-            }
-        } finally {
-            raf.close();
-        }
-
-        // Forcing data loading
-        if (forceToMemory) {
-            buffer.load();
-        }
-
-        // Setting byte order
-        buffer.order(ByteOrder.BIG_ENDIAN);
-
-        return from(Buffer.from(buffer));
-    }
-
-    @NotNull
-    @Override
-    public Database from(
-            @NotNull
-            final FileChannel f) throws IOException {
-        return from(Buffer.from(f));
+        return new V1CompositeDatabase(dbs, bitSetsPerRequest);
     }
 }

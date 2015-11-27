@@ -10,13 +10,13 @@
 
 package com.yandex.yoctodb.query.simple;
 
-import com.yandex.yoctodb.query.QueryContext;
+import com.yandex.yoctodb.immutable.FilterableIndex;
+import com.yandex.yoctodb.immutable.FilterableIndexProvider;
+import com.yandex.yoctodb.util.UnsignedByteArray;
 import com.yandex.yoctodb.util.buf.Buffer;
+import com.yandex.yoctodb.util.mutable.BitSet;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
-import com.yandex.yoctodb.immutable.FilterableIndex;
-import com.yandex.yoctodb.util.UnsignedByteArray;
-import com.yandex.yoctodb.util.mutable.BitSet;
 
 /**
  * Equality condition
@@ -44,10 +44,10 @@ public final class SimpleEqualityCondition extends AbstractSimpleCondition {
     @Override
     public boolean set(
             @NotNull
-            final QueryContext ctx,
+            final FilterableIndexProvider indexProvider,
             @NotNull
             final BitSet to) {
-        final FilterableIndex index = ctx.getFilter(getFieldName());
+        final FilterableIndex index = indexProvider.getFilter(getFieldName());
         return index != null && index.eq(to, value);
     }
 }

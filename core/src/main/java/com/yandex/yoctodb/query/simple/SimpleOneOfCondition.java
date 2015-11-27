@@ -10,8 +10,8 @@
 
 package com.yandex.yoctodb.query.simple;
 
+import com.yandex.yoctodb.immutable.FilterableIndexProvider;
 import com.yandex.yoctodb.query.Condition;
-import com.yandex.yoctodb.query.QueryContext;
 import com.yandex.yoctodb.query.TermCondition;
 import com.yandex.yoctodb.util.mutable.BitSet;
 import net.jcip.annotations.Immutable;
@@ -41,12 +41,12 @@ public final class SimpleOneOfCondition implements Condition {
     @Override
     public boolean set(
             @NotNull
-            final QueryContext ctx,
+            final FilterableIndexProvider indexProvider,
             @NotNull
             final BitSet to) {
         boolean notEmpty = false;
         for (Condition clause : clauses)
-            if (clause.set(ctx, to))
+            if (clause.set(indexProvider, to))
                 notEmpty = true;
 
         return notEmpty;

@@ -11,9 +11,10 @@
 package com.yandex.yoctodb.query.simple;
 
 import com.google.common.collect.Iterators;
+import com.yandex.yoctodb.immutable.Database;
+import com.yandex.yoctodb.immutable.IndexedDatabase;
 import com.yandex.yoctodb.immutable.SortableIndex;
 import com.yandex.yoctodb.query.Order;
-import com.yandex.yoctodb.query.QueryContext;
 import com.yandex.yoctodb.util.buf.Buffer;
 import com.yandex.yoctodb.util.immutable.IntToIntArray;
 import com.yandex.yoctodb.util.mutable.BitSet;
@@ -34,7 +35,7 @@ import java.util.List;
 public final class SortingScoredDocumentIterator
         implements Iterator<SimpleScoredDocument> {
     @NotNull
-    private final QueryContext ctx;
+    private final Database ctx;
     @NotNull
     private final SortableIndex[] indexes;
     @NotNull
@@ -46,7 +47,7 @@ public final class SortingScoredDocumentIterator
 
     public SortingScoredDocumentIterator(
             @NotNull
-            final QueryContext ctx,
+            final IndexedDatabase ctx,
             @NotNull
             final BitSet docs,
             @NotNull

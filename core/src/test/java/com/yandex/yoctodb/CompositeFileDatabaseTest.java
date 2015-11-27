@@ -57,18 +57,18 @@ public class CompositeFileDatabaseTest {
     @Test
     public void build() throws IOException {
         final Database db1 =
-                READER.from(
+                READER.from(Buffer.from(
                         new RandomAccessFile(
                                 buildDatabase1("1.dat"),
-                                "r").getChannel());
+                                "r").getChannel()));
 
         assertEquals(DOCS, db1.getDocumentCount());
 
         final Database db2 =
-                READER.from(
+                READER.from(Buffer.from(
                         new RandomAccessFile(
                                 buildDatabase2("2.dat"),
-                                "r").getChannel());
+                                "r").getChannel()));
 
         assertEquals(DOCS, db2.getDocumentCount());
 
@@ -83,13 +83,15 @@ public class CompositeFileDatabaseTest {
                 READER.composite(
                         Arrays.asList(
                                 READER.from(
-                                        new RandomAccessFile(
-                                                buildDatabase1("1.dat"),
-                                                "r").getChannel()),
+                                        Buffer.from(
+                                                new RandomAccessFile(
+                                                        buildDatabase1("1.dat"),
+                                                        "r").getChannel())),
                                 READER.from(
-                                        new RandomAccessFile(
-                                                buildDatabase2("2.dat"),
-                                                "r").getChannel())));
+                                        Buffer.from(
+                                                new RandomAccessFile(
+                                                        buildDatabase2("2.dat"),
+                                                        "r").getChannel()))));
         for (int i = 0; i < DOCS; i++) {
             assertEquals(
                     Buffer.from(("payload1=" + i).getBytes()),
@@ -108,13 +110,15 @@ public class CompositeFileDatabaseTest {
                 READER.composite(
                         Arrays.asList(
                                 READER.from(
-                                        new RandomAccessFile(
-                                                buildDatabase1("1.dat"),
-                                                "r").getChannel()),
+                                        Buffer.from(
+                                                new RandomAccessFile(
+                                                        buildDatabase1("1.dat"),
+                                                        "r").getChannel())),
                                 READER.from(
-                                        new RandomAccessFile(
-                                                buildDatabase2("2.dat"),
-                                                "r").getChannel())));
+                                        Buffer.from(
+                                                new RandomAccessFile(
+                                                        buildDatabase2("2.dat"),
+                                                        "r").getChannel()))));
 
         // skip
         final Query qSkip = select().skip(DOCS / 4);
@@ -184,14 +188,16 @@ public class CompositeFileDatabaseTest {
     public void filter() throws IOException {
         final Database db1 =
                 READER.from(
-                        new RandomAccessFile(
-                                buildDatabase1("1.dat"),
-                                "r").getChannel());
+                        Buffer.from(
+                                new RandomAccessFile(
+                                        buildDatabase1("1.dat"),
+                                        "r").getChannel()));
         final Database db2 =
                 READER.from(
-                        new RandomAccessFile(
-                                buildDatabase2("2.dat"),
-                                "r").getChannel());
+                        Buffer.from(
+                                new RandomAccessFile(
+                                        buildDatabase2("2.dat"),
+                                        "r").getChannel()));
 
         final Database db = READER.composite(Arrays.asList(db1, db2));
 
@@ -308,14 +314,16 @@ public class CompositeFileDatabaseTest {
     public void filterDatabase() throws IOException {
         final Database db1 =
                 READER.from(
-                        new RandomAccessFile(
-                                buildDatabase1("1.dat"),
-                                "r").getChannel());
+                        Buffer.from(
+                                new RandomAccessFile(
+                                        buildDatabase1("1.dat"),
+                                        "r").getChannel()));
         final Database db2 =
                 READER.from(
-                        new RandomAccessFile(
-                                buildDatabase2("2.dat"),
-                                "r").getChannel());
+                        Buffer.from(
+                                new RandomAccessFile(
+                                        buildDatabase2("2.dat"),
+                                        "r").getChannel()));
         final Database db = READER.composite(Arrays.asList(db1, db2));
 
         final Query query =
@@ -331,7 +339,8 @@ public class CompositeFileDatabaseTest {
                     @Override
                     public boolean process(
                             final int document,
-                            @NotNull final Database database) {
+                            @NotNull
+                            final Database database) {
                         assertEquals(db2, database);
                         assertEquals(
                                 expected.getAndIncrement() - DOCS,
@@ -352,14 +361,16 @@ public class CompositeFileDatabaseTest {
     public void sort() throws IOException {
         final Database db1 =
                 READER.from(
-                        new RandomAccessFile(
-                                buildDatabase1("1.dat"),
-                                "r").getChannel());
+                        Buffer.from(
+                                new RandomAccessFile(
+                                        buildDatabase1("1.dat"),
+                                        "r").getChannel()));
         final Database db2 =
                 READER.from(
-                        new RandomAccessFile(
-                                buildDatabase2("2.dat"),
-                                "r").getChannel());
+                        Buffer.from(
+                                new RandomAccessFile(
+                                        buildDatabase2("2.dat"),
+                                        "r").getChannel()));
         final Database db = READER.composite(Arrays.asList(db1, db2));
 
         final Query query =
@@ -405,14 +416,16 @@ public class CompositeFileDatabaseTest {
     public void sortAndFilter() throws IOException {
         final Database db1 =
                 READER.from(
-                        new RandomAccessFile(
-                                buildDatabase1("1.dat"),
-                                "r").getChannel());
+                        Buffer.from(
+                                new RandomAccessFile(
+                                        buildDatabase1("1.dat"),
+                                        "r").getChannel()));
         final Database db2 =
                 READER.from(
-                        new RandomAccessFile(
-                                buildDatabase2("2.dat"),
-                                "r").getChannel());
+                        Buffer.from(
+                                new RandomAccessFile(
+                                        buildDatabase2("2.dat"),
+                                        "r").getChannel()));
 
         final Database db = READER.composite(Arrays.asList(db1, db2));
 
@@ -486,14 +499,16 @@ public class CompositeFileDatabaseTest {
     public void emptyRangeRight() throws IOException {
         final Database db1 =
                 READER.from(
-                        new RandomAccessFile(
-                                buildDatabase1("1.dat"),
-                                "r").getChannel());
+                        Buffer.from(
+                                new RandomAccessFile(
+                                        buildDatabase1("1.dat"),
+                                        "r").getChannel()));
         final Database db2 =
                 READER.from(
-                        new RandomAccessFile(
-                                buildDatabase2("2.dat"),
-                                "r").getChannel());
+                        Buffer.from(
+                                new RandomAccessFile(
+                                        buildDatabase2("2.dat"),
+                                        "r").getChannel()));
 
         final Database db = READER.composite(Arrays.asList(db1, db2));
 
@@ -536,14 +551,16 @@ public class CompositeFileDatabaseTest {
     public void emptyRangeLeft() throws IOException {
         final Database db1 =
                 READER.from(
-                        new RandomAccessFile(
-                                buildDatabase1("1.dat"),
-                                "r").getChannel());
+                        Buffer.from(
+                                new RandomAccessFile(
+                                        buildDatabase1("1.dat"),
+                                        "r").getChannel()));
         final Database db2 =
                 READER.from(
-                        new RandomAccessFile(
-                                buildDatabase2("2.dat"),
-                                "r").getChannel());
+                        Buffer.from(
+                                new RandomAccessFile(
+                                        buildDatabase2("2.dat"),
+                                        "r").getChannel()));
 
         final Database db = READER.composite(Arrays.asList(db1, db2));
 
@@ -586,14 +603,16 @@ public class CompositeFileDatabaseTest {
     public void unindexedFieldSearch() throws IOException {
         final Database db1 =
                 READER.from(
-                        new RandomAccessFile(
-                                buildDatabase1("1.dat"),
-                                "r").getChannel());
+                        Buffer.from(
+                                new RandomAccessFile(
+                                        buildDatabase1("1.dat"),
+                                        "r").getChannel()));
         final Database db2 =
                 READER.from(
-                        new RandomAccessFile(
-                                buildDatabase2("2.dat"),
-                                "r").getChannel());
+                        Buffer.from(
+                                new RandomAccessFile(
+                                        buildDatabase2("2.dat"),
+                                        "r").getChannel()));
 
         final Database db = READER.composite(Arrays.asList(db1, db2));
 
@@ -654,7 +673,8 @@ public class CompositeFileDatabaseTest {
                     @Override
                     public boolean process(
                             final int document,
-                            final @NotNull Database database) {
+                            @NotNull
+                            final Database database) {
                         docs.add(document);
                         return true;
                     }
@@ -672,14 +692,16 @@ public class CompositeFileDatabaseTest {
     public void noSortNoLimitSearch() throws IOException {
         final Database db1 =
                 READER.from(
-                        new RandomAccessFile(
-                                buildDatabase1("1.dat"),
-                                "r").getChannel());
+                        Buffer.from(
+                                new RandomAccessFile(
+                                        buildDatabase1("1.dat"),
+                                        "r").getChannel()));
         final Database db2 =
                 READER.from(
-                        new RandomAccessFile(
-                                buildDatabase2("2.dat"),
-                                "r").getChannel());
+                        Buffer.from(
+                                new RandomAccessFile(
+                                        buildDatabase2("2.dat"),
+                                        "r").getChannel()));
 
         final Database db = READER.composite(Arrays.asList(db1, db2));
 
@@ -692,7 +714,8 @@ public class CompositeFileDatabaseTest {
                     @Override
                     public boolean process(
                             final int document,
-                            final @NotNull Database database) {
+                            @NotNull
+                            final Database database) {
                         if (database == db1) {
                             docs.add(-document);
                         } else {

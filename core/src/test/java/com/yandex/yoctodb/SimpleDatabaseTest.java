@@ -991,7 +991,8 @@ public class SimpleDatabaseTest {
             @Override
             public boolean process(
                     final int document,
-                    final @NotNull Database database) {
+                    @NotNull
+                    final Database database) {
                 assertEquals(
                         ids.getAndIncrement(),
                         document);
@@ -1074,7 +1075,8 @@ public class SimpleDatabaseTest {
             @Override
             public boolean process(
                     final int document,
-                    final @NotNull Database database) {
+                    @NotNull
+                    final Database database) {
                 ids.add(document);
                 return false;
             }

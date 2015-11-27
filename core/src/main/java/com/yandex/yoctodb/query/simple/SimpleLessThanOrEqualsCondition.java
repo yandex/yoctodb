@@ -10,7 +10,7 @@
 
 package com.yandex.yoctodb.query.simple;
 
-import com.yandex.yoctodb.query.QueryContext;
+import com.yandex.yoctodb.immutable.FilterableIndexProvider;
 import com.yandex.yoctodb.util.buf.Buffer;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
@@ -45,10 +45,10 @@ public final class SimpleLessThanOrEqualsCondition
     @Override
     public boolean set(
             @NotNull
-            final QueryContext ctx,
+            final FilterableIndexProvider indexProvider,
             @NotNull
             final BitSet to) {
-        final FilterableIndex index = ctx.getFilter(getFieldName());
+        final FilterableIndex index = indexProvider.getFilter(getFieldName());
         return index != null && index.lessThan(to, value, true);
     }
 }

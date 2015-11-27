@@ -11,7 +11,6 @@
 package com.yandex.yoctodb.v1.immutable;
 
 import com.yandex.yoctodb.query.Query;
-import com.yandex.yoctodb.query.QueryContext;
 import com.yandex.yoctodb.query.ScoredDocument;
 import com.yandex.yoctodb.util.mutable.BitSet;
 import org.jetbrains.annotations.NotNull;
@@ -29,32 +28,37 @@ public class FilterResultIterator
     @NotNull
     private final Query query;
     @NotNull
-    private final Iterator<? extends QueryContext> dbs;
+    private final Iterator<V1QueryContext> contexts;
 
     public FilterResultIterator(
             @NotNull
             final Query query,
             @NotNull
-            final Iterator<? extends QueryContext> dbs) {
+            final Iterator<V1QueryContext> contexts) {
         this.query = query;
-        this.dbs = dbs;
+        this.contexts = contexts;
     }
 
     @Override
     public boolean hasNext() {
-        return dbs.hasNext();
+        return contexts.hasNext();
     }
 
     @NotNull
     @Override
     public Iterator<? extends ScoredDocument<?>> next() {
-        final QueryContext ctx = dbs.next();
-        final BitSet docs = query.filteredUnlimited(
-                ctx);
+        final V1QueryContext ctx = contexts.next();
+        final BitSet docs =
+                query.filteredUnlimited(
+                        ctx.getDatabase(),
+                        ctx.getBitSetPool());
         if (docs == null) {
             return Collections.emptyIterator();
         } else {
-            return query.sortedUnlimited(docs, ctx);
+            return query.sortedUnlimited(
+                    docs,
+                    ctx.getDatabase(),
+                    ctx.getBitSetPool());
         }
     }
 

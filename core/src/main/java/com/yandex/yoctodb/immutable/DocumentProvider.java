@@ -10,13 +10,17 @@
 
 package com.yandex.yoctodb.immutable;
 
-import net.jcip.annotations.Immutable;
+import com.yandex.yoctodb.util.buf.Buffer;
+import org.jetbrains.annotations.NotNull;
 
 /**
- * An immutable database
+ * Provides access to database documents
  *
  * @author incubos
  */
-@Immutable
-public interface Database extends DocumentProvider, ExecutionEngine {
+public interface DocumentProvider {
+    int getDocumentCount();
+
+    @NotNull
+    Buffer getDocument(int i);
 }

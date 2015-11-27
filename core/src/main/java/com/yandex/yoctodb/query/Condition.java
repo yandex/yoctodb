@@ -10,6 +10,7 @@
 
 package com.yandex.yoctodb.query;
 
+import com.yandex.yoctodb.immutable.FilterableIndexProvider;
 import com.yandex.yoctodb.util.mutable.BitSet;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
@@ -23,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
 public interface Condition {
     boolean set(
             @NotNull
-            QueryContext ctx,
+            FilterableIndexProvider indexProvider,
             @NotNull
             BitSet to);
 }

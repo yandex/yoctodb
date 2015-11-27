@@ -11,7 +11,6 @@
 package com.yandex.yoctodb.v1.immutable;
 
 import com.yandex.yoctodb.query.QueryBuilder;
-import com.yandex.yoctodb.query.QueryContext;
 import org.junit.Test;
 
 import java.util.Collections;
@@ -26,6 +25,6 @@ public class FilterResultIteratorTest {
     public void unsupportedRemove() {
         new FilterResultIterator(
                 QueryBuilder.select(),
-                Collections.<QueryContext>emptyIterator()).remove();
+                Collections.<V1QueryContext>emptyIterator()).remove();
     }
 }

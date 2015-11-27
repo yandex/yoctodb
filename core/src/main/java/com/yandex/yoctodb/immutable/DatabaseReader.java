@@ -14,9 +14,7 @@ import com.yandex.yoctodb.util.buf.Buffer;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.channels.FileChannel;
 import java.util.Collection;
 
 /**
@@ -26,32 +24,32 @@ import java.util.Collection;
  */
 @ThreadSafe
 public abstract class DatabaseReader {
+    public final int DEFAULT_QUERY_DEPTH = 2;
+
     @NotNull
     public Database from(
             @NotNull
             final Buffer buffer) throws IOException {
-        return from(buffer, true);
+        return from(buffer, DEFAULT_QUERY_DEPTH, true);
     }
 
     @NotNull
     public abstract Database from(
             @NotNull
             Buffer b,
+            final int bitSetsPerRequest,
             boolean checksum) throws IOException;
 
     @NotNull
     public abstract Database composite(
             @NotNull
-            Collection<Database> databases) throws IOException;
+            Collection<Database> databases,
+            int bitSetsPerRequest) throws IOException;
 
     @NotNull
-    public abstract Database mmap(
+    public Database composite(
             @NotNull
-            File f,
-            boolean forceToMemory) throws IOException;
-
-    @NotNull
-    public abstract Database from(
-            @NotNull
-            FileChannel f) throws IOException;
+            Collection<Database> databases) throws IOException {
+        return composite(databases, DEFAULT_QUERY_DEPTH);
+    }
 }
