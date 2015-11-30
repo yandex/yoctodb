@@ -18,13 +18,11 @@ import com.yandex.yoctodb.util.mutable.BitSet;
 /**
  * Index filtering documents.
  *
- * It is extremely important to check {@code boolean} result of filtering
- * methods, because if there are no documents found, then {@code dest} bit set
- * might be left unchanged.
- *
  * The contract of each comparison method is:
  * Set to one bits in {@code dest} for conforming documents and
  * leave the other bits untouched.
+ *
+ * Each method returns {@code boolean} result stating if any bit was set.
  *
  * @author incubos
  */
