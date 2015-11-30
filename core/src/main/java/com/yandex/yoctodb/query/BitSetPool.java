@@ -21,6 +21,14 @@ import org.jetbrains.annotations.NotNull;
 public interface BitSetPool {
     int getBitSetSize();
 
+    /**
+     * Borrow a {@link BitSet} instance.
+     *
+     * IMPORTANT! There is no contract on {@link BitSet} content, so a user
+     * has to prepare it for future use after getting.
+     *
+     * @return An instance of {@link BitSet}
+     */
     @NotNull
     BitSet borrowSet();
 
