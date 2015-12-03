@@ -1,3 +1,5 @@
+[![yoctodb-core](https://maven-badges.herokuapp.com/maven-central/com.yandex.yoctodb/yoctodb-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.yandex.yoctodb/yoctodb-core)
+
 # YoctoDB
 
 YoctoDB is a database engine with the following features:
@@ -18,4 +20,3 @@ Contact us through [YoctoDB User Group][3].
 [1]: https://bitbucket.org/yandex/yoctodb/wiki/Home
 [2]: https://bitbucket.org/yandex/yoctodb/wiki/GettingStarted
 [3]: https://groups.google.com/forum/#!forum/yoctodb
-
