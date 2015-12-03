@@ -11,8 +11,8 @@
 package com.yandex.yoctodb.query.simple;
 
 import com.yandex.yoctodb.immutable.FilterableIndexProvider;
+import com.yandex.yoctodb.query.BitSetPool;
 import com.yandex.yoctodb.query.Condition;
-import com.yandex.yoctodb.query.TermCondition;
 import com.yandex.yoctodb.util.mutable.BitSet;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
@@ -26,16 +26,17 @@ import java.util.Collection;
  * @author incubos
  */
 @Immutable
-public final class SimpleOneOfCondition implements Condition {
+public final class SimpleOrCondition implements Condition {
     @NotNull
-    private final Collection<TermCondition> clauses;
+    private final Iterable<Condition> clauses;
 
-    public SimpleOneOfCondition(
+    public SimpleOrCondition(
             @NotNull
-            final Collection<TermCondition> conditions) {
-        assert conditions.size() >= 2;
+            final Collection<Condition> conditions) {
+        if (conditions.isEmpty())
+            throw new IllegalArgumentException("No conditions");
 
-        this.clauses = new ArrayList<TermCondition>(conditions);
+        this.clauses = new ArrayList<Condition>(conditions);
     }
 
     @Override
@@ -43,10 +44,12 @@ public final class SimpleOneOfCondition implements Condition {
             @NotNull
             final FilterableIndexProvider indexProvider,
             @NotNull
-            final BitSet to) {
+            final BitSet to,
+            @NotNull
+            final BitSetPool bitSetPool) {
         boolean notEmpty = false;
         for (Condition clause : clauses)
-            if (clause.set(indexProvider, to))
+            if (clause.set(indexProvider, to, bitSetPool))
                 notEmpty = true;
 
         return notEmpty;

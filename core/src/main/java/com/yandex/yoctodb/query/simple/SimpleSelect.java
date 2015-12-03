@@ -94,45 +94,16 @@ public final class SimpleSelect implements Select {
             final BitSetPool bitSetPool) {
         if (conditions.isEmpty()) {
             return new ReadOnlyOneBitSet(bitSetPool.getBitSetSize());
-        } else if (conditions.size() == 1) {
-            final Condition c = conditions.iterator().next();
+        } else {
+            final Condition where = new SimpleAndCondition(conditions);
             final BitSet result = bitSetPool.borrowSet();
             result.clear();
-            if (c.set(database, result)) {
+            if (where.set(database, result, bitSetPool)) {
                 return result;
             } else {
                 bitSetPool.returnSet(result);
                 return null;
             }
-        } else {
-            // Searching
-            final BitSet result = bitSetPool.borrowSet();
-            result.set();
-            final BitSet conditionResult = bitSetPool.borrowSet();
-            conditionResult.clear();
-            try {
-                final Iterator<Condition> iter = conditions.iterator();
-                while (iter.hasNext()) {
-                    final Condition c = iter.next();
-                    if (!c.set(database, conditionResult)) {
-                        bitSetPool.returnSet(result);
-                        return null;
-                    }
-                    if (!result.and(conditionResult)) {
-                        bitSetPool.returnSet(result);
-                        return null;
-                    }
-                    if (iter.hasNext()) {
-                        conditionResult.clear();
-                    }
-                }
-            } finally {
-                bitSetPool.returnSet(conditionResult);
-            }
-
-            assert !result.isEmpty();
-
-            return result;
         }
     }
 

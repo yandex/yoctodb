@@ -15,16 +15,16 @@ import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Abstract condition
+ * Abstract term condition
  *
  * @author incubos
  */
 @Immutable
-abstract class AbstractSimpleCondition implements TermCondition {
+abstract class AbstractTermCondition implements TermCondition {
     @NotNull
     private final String fieldName;
 
-    AbstractSimpleCondition(
+    AbstractTermCondition(
             @NotNull
             final String fieldName) {
         this.fieldName = fieldName;

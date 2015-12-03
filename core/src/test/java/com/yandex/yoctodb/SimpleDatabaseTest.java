@@ -39,6 +39,26 @@ import static org.junit.Assert.assertTrue;
 public class SimpleDatabaseTest {
     private final int DOCS = 128;
 
+    private static class StringProcessor implements DocumentProcessor {
+        private final List<String> results;
+
+        public StringProcessor(final List<String> results) {
+            this.results = results;
+        }
+
+        @Override
+        public boolean process(
+                final int document,
+                @NotNull
+                final Database database) {
+            final Buffer payload = database.getDocument(document);
+            final byte[] buf = new byte[(int) payload.remaining()];
+            payload.get(buf);
+            results.add(new String(buf));
+            return true;
+        }
+    }
+
     @Test
     public void buildDatabase() throws IOException {
         final DatabaseBuilder dbBuilder =
@@ -520,19 +540,7 @@ public class SimpleDatabaseTest {
                         .and(lte("id", from(DOCS)))
                         .orderBy(desc("id"));
         final List<String> results = new ArrayList<String>(DOCS);
-        db.execute(q1, new DocumentProcessor() {
-            @Override
-            public boolean process(
-                    final int document,
-                    @NotNull
-                    final Database database) {
-                final Buffer payload = database.getDocument(document);
-                final byte[] buf = new byte[(int) payload.remaining()];
-                payload.get(buf);
-                results.add(new String(buf));
-                return true;
-            }
-        });
+        db.execute(q1, new StringProcessor(results));
 
         // Checking
         int i = DOCS - 1;
@@ -571,19 +579,7 @@ public class SimpleDatabaseTest {
                 select().where(eq("f", from(0)))
                         .orderBy(desc("f"));
         final List<String> results = new ArrayList<String>(DOCS);
-        db.execute(q1, new DocumentProcessor() {
-            @Override
-            public boolean process(
-                    final int document,
-                    @NotNull
-                    final Database database) {
-                final Buffer payload = database.getDocument(document);
-                final byte[] buf = new byte[(int) payload.remaining()];
-                payload.get(buf);
-                results.add(new String(buf));
-                return true;
-            }
-        });
+        db.execute(q1, new StringProcessor(results));
 
         // Checking
         int i = 0;
@@ -626,19 +622,7 @@ public class SimpleDatabaseTest {
                 select().orderBy(desc("f1")).and(asc("f2"));
 
         final List<String> results = new ArrayList<String>(DOCS);
-        db.execute(q, new DocumentProcessor() {
-            @Override
-            public boolean process(
-                    final int document,
-                    @NotNull
-                    final Database database) {
-                final Buffer payload = database.getDocument(document);
-                final byte[] buf = new byte[(int) payload.remaining()];
-                payload.get(buf);
-                results.add(new String(buf));
-                return true;
-            }
-        });
+        db.execute(q, new StringProcessor(results));
 
         final List<String> expected = new ArrayList<String>(DOCS);
         for (int i = DOCS - 2; i >= 0; i -= 2) {
@@ -685,19 +669,7 @@ public class SimpleDatabaseTest {
                                 true))
                         .orderBy(new SimpleDescendingOrder("id"));
         final List<String> results = new ArrayList<String>(DOCS);
-        db.execute(q1, new DocumentProcessor() {
-            @Override
-            public boolean process(
-                    final int document,
-                    @NotNull
-                    final Database database) {
-                final Buffer payload = database.getDocument(document);
-                final byte[] buf = new byte[(int) payload.remaining()];
-                payload.get(buf);
-                results.add(new String(buf));
-                return true;
-            }
-        });
+        db.execute(q1, new StringProcessor(results));
 
         // Checking
         int i = 20;
@@ -712,19 +684,7 @@ public class SimpleDatabaseTest {
                         true, from(2000),
                         true)).orderBy(new SimpleDescendingOrder("id"));
         final List<String> results2 = new ArrayList<String>(DOCS);
-        db.execute(q2, new DocumentProcessor() {
-            @Override
-            public boolean process(
-                    final int document,
-                    @NotNull
-                    final Database database) {
-                final Buffer payload = database.getDocument(document);
-                final byte[] buf = new byte[(int) payload.remaining()];
-                payload.get(buf);
-                results2.add(new String(buf));
-                return true;
-            }
-        });
+        db.execute(q2, new StringProcessor(results2));
         assertTrue(results2.isEmpty());
     }
 
@@ -865,7 +825,7 @@ public class SimpleDatabaseTest {
     }
 
     @Test
-    public void oneOfQuery() throws IOException {
+    public void orQuery() throws IOException {
         final DatabaseBuilder dbBuilder =
                 DatabaseFormat.getCurrent().newDatabaseBuilder();
 
@@ -910,7 +870,7 @@ public class SimpleDatabaseTest {
 
         final Query q =
                 select().where(
-                        oneOf(
+                        or(
                                 eq("int", from(1)),
                                 eq("text", from("doc2"))));
         assertEquals(2, db.count(q));
