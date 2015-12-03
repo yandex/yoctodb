@@ -11,6 +11,7 @@
 package com.yandex.yoctodb.query.simple;
 
 import com.yandex.yoctodb.immutable.FilterableIndexProvider;
+import com.yandex.yoctodb.query.BitSetPool;
 import com.yandex.yoctodb.util.buf.Buffer;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
@@ -24,7 +25,7 @@ import com.yandex.yoctodb.util.mutable.BitSet;
  * @author incubos
  */
 @Immutable
-public final class SimpleLessThanCondition extends AbstractSimpleCondition {
+public final class SimpleLessThanCondition extends AbstractTermCondition {
     @NotNull
     private final Buffer value;
 
@@ -46,7 +47,9 @@ public final class SimpleLessThanCondition extends AbstractSimpleCondition {
             @NotNull
             final FilterableIndexProvider indexProvider,
             @NotNull
-            final BitSet to) {
+            final BitSet to,
+            @NotNull
+            final BitSetPool bitSetPool) {
         final FilterableIndex index = indexProvider.getFilter(getFieldName());
         return index != null && index.lessThan(to, value, false);
     }

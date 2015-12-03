@@ -12,6 +12,7 @@ package com.yandex.yoctodb.query.simple;
 
 import com.yandex.yoctodb.immutable.FilterableIndex;
 import com.yandex.yoctodb.immutable.FilterableIndexProvider;
+import com.yandex.yoctodb.query.BitSetPool;
 import com.yandex.yoctodb.util.UnsignedByteArray;
 import com.yandex.yoctodb.util.buf.Buffer;
 import com.yandex.yoctodb.util.mutable.BitSet;
@@ -24,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
  * @author incubos
  */
 @Immutable
-public final class SimpleEqualityCondition extends AbstractSimpleCondition {
+public final class SimpleEqualityCondition extends AbstractTermCondition {
     @NotNull
     private final Buffer value;
 
@@ -46,7 +47,9 @@ public final class SimpleEqualityCondition extends AbstractSimpleCondition {
             @NotNull
             final FilterableIndexProvider indexProvider,
             @NotNull
-            final BitSet to) {
+            final BitSet to,
+            @NotNull
+            final BitSetPool bitSetPool) {
         final FilterableIndex index = indexProvider.getFilter(getFieldName());
         return index != null && index.eq(to, value);
     }

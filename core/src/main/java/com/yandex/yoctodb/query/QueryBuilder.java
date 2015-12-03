@@ -10,10 +10,10 @@
 
 package com.yandex.yoctodb.query;
 
-import net.jcip.annotations.NotThreadSafe;
-import org.jetbrains.annotations.NotNull;
 import com.yandex.yoctodb.query.simple.*;
 import com.yandex.yoctodb.util.UnsignedByteArray;
+import net.jcip.annotations.NotThreadSafe;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -115,23 +115,47 @@ public final class QueryBuilder {
     @NotNull
     public static Condition not(
             @NotNull
-            final TermCondition condition) {
+            final Condition condition) {
         return new SimpleNotCondition(condition);
     }
 
     @NotNull
-    public static Condition oneOf(
+    private static Collection<Condition> collect(
             @NotNull
-            final TermCondition c1,
-            final TermCondition c2,
-            final TermCondition... rest) {
-        final Collection<TermCondition> conditions =
-                new ArrayList<TermCondition>(rest.length + 2);
+            final Condition c1,
+            @NotNull
+            final Condition c2,
+            final Condition[] rest) {
+        final Collection<Condition> conditions =
+                new ArrayList<Condition>(rest.length + 2);
+
         conditions.add(c1);
         conditions.add(c2);
-        conditions.addAll(Arrays.asList(rest));
 
-        return new SimpleOneOfCondition(conditions);
+        if (rest.length > 0)
+            conditions.addAll(Arrays.asList(rest));
+
+        return conditions;
+    }
+
+    @NotNull
+    public static Condition or(
+            @NotNull
+            final Condition c1,
+            @NotNull
+            final Condition c2,
+            final Condition... rest) {
+        return new SimpleOrCondition(collect(c1, c2, rest));
+    }
+
+    @NotNull
+    public static Condition and(
+            @NotNull
+            final Condition c1,
+            @NotNull
+            final Condition c2,
+            final Condition... rest) {
+        return new SimpleAndCondition(collect(c1, c2, rest));
     }
 
     @NotNull

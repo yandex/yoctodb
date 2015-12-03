@@ -11,6 +11,7 @@
 package com.yandex.yoctodb.query.simple;
 
 import com.yandex.yoctodb.immutable.FilterableIndexProvider;
+import com.yandex.yoctodb.query.BitSetPool;
 import com.yandex.yoctodb.query.Condition;
 import com.yandex.yoctodb.util.mutable.BitSet;
 import net.jcip.annotations.Immutable;
@@ -37,8 +38,17 @@ public final class SimpleNotCondition implements Condition {
             @NotNull
             final FilterableIndexProvider indexProvider,
             @NotNull
-            final BitSet to) {
-        delegate.set(indexProvider, to);
-        return to.inverse();
+            final BitSet to,
+            @NotNull
+            final BitSetPool bitSetPool) {
+        final BitSet result = bitSetPool.borrowSet();
+        result.clear();
+        try {
+            delegate.set(indexProvider, result, bitSetPool);
+            result.inverse();
+            return to.or(result);
+        } finally {
+            bitSetPool.returnSet(result);
+        }
     }
 }
