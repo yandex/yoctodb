@@ -1,5 +1,6 @@
 [![yoctodb-core](https://maven-badges.herokuapp.com/maven-central/com.yandex.yoctodb/yoctodb-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.yandex.yoctodb/yoctodb-core)
 
+[![Build Status](https://drone.io/bitbucket.org/incubos/yoctodb/status.png)](https://drone.io/bitbucket.org/incubos/yoctodb/latest)
 # YoctoDB
 
 YoctoDB is a database engine with the following features:
