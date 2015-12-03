@@ -24,7 +24,7 @@ import java.util.Collection;
  */
 @ThreadSafe
 public abstract class DatabaseReader {
-    public final int DEFAULT_QUERY_DEPTH = 2;
+    public static final int DEFAULT_QUERY_DEPTH = 4;
 
     @NotNull
     public Database from(
