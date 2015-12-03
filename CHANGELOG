@@ -1,3 +1,11 @@
+0.0.11
+  * #24: Support for segments over 2 GB
+  * #29: Using separate V1SortableIndex (same as V1FullIndex)
+  * #33: unconstrained filtering queries
+  * Faster composite DB document extraction
+  * Full unit test coverage
+  * Empty field name support
+
 0.0.10
   * #27: Data race in FileChannelBuffer.get*(index)
 
