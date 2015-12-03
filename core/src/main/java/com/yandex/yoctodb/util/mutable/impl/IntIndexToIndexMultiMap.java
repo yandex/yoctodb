@@ -26,9 +26,9 @@ import java.util.Map;
 
 /**
  * {@link IntIndexToIndexMultiMap} implementation based on {@link Integer}s
- * <p/>
+ *
  * Format:
- * <p/>
+ *
  * <pre>
  * {@code
  * type (int)
