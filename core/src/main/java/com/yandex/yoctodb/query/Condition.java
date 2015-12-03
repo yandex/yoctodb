@@ -22,9 +22,23 @@ import org.jetbrains.annotations.NotNull;
  */
 @Immutable
 public interface Condition {
+    /**
+     * Set bits for the documents satisfying condition and leave all the other
+     * bits untouched.
+     *
+     * {@code false} return value is used for short-circuiting, so it is safe
+     * to return {@code true}, but not otherwise.
+     *
+     * @param indexProvider index provider
+     * @param to            container of filtered documents
+     * @param bitSetPool    temporary bit set pool
+     * @return if at least one bit was set
+     */
     boolean set(
             @NotNull
             FilterableIndexProvider indexProvider,
             @NotNull
-            BitSet to);
+            BitSet to,
+            @NotNull
+            BitSetPool bitSetPool);
 }

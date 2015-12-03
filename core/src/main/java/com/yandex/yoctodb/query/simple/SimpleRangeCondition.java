@@ -11,6 +11,7 @@
 package com.yandex.yoctodb.query.simple;
 
 import com.yandex.yoctodb.immutable.FilterableIndexProvider;
+import com.yandex.yoctodb.query.BitSetPool;
 import com.yandex.yoctodb.util.buf.Buffer;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
@@ -24,7 +25,7 @@ import com.yandex.yoctodb.util.mutable.BitSet;
  * @author incubos
  */
 @Immutable
-public final class SimpleRangeCondition extends AbstractSimpleCondition {
+public final class SimpleRangeCondition extends AbstractTermCondition {
     @NotNull
     private final Buffer from;
     private final boolean fromInclusive;
@@ -62,7 +63,9 @@ public final class SimpleRangeCondition extends AbstractSimpleCondition {
             @NotNull
             final FilterableIndexProvider indexProvider,
             @NotNull
-            final BitSet dest) {
+            final BitSet dest,
+            @NotNull
+            final BitSetPool bitSetPool) {
         final FilterableIndex index = indexProvider.getFilter(getFieldName());
         return index != null &&
                 index.between(dest, from, fromInclusive, to, toInclusive);
