@@ -43,7 +43,8 @@ public interface Query {
     /**
      * Return sorted results not taking into account skip/limit
      *
-     * @param database      database
+     * @param docs       docs to leave
+     * @param database   database
      * @param bitSetPool {@link BitSet} factory
      * @return sorted results
      */

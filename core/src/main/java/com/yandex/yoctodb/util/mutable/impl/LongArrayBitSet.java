@@ -20,7 +20,7 @@ import java.util.Arrays;
 
 /**
  * {@link BitSet} implementation based on {@code long} array.
- * <p/>
+ *
  * Based on Lucene {@code FixedBitSet}.
  *
  * @author incubos
