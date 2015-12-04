@@ -35,7 +35,7 @@ public class SegmentRegistryTest {
                 @Override
                 public Segment read(
                         @NotNull
-                        final Buffer buffer) throws IOException {
+                        final Buffer buffer) {
                     return PROBE;
                 }
             };

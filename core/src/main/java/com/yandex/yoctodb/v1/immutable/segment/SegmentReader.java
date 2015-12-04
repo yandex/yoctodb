@@ -14,8 +14,6 @@ import com.yandex.yoctodb.util.buf.Buffer;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
-
 /**
  * Reads segments
  *
@@ -26,5 +24,5 @@ public interface SegmentReader {
     @NotNull
     Segment read(
             @NotNull
-            Buffer buffer) throws IOException;
+            Buffer buffer);
 }

@@ -69,8 +69,6 @@ public class UnsignedByteArrays {
         return raw(new byte[]{(byte) (b ^ Byte.MIN_VALUE)});
     }
 
-    public final static byte BOOLEAN_TRUE_IN_BYTE = 0x1;
-    public final static byte BOOLEAN_FALSE_IN_BYTE = 0x0;
     private final static UnsignedByteArray TRUE = raw(new byte[]{0x1});
     private final static UnsignedByteArray FALSE = raw(new byte[]{0x0});
 
