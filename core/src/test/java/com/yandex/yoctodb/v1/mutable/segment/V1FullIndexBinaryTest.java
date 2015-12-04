@@ -36,17 +36,17 @@ public class V1FullIndexBinaryTest {
 
         //first doc
         Collection<UnsignedByteArray> byteArraysDoc1 = new ArrayList<UnsignedByteArray>();
-        byteArraysDoc1.add(UnsignedByteArrays.raw(new byte[]{7, 7, 7, 7}));
+        byteArraysDoc1.add(UnsignedByteArrays.from(new byte[]{7, 7, 7, 7}));
         v1FullIndex.addDocument(0, byteArraysDoc1);
 
         //second doc
         Collection<UnsignedByteArray> byteArraysDoc2 = new ArrayList<UnsignedByteArray>();
-        byteArraysDoc2.add(UnsignedByteArrays.raw(new byte[]{3, 2, 1, 0}));
+        byteArraysDoc2.add(UnsignedByteArrays.from(new byte[]{3, 2, 1, 0}));
         v1FullIndex.addDocument(1, byteArraysDoc2);
 
         //third doc
         Collection<UnsignedByteArray> byteArraysDoc3 = new ArrayList<UnsignedByteArray>();
-        byteArraysDoc3.add(UnsignedByteArrays.raw(new byte[]{7, 7, 7, 7}));
+        byteArraysDoc3.add(UnsignedByteArrays.from(new byte[]{7, 7, 7, 7}));
         v1FullIndex.addDocument(2, byteArraysDoc3);
 
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -84,14 +84,14 @@ public class V1FullIndexBinaryTest {
         for (int i = 0; i < elementsCount; i++) {
             final byte[] currentElementBytes = new byte[elementSize];
             byteBuffer.get(currentElementBytes);
-            elements.add(UnsignedByteArrays.raw(currentElementBytes));
+            elements.add(UnsignedByteArrays.from(currentElementBytes));
         }
         //elements - should equals to sorted collection of bytes (byteArraysDoc1 merged with byteArraysDoc2)
         Assert.assertEquals(
-                UnsignedByteArrays.raw(new byte[]{3, 2, 1, 0}),
+                UnsignedByteArrays.from(new byte[]{3, 2, 1, 0}),
                 elements.get(0));
         Assert.assertEquals(
-                UnsignedByteArrays.raw(new byte[]{7, 7, 7, 7}),
+                UnsignedByteArrays.from(new byte[]{7, 7, 7, 7}),
                 elements.get(1));
 
         //Reading values to document indexes
@@ -146,17 +146,17 @@ public class V1FullIndexBinaryTest {
 
         //first doc
         final Collection<UnsignedByteArray> byteArraysDoc1 = new ArrayList<UnsignedByteArray>();
-        byteArraysDoc1.add(UnsignedByteArrays.raw(new byte[]{7, 7, 7, 7, 7}));
+        byteArraysDoc1.add(UnsignedByteArrays.from(new byte[]{7, 7, 7, 7, 7}));
         v1FullIndex.addDocument(0, byteArraysDoc1);
 
         //second doc
         final Collection<UnsignedByteArray> byteArraysDoc2 = new ArrayList<UnsignedByteArray>();
-        byteArraysDoc2.add(UnsignedByteArrays.raw(new byte[]{3, 2, 1, 0}));
+        byteArraysDoc2.add(UnsignedByteArrays.from(new byte[]{3, 2, 1, 0}));
         v1FullIndex.addDocument(1, byteArraysDoc2);
 
         //third doc
         final Collection<UnsignedByteArray> byteArraysDoc3 = new ArrayList<UnsignedByteArray>();
-        byteArraysDoc3.add(UnsignedByteArrays.raw(new byte[]{7, 7, 7, 7, 7}));
+        byteArraysDoc3.add(UnsignedByteArrays.from(new byte[]{7, 7, 7, 7, 7}));
         v1FullIndex.addDocument(2, byteArraysDoc3);
 
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -202,15 +202,15 @@ public class V1FullIndexBinaryTest {
         for (int i = 0; i < elementsCount; i++) {
             final byte[] currentElementBytes = new byte[(int) elementOffsets[i + 1] - (int) elementOffsets[i]];
             byteBuffer.get(currentElementBytes);
-            elements.add(UnsignedByteArrays.raw(currentElementBytes));
+            elements.add(UnsignedByteArrays.from(currentElementBytes));
         }
         //elements - should equals to sorted collection of bytes (byteArraysDoc1 merged with byteArraysDoc2)
         Assert.assertEquals(
                 elements.get(0),
-                UnsignedByteArrays.raw(new byte[]{3, 2, 1, 0}));
+                UnsignedByteArrays.from(new byte[]{3, 2, 1, 0}));
         Assert.assertEquals(
                 elements.get(1),
-                UnsignedByteArrays.raw(new byte[]{7, 7, 7, 7, 7}));
+                UnsignedByteArrays.from(new byte[]{7, 7, 7, 7, 7}));
 
         //Reading values to document indexes
         final long valuesToDocumentIndexesSize1 = byteBuffer.getLong();

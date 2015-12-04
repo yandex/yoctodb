@@ -38,7 +38,7 @@ public final class UnsignedByteArray
                    Iterable<Byte>,
                    OutputStreamWritable {
     @NotNull
-    private final byte[] data;
+    final byte[] data;
     private int hash;
 
     UnsignedByteArray(

@@ -36,7 +36,7 @@ public class UnsignedByteArrays {
     private static final Charset UTF8 = Charsets.UTF_8;
 
     @NotNull
-    public static UnsignedByteArray raw(
+    public static UnsignedByteArray from(
             @NotNull
             final byte[] bytes) {
         return new UnsignedByteArray(bytes);
@@ -45,36 +45,97 @@ public class UnsignedByteArrays {
     @NotNull
     public static UnsignedByteArray from(
             @NotNull
+            final Buffer buffer) {
+        return from(buffer.toByteArray());
+    }
+
+    @NotNull
+    public static UnsignedByteArray from(
+            @NotNull
             final String s) {
-        return raw(s.getBytes(UTF8));
+        return from(s.getBytes(UTF8));
+    }
+
+    @NotNull
+    public static String toString(
+            @NotNull
+            final UnsignedByteArray bytes) {
+        return new String(bytes.data, UTF8);
     }
 
     @NotNull
     public static UnsignedByteArray from(final long l) {
-        return raw(Longs.toByteArray(l ^ Long.MIN_VALUE));
+        return from(Longs.toByteArray(l ^ Long.MIN_VALUE));
+    }
+
+    public static long toLong(
+            @NotNull
+            final UnsignedByteArray bytes) {
+        if (bytes.length() != Longs.BYTES)
+            throw new IllegalArgumentException("Wrong length");
+
+        return Longs.fromByteArray(bytes.data) ^ Long.MIN_VALUE;
     }
 
     @NotNull
     public static UnsignedByteArray from(final int i) {
-        return raw(Ints.toByteArray(i ^ Integer.MIN_VALUE));
+        return from(Ints.toByteArray(i ^ Integer.MIN_VALUE));
+    }
+
+    public static int toInt(
+            @NotNull
+            final UnsignedByteArray bytes) {
+        if (bytes.length() != Ints.BYTES)
+            throw new IllegalArgumentException("Wrong length");
+
+        return Ints.fromByteArray(bytes.data) ^ Integer.MIN_VALUE;
     }
 
     @NotNull
     public static UnsignedByteArray from(final short s) {
-        return raw(Shorts.toByteArray((short) (s ^ Short.MIN_VALUE)));
+        return from(Shorts.toByteArray((short) (s ^ Short.MIN_VALUE)));
+    }
+
+    public static short toShort(
+            @NotNull
+            final UnsignedByteArray bytes) {
+        if (bytes.length() != Shorts.BYTES)
+            throw new IllegalArgumentException("Wrong length");
+
+        return (short) (Shorts.fromByteArray(bytes.data) ^ Short.MIN_VALUE);
     }
 
     @NotNull
     public static UnsignedByteArray from(final byte b) {
-        return raw(new byte[]{(byte) (b ^ Byte.MIN_VALUE)});
+        return from(new byte[]{(byte) (b ^ Byte.MIN_VALUE)});
     }
 
-    private final static UnsignedByteArray TRUE = raw(new byte[]{0x1});
-    private final static UnsignedByteArray FALSE = raw(new byte[]{0x0});
+    public static byte toByte(
+            @NotNull
+            final UnsignedByteArray bytes) {
+        if (bytes.length() != 1)
+            throw new IllegalArgumentException("Wrong length");
+
+        return (byte) (bytes.data[0] ^ Byte.MIN_VALUE);
+    }
+
+    private final static UnsignedByteArray TRUE = from(new byte[]{0x1});
+    private final static UnsignedByteArray FALSE = from(new byte[]{0x0});
 
     @NotNull
     public static UnsignedByteArray from(final boolean b) {
         return b ? TRUE : FALSE;
+    }
+
+    public static boolean toBoolean(
+            @NotNull
+            final UnsignedByteArray bytes) {
+        if (bytes.equals(TRUE))
+            return true;
+        else if (bytes.equals(FALSE))
+            return false;
+        else
+            throw new IllegalArgumentException("Unexpected value");
     }
 
     public static int compare(

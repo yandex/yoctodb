@@ -35,12 +35,12 @@ public class V1FilterableIndexBinaryTest {
 
         //first doc
         final Collection<UnsignedByteArray> byteArraysDoc1 = new ArrayList<UnsignedByteArray>();
-        byteArraysDoc1.add(UnsignedByteArrays.raw(new byte[]{0}));
-        byteArraysDoc1.add(UnsignedByteArrays.raw(new byte[]{1, 2}));
-        byteArraysDoc1.add(UnsignedByteArrays.raw(new byte[]{3, 4, 5}));
-        byteArraysDoc1.add(UnsignedByteArrays.raw(new byte[]{6, 7, 8, 9}));
+        byteArraysDoc1.add(UnsignedByteArrays.from(new byte[]{0}));
+        byteArraysDoc1.add(UnsignedByteArrays.from(new byte[]{1, 2}));
+        byteArraysDoc1.add(UnsignedByteArrays.from(new byte[]{3, 4, 5}));
+        byteArraysDoc1.add(UnsignedByteArrays.from(new byte[]{6, 7, 8, 9}));
         byteArraysDoc1.add(
-                UnsignedByteArrays.raw(
+                UnsignedByteArrays.from(
                         new byte[]{
                                 10,
                                 11,
@@ -49,17 +49,17 @@ public class V1FilterableIndexBinaryTest {
                                 14}
                 )
         );
-        byteArraysDoc1.add(UnsignedByteArrays.raw(new byte[]{15}));
+        byteArraysDoc1.add(UnsignedByteArrays.from(new byte[]{15}));
         v1FilterableIndex.addDocument(0, byteArraysDoc1);
 
         //second doc
         final Collection<UnsignedByteArray> byteArraysDoc2 = new ArrayList<UnsignedByteArray>();
-        byteArraysDoc2.add(UnsignedByteArrays.raw(new byte[]{0, 1, 2, 3, 4}));
-        byteArraysDoc2.add(UnsignedByteArrays.raw(new byte[]{5, 6, 7, 8}));
-        byteArraysDoc2.add(UnsignedByteArrays.raw(new byte[]{9, 10, 11}));
-        byteArraysDoc2.add(UnsignedByteArrays.raw(new byte[]{12, 13,}));
-        byteArraysDoc2.add(UnsignedByteArrays.raw(new byte[]{14}));
-        byteArraysDoc2.add(UnsignedByteArrays.raw(new byte[]{15}));
+        byteArraysDoc2.add(UnsignedByteArrays.from(new byte[]{0, 1, 2, 3, 4}));
+        byteArraysDoc2.add(UnsignedByteArrays.from(new byte[]{5, 6, 7, 8}));
+        byteArraysDoc2.add(UnsignedByteArrays.from(new byte[]{9, 10, 11}));
+        byteArraysDoc2.add(UnsignedByteArrays.from(new byte[]{12, 13,}));
+        byteArraysDoc2.add(UnsignedByteArrays.from(new byte[]{14}));
+        byteArraysDoc2.add(UnsignedByteArrays.from(new byte[]{15}));
         v1FilterableIndex.addDocument(1, byteArraysDoc2);
 
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -104,20 +104,20 @@ public class V1FilterableIndexBinaryTest {
         for (int i = 0; i < elementsCount; i++) {
             final byte[] currentElementBytes = new byte[(int) elementOffsets[i + 1] - (int) elementOffsets[i]];
             byteBuffer.get(currentElementBytes);
-            elements.add(UnsignedByteArrays.raw(currentElementBytes));
+            elements.add(UnsignedByteArrays.from(currentElementBytes));
         }
         //elements - should equals to sorted collection of bytes (byteArraysDoc1 merged with byteArraysDoc2)
-        Assert.assertEquals(UnsignedByteArrays.raw(new byte[]{0}), elements.get(0));
-        Assert.assertEquals(UnsignedByteArrays.raw(new byte[]{0, 1, 2, 3, 4}), elements.get(1));
-        Assert.assertEquals(UnsignedByteArrays.raw(new byte[]{1, 2}), elements.get(2));
-        Assert.assertEquals(UnsignedByteArrays.raw(new byte[]{3, 4, 5}), elements.get(3));
-        Assert.assertEquals(UnsignedByteArrays.raw(new byte[]{5, 6, 7, 8}), elements.get(4));
-        Assert.assertEquals(UnsignedByteArrays.raw(new byte[]{6, 7, 8, 9}), elements.get(5));
-        Assert.assertEquals(UnsignedByteArrays.raw(new byte[]{9, 10, 11}), elements.get(6));
-        Assert.assertEquals(UnsignedByteArrays.raw(new byte[]{10, 11, 12, 13, 14}), elements.get(7));
-        Assert.assertEquals(UnsignedByteArrays.raw(new byte[]{12, 13}), elements.get(8));
-        Assert.assertEquals(UnsignedByteArrays.raw(new byte[]{14}), elements.get(9));
-        Assert.assertEquals(UnsignedByteArrays.raw(new byte[]{15}), elements.get(10));
+        Assert.assertEquals(UnsignedByteArrays.from(new byte[]{0}), elements.get(0));
+        Assert.assertEquals(UnsignedByteArrays.from(new byte[]{0, 1, 2, 3, 4}), elements.get(1));
+        Assert.assertEquals(UnsignedByteArrays.from(new byte[]{1, 2}), elements.get(2));
+        Assert.assertEquals(UnsignedByteArrays.from(new byte[]{3, 4, 5}), elements.get(3));
+        Assert.assertEquals(UnsignedByteArrays.from(new byte[]{5, 6, 7, 8}), elements.get(4));
+        Assert.assertEquals(UnsignedByteArrays.from(new byte[]{6, 7, 8, 9}), elements.get(5));
+        Assert.assertEquals(UnsignedByteArrays.from(new byte[]{9, 10, 11}), elements.get(6));
+        Assert.assertEquals(UnsignedByteArrays.from(new byte[]{10, 11, 12, 13, 14}), elements.get(7));
+        Assert.assertEquals(UnsignedByteArrays.from(new byte[]{12, 13}), elements.get(8));
+        Assert.assertEquals(UnsignedByteArrays.from(new byte[]{14}), elements.get(9));
+        Assert.assertEquals(UnsignedByteArrays.from(new byte[]{15}), elements.get(10));
         //Reading indexes
         final long indexesSize = byteBuffer.getLong();
         Assert.assertEquals(100, indexesSize);
@@ -174,22 +174,22 @@ public class V1FilterableIndexBinaryTest {
 
         //first doc
         final Collection<UnsignedByteArray> byteArraysDoc1 = new ArrayList<UnsignedByteArray>();
-        byteArraysDoc1.add(UnsignedByteArrays.raw(new byte[]{0, 1, 2, 3}));
-        byteArraysDoc1.add(UnsignedByteArrays.raw(new byte[]{4, 5, 6, 7}));
-        byteArraysDoc1.add(UnsignedByteArrays.raw(new byte[]{8, 9, 10, 11}));
-        byteArraysDoc1.add(UnsignedByteArrays.raw(new byte[]{12, 13, 14, 15}));
-        byteArraysDoc1.add(UnsignedByteArrays.raw(new byte[]{16, 17, 18, 19}));
-        byteArraysDoc1.add(UnsignedByteArrays.raw(new byte[]{7, 7, 7, 7}));
+        byteArraysDoc1.add(UnsignedByteArrays.from(new byte[]{0, 1, 2, 3}));
+        byteArraysDoc1.add(UnsignedByteArrays.from(new byte[]{4, 5, 6, 7}));
+        byteArraysDoc1.add(UnsignedByteArrays.from(new byte[]{8, 9, 10, 11}));
+        byteArraysDoc1.add(UnsignedByteArrays.from(new byte[]{12, 13, 14, 15}));
+        byteArraysDoc1.add(UnsignedByteArrays.from(new byte[]{16, 17, 18, 19}));
+        byteArraysDoc1.add(UnsignedByteArrays.from(new byte[]{7, 7, 7, 7}));
         v1FilterableIndex.addDocument(0, byteArraysDoc1);
 
         //second doc
         final Collection<UnsignedByteArray> byteArraysDoc2 = new ArrayList<UnsignedByteArray>();
-        byteArraysDoc2.add(UnsignedByteArrays.raw(new byte[]{19, 18, 17, 16}));
-        byteArraysDoc2.add(UnsignedByteArrays.raw(new byte[]{15, 14, 13, 12}));
-        byteArraysDoc2.add(UnsignedByteArrays.raw(new byte[]{11, 10, 9, 8}));
-        byteArraysDoc2.add(UnsignedByteArrays.raw(new byte[]{7, 6, 5, 4}));
-        byteArraysDoc2.add(UnsignedByteArrays.raw(new byte[]{3, 2, 1, 0}));
-        byteArraysDoc2.add(UnsignedByteArrays.raw(new byte[]{7, 7, 7, 7}));
+        byteArraysDoc2.add(UnsignedByteArrays.from(new byte[]{19, 18, 17, 16}));
+        byteArraysDoc2.add(UnsignedByteArrays.from(new byte[]{15, 14, 13, 12}));
+        byteArraysDoc2.add(UnsignedByteArrays.from(new byte[]{11, 10, 9, 8}));
+        byteArraysDoc2.add(UnsignedByteArrays.from(new byte[]{7, 6, 5, 4}));
+        byteArraysDoc2.add(UnsignedByteArrays.from(new byte[]{3, 2, 1, 0}));
+        byteArraysDoc2.add(UnsignedByteArrays.from(new byte[]{7, 7, 7, 7}));
         v1FilterableIndex.addDocument(1, byteArraysDoc2);
 
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -229,20 +229,20 @@ public class V1FilterableIndexBinaryTest {
         for (int i = 0; i < elementsCount; i++) {
             final byte[] currentElementBytes = new byte[elementSize];
             byteBuffer.get(currentElementBytes);
-            elements.add(UnsignedByteArrays.raw(currentElementBytes));
+            elements.add(UnsignedByteArrays.from(currentElementBytes));
         }
         //elements - should equals to sorted collection of bytes (byteArraysDoc1 merged with byteArraysDoc2)
-        Assert.assertEquals(UnsignedByteArrays.raw(new byte[]{0, 1, 2, 3}), elements.get(0));
-        Assert.assertEquals(UnsignedByteArrays.raw(new byte[]{3, 2, 1, 0}), elements.get(1));
-        Assert.assertEquals(UnsignedByteArrays.raw(new byte[]{4, 5, 6, 7}), elements.get(2));
-        Assert.assertEquals(UnsignedByteArrays.raw(new byte[]{7, 6, 5, 4}), elements.get(3));
-        Assert.assertEquals(UnsignedByteArrays.raw(new byte[]{7, 7, 7, 7}), elements.get(4));
-        Assert.assertEquals(UnsignedByteArrays.raw(new byte[]{8, 9, 10, 11}), elements.get(5));
-        Assert.assertEquals(UnsignedByteArrays.raw(new byte[]{11, 10, 9, 8}), elements.get(6));
-        Assert.assertEquals(UnsignedByteArrays.raw(new byte[]{12, 13, 14, 15}), elements.get(7));
-        Assert.assertEquals(UnsignedByteArrays.raw(new byte[]{15, 14, 13, 12}), elements.get(8));
-        Assert.assertEquals(UnsignedByteArrays.raw(new byte[]{16, 17, 18, 19}), elements.get(9));
-        Assert.assertEquals(UnsignedByteArrays.raw(new byte[]{19, 18, 17, 16}), elements.get(10));
+        Assert.assertEquals(UnsignedByteArrays.from(new byte[]{0, 1, 2, 3}), elements.get(0));
+        Assert.assertEquals(UnsignedByteArrays.from(new byte[]{3, 2, 1, 0}), elements.get(1));
+        Assert.assertEquals(UnsignedByteArrays.from(new byte[]{4, 5, 6, 7}), elements.get(2));
+        Assert.assertEquals(UnsignedByteArrays.from(new byte[]{7, 6, 5, 4}), elements.get(3));
+        Assert.assertEquals(UnsignedByteArrays.from(new byte[]{7, 7, 7, 7}), elements.get(4));
+        Assert.assertEquals(UnsignedByteArrays.from(new byte[]{8, 9, 10, 11}), elements.get(5));
+        Assert.assertEquals(UnsignedByteArrays.from(new byte[]{11, 10, 9, 8}), elements.get(6));
+        Assert.assertEquals(UnsignedByteArrays.from(new byte[]{12, 13, 14, 15}), elements.get(7));
+        Assert.assertEquals(UnsignedByteArrays.from(new byte[]{15, 14, 13, 12}), elements.get(8));
+        Assert.assertEquals(UnsignedByteArrays.from(new byte[]{16, 17, 18, 19}), elements.get(9));
+        Assert.assertEquals(UnsignedByteArrays.from(new byte[]{19, 18, 17, 16}), elements.get(10));
         //Reading indexes
         final long indexesSize = byteBuffer.getLong();
         Assert.assertEquals(100, indexesSize);
