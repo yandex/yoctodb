@@ -1,6 +1,5 @@
 package com.yandex.yoctodb.util.buf;
 
-import com.yandex.yoctodb.util.buf.Buffer;
 import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.NotNull;
 

@@ -226,20 +226,7 @@ public class CompositeMmapDatabaseTest {
                                 false)
                 )
                         .orderBy(desc("relevance")),
-                new DocumentProcessor() {
-                    @Override
-                    public boolean process(
-                            final int document,
-                            @NotNull
-                            final Database database) {
-                        if (database == db1) {
-                            docs.add(-document);
-                        } else {
-                            docs.add(document);
-                        }
-                        return true;
-                    }
-                }
+                new DoubleDatabaseProcessor(db1, db2, docs)
         );
 
         Assert.assertEquals(0, docs.size());
@@ -264,20 +251,7 @@ public class CompositeMmapDatabaseTest {
                                 false)
                 )
                         .orderBy(desc("relevance")),
-                new DocumentProcessor() {
-                    @Override
-                    public boolean process(
-                            final int document,
-                            @NotNull
-                            final Database database) {
-                        if (database == db1) {
-                            docs.add(-document);
-                        } else {
-                            docs.add(document);
-                        }
-                        return true;
-                    }
-                }
+                new DoubleDatabaseProcessor(db1, db2, docs)
         );
 
         Assert.assertEquals(0, docs.size());
@@ -302,20 +276,7 @@ public class CompositeMmapDatabaseTest {
                                 false)
                 )
                         .orderBy(desc("relevance")),
-                new DocumentProcessor() {
-                    @Override
-                    public boolean process(
-                            final int document,
-                            @NotNull
-                            final Database database) {
-                        if (database == db1) {
-                            docs.add(-document);
-                        } else {
-                            docs.add(document);
-                        }
-                        return true;
-                    }
-                }
+                new DoubleDatabaseProcessor(db1, db2, docs)
         );
 
         Assert.assertEquals(0, docs.size());

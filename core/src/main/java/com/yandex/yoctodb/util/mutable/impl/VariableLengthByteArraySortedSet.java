@@ -30,14 +30,6 @@ import java.io.OutputStream;
 public final class VariableLengthByteArraySortedSet
         extends AbstractByteArraySortedSet {
 
-    @NotNull
-    @Override
-    public UnsignedByteArray add(
-            @NotNull
-            final UnsignedByteArray e) {
-        return super.add(e);
-    }
-
     @Override
     public long getSizeInBytes() {
         if (sortedElements == null) {
