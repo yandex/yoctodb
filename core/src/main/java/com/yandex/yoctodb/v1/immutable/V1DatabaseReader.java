@@ -36,7 +36,7 @@ import java.util.Map;
 public class V1DatabaseReader extends DatabaseReader {
     private static final int DIGEST_BUF_SIZE = 4096;
 
-    protected static Buffer calculateDigest(
+    private static Buffer calculateDigest(
             @NotNull
             final Buffer buffer) {
         final Buffer data = buffer.slice();
@@ -166,7 +166,7 @@ public class V1DatabaseReader extends DatabaseReader {
     public Database composite(
             @NotNull
             final Collection<Database> databases,
-            final int bitSetsPerRequest) throws IOException {
+            final int bitSetsPerRequest) {
         final Collection<V1Database> dbs =
                 new ArrayList<V1Database>(databases.size());
 

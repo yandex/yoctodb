@@ -63,14 +63,14 @@ public class VariableLengthByteArraySortedSetTest {
         final byte[] e2 = new byte[]{1, 0};
         final byte[] e3 = new byte[]{0};
         final byte[] e4 = new byte[]{};
-        set.add(raw(e1));
-        set.add(raw(e2));
-        set.add(raw(e3));
-        set.add(raw(e4));
-        assertEquals(0, set.indexOf(raw(e4)));
-        assertEquals(1, set.indexOf(raw(e3)));
-        assertEquals(2, set.indexOf(raw(e2)));
-        assertEquals(3, set.indexOf(raw(e1)));
+        set.add(from(e1));
+        set.add(from(e2));
+        set.add(from(e3));
+        set.add(from(e4));
+        assertEquals(0, set.indexOf(from(e4)));
+        assertEquals(1, set.indexOf(from(e3)));
+        assertEquals(2, set.indexOf(from(e2)));
+        assertEquals(3, set.indexOf(from(e1)));
     }
 
     @Test(expected = NoSuchElementException.class)

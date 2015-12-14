@@ -75,19 +75,32 @@ public final class V1CompositeDatabase implements Database {
         return this.documentCount;
     }
 
-    @NotNull
-    @Override
-    public Buffer getDocument(final int i) {
+    private int databaseByDocIndex(final int i) {
         assert 0 <= i && i < this.documentCount;
 
         final int offsetIndex = Arrays.binarySearch(documentOffsets, i);
-        final int dbIndex;
-        if (offsetIndex >= 0)
-            dbIndex = offsetIndex;
-        else
-            dbIndex = -offsetIndex - 2;
 
+        return offsetIndex >= 0 ? offsetIndex : -offsetIndex - 2;
+    }
+
+    @NotNull
+    @Override
+    public Buffer getDocument(final int i) {
+        final int dbIndex = databaseByDocIndex(i);
         return databases.get(dbIndex).getDocument(i - documentOffsets[dbIndex]);
+    }
+
+    @NotNull
+    @Override
+    public Buffer getFieldValue(
+            final int document,
+            @NotNull
+            final String fieldName) {
+        final int dbIndex = databaseByDocIndex(document);
+        return databases.get(dbIndex)
+                .getFieldValue(
+                        document - documentOffsets[dbIndex],
+                        fieldName);
     }
 
     @NotNull
@@ -149,8 +162,7 @@ public final class V1CompositeDatabase implements Database {
                 iterator =
                         Iterators.mergeSorted(
                                 results,
-                                SCORED_DOCUMENT_COMPARATOR
-                        );
+                                SCORED_DOCUMENT_COMPARATOR);
             } else {
                 iterator =
                         Iterators.concat(

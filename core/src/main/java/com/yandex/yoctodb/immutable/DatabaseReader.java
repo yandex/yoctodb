@@ -37,14 +37,14 @@ public abstract class DatabaseReader {
     public abstract Database from(
             @NotNull
             Buffer b,
-            final int bitSetsPerRequest,
+            int bitSetsPerRequest,
             boolean checksum) throws IOException;
 
     @NotNull
     public abstract Database composite(
             @NotNull
             Collection<Database> databases,
-            int bitSetsPerRequest) throws IOException;
+            int bitSetsPerRequest);
 
     @NotNull
     public Database composite(

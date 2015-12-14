@@ -23,4 +23,21 @@ public interface DocumentProvider {
 
     @NotNull
     Buffer getDocument(int i);
+
+    /**
+     * Get {@code document} document {@code fieldName} field value.
+     *
+     * The field must be sortable.
+     *
+     * @see com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption#SORTABLE
+     * @see com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption#FULL
+     * @param document  document index
+     * @param fieldName field name
+     * @return document field value
+     */
+    @NotNull
+    Buffer getFieldValue(
+            int document,
+            @NotNull
+            String fieldName);
 }

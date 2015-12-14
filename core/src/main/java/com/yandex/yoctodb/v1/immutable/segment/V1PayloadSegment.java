@@ -18,8 +18,6 @@ import com.yandex.yoctodb.v1.V1DatabaseFormat;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
-
 /**
  * Immutable payload segment of V1 format
  *
@@ -57,7 +55,7 @@ public final class V1PayloadSegment implements Payload, Segment {
                     @Override
                     public Segment read(
                             @NotNull
-                            final Buffer buffer) throws IOException {
+                            final Buffer buffer) {
                         final ByteArrayIndexedList payloads =
                                 VariableLengthByteArrayIndexedList.from(
                                         Segments.extract(buffer));
