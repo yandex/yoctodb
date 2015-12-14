@@ -12,6 +12,7 @@ package com.yandex.yoctodb;
 
 import com.yandex.yoctodb.immutable.Database;
 import com.yandex.yoctodb.immutable.DatabaseReader;
+import com.yandex.yoctodb.immutable.DocumentProvider;
 import com.yandex.yoctodb.mutable.DatabaseBuilder;
 import com.yandex.yoctodb.mutable.DocumentBuilder;
 import com.yandex.yoctodb.query.DocumentProcessor;
@@ -654,6 +655,34 @@ public class CompositeFileDatabaseTest {
 
         assertEquals(DOCS * 2, db.executeAndUnlimitedCount(query, processor));
         assertEquals(DOCS * 2, docs.size());
+    }
+
+    @Test
+    public void extractFieldValues() throws IOException {
+        final Database db1 =
+                READER.from(
+                        Buffer.from(
+                                new RandomAccessFile(
+                                        buildDatabase1("1.dat"),
+                                        "r").getChannel()));
+        final Database db2 =
+                READER.from(
+                        Buffer.from(
+                                new RandomAccessFile(
+                                        buildDatabase2("2.dat"),
+                                        "r").getChannel()));
+
+        final DocumentProvider db = READER.composite(Arrays.asList(db1, db2));
+
+        for (int i = 0; i < 2 * DOCS; i++) {
+            final int id = i % DOCS;
+            assertEquals(
+                    from(id).toByteBuffer(),
+                    db.getFieldValue(id, "index"));
+            assertEquals(
+                    from(-id).toByteBuffer(),
+                    db.getFieldValue(id, "relevance"));
+        }
     }
 
     private File buildDatabase1(final String name) throws IOException {
