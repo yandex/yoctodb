@@ -54,4 +54,13 @@ public final class V1QueryContextFactory implements DocumentProvider {
     public Buffer getDocument(final int i) {
         return database.getDocument(i);
     }
+
+    @NotNull
+    @Override
+    public Buffer getFieldValue(
+            final int document,
+            @NotNull
+            final String fieldName) {
+        return database.getFieldValue(document, fieldName);
+    }
 }
