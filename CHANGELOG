@@ -1,3 +1,7 @@
+0.0.12
+  * #20: Support for retrieval of SORTABLE/FULL field values
+  * UnsignedByteArray to primitive transformation
+
 0.0.11
   * #24: Support for segments over 2 GB
   * #29: Using separate V1SortableIndex (same as V1FullIndex)
