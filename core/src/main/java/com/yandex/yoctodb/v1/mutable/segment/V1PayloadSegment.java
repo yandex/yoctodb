@@ -50,7 +50,7 @@ public final class V1PayloadSegment
 
         checkNotFrozen();
 
-        payloads.add(UnsignedByteArrays.raw(payload));
+        payloads.add(UnsignedByteArrays.from(payload));
         currentDocumentId++;
 
         return this;

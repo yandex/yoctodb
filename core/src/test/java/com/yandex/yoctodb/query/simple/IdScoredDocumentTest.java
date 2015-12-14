@@ -40,6 +40,15 @@ public class IdScoredDocumentTest {
                     throw new IllegalStateException();
                 }
 
+                @NotNull
+                @Override
+                public Buffer getFieldValue(
+                        final int document,
+                        @NotNull
+                        final String fieldName) {
+                    throw new IllegalStateException();
+                }
+
                 @Override
                 public void execute(
                         @NotNull

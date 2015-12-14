@@ -22,8 +22,6 @@ import com.yandex.yoctodb.v1.V1DatabaseFormat;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
-
 /**
  * Immutable {@link FilterableIndex} implementation
  *
@@ -153,7 +151,7 @@ public final class V1FilterableIndex implements FilterableIndex, Segment {
                     @Override
                     public Segment read(
                             @NotNull
-                            final Buffer buffer) throws IOException {
+                            final Buffer buffer) {
                         final String fieldName = Segments.extractString(buffer);
 
                         final ByteArraySortedSet values =
@@ -180,7 +178,7 @@ public final class V1FilterableIndex implements FilterableIndex, Segment {
                     @Override
                     public Segment read(
                             @NotNull
-                            final Buffer buffer) throws IOException {
+                            final Buffer buffer) {
                         final String fieldName = Segments.extractString(buffer);
 
                         final ByteArraySortedSet values =

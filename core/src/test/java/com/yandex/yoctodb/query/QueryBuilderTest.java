@@ -92,17 +92,17 @@ public class QueryBuilderTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void emptyValue() {
-        in("f", from(1), UnsignedByteArrays.raw(new byte[0]), from(3));
+        in("f", from(1), UnsignedByteArrays.from(new byte[0]), from(3));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void emptyFrom() {
-        in("test", UnsignedByteArrays.raw(new byte[0]), true, from(2), false);
+        in("test", UnsignedByteArrays.from(new byte[0]), true, from(2), false);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void emptyTo() {
-        in("test", from(1), true, UnsignedByteArrays.raw(new byte[0]), false);
+        in("test", from(1), true, UnsignedByteArrays.from(new byte[0]), false);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -122,26 +122,26 @@ public class QueryBuilderTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void emptyLteValue() {
-        lte("f", UnsignedByteArrays.raw(new byte[0]));
+        lte("f", UnsignedByteArrays.from(new byte[0]));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void emptyLtValue() {
-        lt("f", UnsignedByteArrays.raw(new byte[0]));
+        lt("f", UnsignedByteArrays.from(new byte[0]));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void emptyGteValue() {
-        gte("f", UnsignedByteArrays.raw(new byte[0]));
+        gte("f", UnsignedByteArrays.from(new byte[0]));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void emptyGtValue() {
-        gt("f", UnsignedByteArrays.raw(new byte[0]));
+        gt("f", UnsignedByteArrays.from(new byte[0]));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void emptyEqValue() {
-        eq("f", UnsignedByteArrays.raw(new byte[0]));
+        eq("f", UnsignedByteArrays.from(new byte[0]));
     }
 }

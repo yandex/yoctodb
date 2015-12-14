@@ -38,11 +38,11 @@ public class ByteArraySortedSetTest {
             throws IOException {
         //unsorted elements
         final List<UnsignedByteArray> elements = new ArrayList<UnsignedByteArray>();
-        elements.add(UnsignedByteArrays.raw(new byte[]{8, 9, 10, 11}));
-        elements.add(UnsignedByteArrays.raw(new byte[]{16, 17, 18, 19}));
-        elements.add(UnsignedByteArrays.raw(new byte[]{12, 13, 14, 15}));
-        elements.add(UnsignedByteArrays.raw(new byte[]{4, 5, 6, 7}));
-        elements.add(UnsignedByteArrays.raw(new byte[]{0, 1, 2, 3}));
+        elements.add(UnsignedByteArrays.from(new byte[]{8, 9, 10, 11}));
+        elements.add(UnsignedByteArrays.from(new byte[]{16, 17, 18, 19}));
+        elements.add(UnsignedByteArrays.from(new byte[]{12, 13, 14, 15}));
+        elements.add(UnsignedByteArrays.from(new byte[]{4, 5, 6, 7}));
+        elements.add(UnsignedByteArrays.from(new byte[]{0, 1, 2, 3}));
 
         final Buffer bb =
                 prepareDataFromFixedLengthByteArraySortedSet(elements);
@@ -83,11 +83,11 @@ public class ByteArraySortedSetTest {
             throws IOException {
         //elements
         final List<UnsignedByteArray> elements = new ArrayList<UnsignedByteArray>();
-        elements.add(UnsignedByteArrays.raw(new byte[]{1, 2}));
-        elements.add(UnsignedByteArrays.raw(new byte[]{10, 11, 12, 13, 14}));
-        elements.add(UnsignedByteArrays.raw(new byte[]{6, 7, 8, 9}));
-        elements.add(UnsignedByteArrays.raw(new byte[]{3, 4, 5}));
-        elements.add(UnsignedByteArrays.raw(new byte[]{0}));
+        elements.add(UnsignedByteArrays.from(new byte[]{1, 2}));
+        elements.add(UnsignedByteArrays.from(new byte[]{10, 11, 12, 13, 14}));
+        elements.add(UnsignedByteArrays.from(new byte[]{6, 7, 8, 9}));
+        elements.add(UnsignedByteArrays.from(new byte[]{3, 4, 5}));
+        elements.add(UnsignedByteArrays.from(new byte[]{0}));
 
         final Buffer bb =
                 prepareDataFromVariableLengthByteArraySortedSet(elements);

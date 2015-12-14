@@ -31,7 +31,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public final class V1DatabaseFormat extends DatabaseFormat {
     public final static int FORMAT = 5;
 
-    public final static DatabaseReader DATABASE_READER = new V1DatabaseReader();
+    private final static DatabaseReader DATABASE_READER = new V1DatabaseReader();
 
     private final static AtomicReference<String> messageDigestAlgorithm =
             new AtomicReference<String>("MD5");
@@ -67,7 +67,6 @@ public final class V1DatabaseFormat extends DatabaseFormat {
         PAYLOAD(1),
         FIXED_LENGTH_FILTER(1000),
         VARIABLE_LENGTH_FILTER(2000),
-        TRIE_BASED_FILTER(2500),
         FIXED_LENGTH_SORTABLE_INDEX(3000),
         VARIABLE_LENGTH_SORTABLE_INDEX(4000),
         FIXED_LENGTH_FULL_INDEX(5000),

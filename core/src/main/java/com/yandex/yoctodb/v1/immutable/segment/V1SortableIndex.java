@@ -103,7 +103,7 @@ public final class V1SortableIndex
                     @Override
                     public Segment read(
                             @NotNull
-                            final Buffer buffer) throws IOException {
+                            final Buffer buffer) {
                         final String fieldName = Segments.extractString(buffer);
 
                         final ByteArraySortedSet values =
@@ -136,7 +136,7 @@ public final class V1SortableIndex
                     @Override
                     public Segment read(
                             @NotNull
-                            final Buffer buffer) throws IOException {
+                            final Buffer buffer) {
                         final String fieldName = Segments.extractString(buffer);
 
                         final ByteArraySortedSet values =

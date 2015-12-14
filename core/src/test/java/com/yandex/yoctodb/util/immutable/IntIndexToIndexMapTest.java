@@ -13,7 +13,6 @@ package com.yandex.yoctodb.util.immutable;
 import com.yandex.yoctodb.util.buf.Buffer;
 import org.junit.Assert;
 import org.junit.Test;
-import com.yandex.yoctodb.util.immutable.IndexToIndexMap;
 import com.yandex.yoctodb.util.immutable.impl.IntIndexToIndexMap;
 
 import java.io.ByteArrayOutputStream;
@@ -26,12 +25,11 @@ public class IntIndexToIndexMapTest {
     @Test
     public void simpleTest() throws IOException {
         for (int counter = 1; counter < 10000; counter++) {
-            final int size = counter;
-            final Buffer buf = prepareData(size);
+            final Buffer buf = prepareData(counter);
             final IndexToIndexMap map = IntIndexToIndexMap.from(buf);
-            Assert.assertEquals(size, map.size());
-            for (int i = 0; i < size; i++) {
-                Assert.assertEquals(size - i, map.get(i));
+            Assert.assertEquals(counter, map.size());
+            for (int i = 0; i < counter; i++) {
+                Assert.assertEquals(counter - i, map.get(i));
             }
         }
     }

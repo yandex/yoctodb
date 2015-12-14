@@ -89,6 +89,17 @@ public final class V1Database implements IndexedDatabase {
         return sorters.get(fieldName);
     }
 
+    @NotNull
+    @Override
+    public Buffer getFieldValue(
+            final int document,
+            @NotNull
+            final String fieldName) {
+        final SortableIndex sorter = getSorter(fieldName);
+
+        return sorter.getSortValue(sorter.getSortValueIndex(document));
+    }
+
     @Override
     public void execute(
             @NotNull

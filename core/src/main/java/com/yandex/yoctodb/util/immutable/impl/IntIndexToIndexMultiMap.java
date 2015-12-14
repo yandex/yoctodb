@@ -105,18 +105,15 @@ public final class IntIndexToIndexMultiMap implements IndexToIndexMultiMap {
         return result;
     }
 
-    @Override
-    public boolean getTo(
+    private boolean fill(
             @NotNull
             final BitSet dest,
-            final int toExclusive) {
-        assert 0 < toExclusive && toExclusive <= keysCount;
-
-        int remaining = toExclusive;
-
+            final long from,
+            final int count) {
         boolean result = false;
 
-        long current = 0L;
+        long current = from;
+        int remaining = count;
         while (remaining > 0) {
             int size = elements.getInt(current);
             current += 4L;
@@ -132,6 +129,16 @@ public final class IntIndexToIndexMultiMap implements IndexToIndexMultiMap {
     }
 
     @Override
+    public boolean getTo(
+            @NotNull
+            final BitSet dest,
+            final int toExclusive) {
+        assert 0 < toExclusive && toExclusive <= keysCount;
+
+        return fill(dest, 0, toExclusive);
+    }
+
+    @Override
     public boolean getBetween(
             @NotNull
             final BitSet dest,
@@ -141,23 +148,10 @@ public final class IntIndexToIndexMultiMap implements IndexToIndexMultiMap {
                fromInclusive < toExclusive &&
                toExclusive <= keysCount;
 
-        long current = offsets.getLong(((long) fromInclusive) << 3);
-        int remaining = toExclusive - fromInclusive;
+        final long start = offsets.getLong(((long) fromInclusive) << 3);
+        final int count = toExclusive - fromInclusive;
 
-        boolean result = false;
-
-        while (remaining > 0) {
-            int size = elements.getInt(current);
-            current += 4L;
-            result |= size > 0;
-            for (; 0 < size; size--) {
-                dest.set(elements.getInt(current));
-                current += 4L;
-            }
-            remaining--;
-        }
-
-        return result;
+        return fill(dest, start, count);
     }
 
     @Override
