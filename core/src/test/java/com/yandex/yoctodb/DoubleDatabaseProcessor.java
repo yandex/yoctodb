@@ -29,13 +29,14 @@ public class DoubleDatabaseProcessor implements DocumentProcessor {
             final int document,
             @NotNull
             final Database database) {
+        assert database == negative || database == positive;
+
         if (database == negative) {
             docs.add(-document);
-        } else if (database == positive) {
-            docs.add(document);
         } else {
-            throw new IllegalStateException();
+            docs.add(document);
         }
+
         return true;
     }
 }
