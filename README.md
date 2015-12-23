@@ -4,22 +4,30 @@
 
 # YoctoDB
 
-YoctoDB is a database engine with the following features:
+YoctoDB is an embedded database engine with the following major features:
 
  * Java 6
  * Depends on Guava only
  * Immutable after construction
- * Optionally partitioned (a composite database is a set of partition databases)
- * Space-efficient (uses dictionaries for indexed values after building)
- * Flat document-oriented (a document is an opaque byte sequence)
- * Indexed fields for filtering/sorting (a field is an opaque comparable byte sequence)
- * Embedded (no network API or query languages, just some DSL)
+ * Optionally partitioned
+ * Space-efficient
+ * Flat document-oriented
+ * Indexed fields for filtering/sorting
+ * Embedded
  * `mmap`'ed (`ByteBuffer`'ed)
 
-See [Project Wiki][1] and [Getting Started Guide][2].
+See [Project Wiki][1]:
 
-Contact us through [YoctoDB User Group][3].
+ * [Getting Started Guide][3]
+ * [Motivation][4]
+ * [Design][5]
+ * [Internal Benchmarks][6]
+
+Contact us through [YoctoDB User Group][2].
 
 [1]: https://bitbucket.org/yandex/yoctodb/wiki/Home
-[2]: https://bitbucket.org/yandex/yoctodb/wiki/GettingStarted
-[3]: https://groups.google.com/forum/#!forum/yoctodb
+[2]: https://groups.google.com/forum/#!forum/yoctodb
+[3]: https://bitbucket.org/yandex/yoctodb/wiki/GettingStarted
+[4]: https://bitbucket.org/yandex/yoctodb/wiki/Motivation
+[5]: https://bitbucket.org/yandex/yoctodb/wiki/Design
+[6]: https://bitbucket.org/yandex/yoctodb/wiki/InternalBenchmarks
