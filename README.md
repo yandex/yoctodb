@@ -1,6 +1,4 @@
-[![yoctodb-core](https://maven-badges.herokuapp.com/maven-central/com.yandex.yoctodb/yoctodb-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.yandex.yoctodb/yoctodb-core)
-
-[![Build Status](https://drone.io/bitbucket.org/incubos/yoctodb/status.png)](https://drone.io/bitbucket.org/incubos/yoctodb/latest)
+[![yoctodb-core](https://maven-badges.herokuapp.com/maven-central/com.yandex.yoctodb/yoctodb-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.yandex.yoctodb/yoctodb-core) [![Build Status](https://drone.io/bitbucket.org/incubos/yoctodb/status.png)](https://drone.io/bitbucket.org/incubos/yoctodb/latest)
 
 # YoctoDB
 
@@ -16,18 +14,11 @@ YoctoDB is an embedded database engine with the following major features:
  * Embedded
  * `mmap`'ed (`ByteBuffer`'ed)
 
-See [Project Wiki][1]:
+See [Project Wiki](https://github.com/yandex/yoctodb/wiki/Home):
 
- * [Getting Started Guide][3]
- * [Motivation][4]
- * [Design][5]
- * [Internal Benchmarks][6]
+ * [Getting Started Guide](https://github.com/yandex/yoctodb/wiki/GettingStarted)
+ * [Motivation](https://github.com/yandex/yoctodb/wiki/Motivation)
+ * [Design](https://github.com/yandex/yoctodb/wiki/Design)
+ * [Internal Benchmarks](https://github.com/yandex/yoctodb/wiki/InternalBenchmarks)
 
-Contact us through [YoctoDB User Group][2].
-
-[1]: https://bitbucket.org/yandex/yoctodb/wiki/Home
-[2]: https://groups.google.com/forum/#!forum/yoctodb
-[3]: https://bitbucket.org/yandex/yoctodb/wiki/GettingStarted
-[4]: https://bitbucket.org/yandex/yoctodb/wiki/Motivation
-[5]: https://bitbucket.org/yandex/yoctodb/wiki/Design
-[6]: https://bitbucket.org/yandex/yoctodb/wiki/InternalBenchmarks
+Contact us through [YoctoDB User Group](https://groups.google.com/forum/#!forum/yoctodb).
