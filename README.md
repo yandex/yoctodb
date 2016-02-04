@@ -1,4 +1,4 @@
-[![yoctodb-core](https://maven-badges.herokuapp.com/maven-central/com.yandex.yoctodb/yoctodb-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.yandex.yoctodb/yoctodb-core) [![Build Status](https://drone.io/bitbucket.org/incubos/yoctodb/status.png)](https://drone.io/bitbucket.org/incubos/yoctodb/latest)
+[![yoctodb-core](https://maven-badges.herokuapp.com/maven-central/com.yandex.yoctodb/yoctodb-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.yandex.yoctodb/yoctodb-core) [![Build Status](https://semaphoreci.com/api/v1/projects/79814465-8795-448e-8652-d52e95c632f7/685534/shields_badge.svg)](https://semaphoreci.com/incubos/yoctodb)
 
 # YoctoDB
 
