@@ -10,7 +10,7 @@
 
     <name>YoctoDB parent</name>
     <description>Embedded immutable database. Parent module containing dependencies.</description>
-    <url>https://bitbucket.org/yandex/yoctodb</url>
+    <url>https://github.com/yandex/yoctodb</url>
     <licenses>
         <license>
             <name>Mozilla Public License Version 2.0</name>
@@ -19,9 +19,9 @@
         </license>
     </licenses>
     <scm>
-        <url>https://bitbucket.org/yandex/yoctodb</url>
-        <connection>scm:hg:ssh://hg@bitbucket.org/yandex/yoctodb</connection>
-        <developerConnection>scm:hg:ssh://hg@bitbucket.org/yandex/yoctodb</developerConnection>
+        <url>https://github.com/yandex/yoctodb</url>
+        <connection>scm:git:git@github.com:yandex/yoctodb.git</connection>
+        <developerConnection>scm:git:git@github.com:yandex/yoctodb.git</developerConnection>
     </scm>
     <developers>
         <developer>
