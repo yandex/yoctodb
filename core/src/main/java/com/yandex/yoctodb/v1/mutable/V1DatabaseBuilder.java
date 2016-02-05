@@ -39,7 +39,7 @@ public final class V1DatabaseBuilder
         implements DatabaseBuilder {
     private int currentDocumentId = 0;
 
-    private final V1PayloadSegment payloads = new V1PayloadSegment();
+    private V1PayloadSegment payloads = new V1PayloadSegment();
 
     private final Map<String, IndexSegment> indexes =
             new HashMap<String, IndexSegment>();
@@ -129,11 +129,16 @@ public final class V1DatabaseBuilder
         // Build writables
         final List<OutputStreamWritable> writables =
                 new ArrayList<OutputStreamWritable>(indexes.size() + 1);
-        for (IndexSegment segment : indexes.values()) {
+        final Iterator<IndexSegment> indexSegmentIterator =
+                indexes.values().iterator();
+        while (indexSegmentIterator.hasNext()) {
+            final IndexSegment segment = indexSegmentIterator.next();
             segment.setDatabaseDocumentsCount(currentDocumentId);
             writables.add(segment.buildWritable());
+            indexSegmentIterator.remove();
         }
         writables.add(payloads.buildWritable());
+        payloads = null;
 
         return new OutputStreamWritable() {
             @Override
