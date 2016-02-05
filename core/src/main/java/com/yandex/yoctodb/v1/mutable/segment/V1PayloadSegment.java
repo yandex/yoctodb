@@ -59,6 +59,8 @@ public final class V1PayloadSegment
     @NotNull
     @Override
     public OutputStreamWritable buildWritable() {
+        checkNotFrozen();
+
         freeze();
 
         return new OutputStreamWritable() {

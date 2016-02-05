@@ -122,6 +122,8 @@ public final class V1DatabaseBuilder
     @NotNull
     @Override
     public OutputStreamWritable buildWritable() {
+        checkNotFrozen();
+
         freeze();
 
         // Build writables

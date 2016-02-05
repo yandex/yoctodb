@@ -101,6 +101,8 @@ public abstract class AbstractV1FullIndex
     @NotNull
     @Override
     public OutputStreamWritable buildWritable() {
+        checkNotFrozen();
+
         freeze();
 
         // Building index

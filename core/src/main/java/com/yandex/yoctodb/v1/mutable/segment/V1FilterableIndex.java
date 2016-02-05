@@ -92,6 +92,8 @@ public final class V1FilterableIndex
     @NotNull
     @Override
     public OutputStreamWritable buildWritable() {
+        checkNotFrozen();
+
         freeze();
 
         // Building the index
