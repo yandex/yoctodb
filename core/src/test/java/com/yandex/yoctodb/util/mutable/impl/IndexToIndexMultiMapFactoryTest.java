@@ -10,10 +10,16 @@
 
 package com.yandex.yoctodb.util.mutable.impl;
 
-import static org.junit.Assert.*;
-
+import com.google.common.collect.TreeMultimap;
 import com.yandex.yoctodb.util.mutable.IndexToIndexMultiMap;
 import org.junit.Test;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+
+import static java.util.Collections.singletonList;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Unit tests for {@link IndexToIndexMultiMapFactory}
@@ -23,27 +29,38 @@ import org.junit.Test;
 public class IndexToIndexMultiMapFactoryTest {
     @Test(expected = IllegalArgumentException.class)
     public void zeroValues() {
-        IndexToIndexMultiMapFactory.buildIndexToIndexMultiMap(0, 1);
+        IndexToIndexMultiMapFactory.buildIndexToIndexMultiMap(
+                Collections.<Collection<Integer>>emptyList(),
+                1);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void zeroDocuments() {
-        IndexToIndexMultiMapFactory.buildIndexToIndexMultiMap(1, 0);
+        IndexToIndexMultiMapFactory.buildIndexToIndexMultiMap(
+                singletonList(singletonList(0)),
+                0);
     }
 
     @Test
     public void selective() {
+        final TreeMultimap<Integer, Integer> elements = TreeMultimap.create();
+        for (int i = 0; i < 1024; i++) {
+            elements.put(i, i);
+        }
         final IndexToIndexMultiMap map =
                 IndexToIndexMultiMapFactory.buildIndexToIndexMultiMap(
-                        1024,
+                        elements.asMap().values(),
                         1024);
         assertTrue(map instanceof IntIndexToIndexMultiMap);
     }
 
     @Test
     public void nonSelective() {
+        @SuppressWarnings("unchecked")
         final IndexToIndexMultiMap map =
-                IndexToIndexMultiMapFactory.buildIndexToIndexMultiMap(2, 128);
+                IndexToIndexMultiMapFactory.buildIndexToIndexMultiMap(
+                        Arrays.asList(singletonList(0), singletonList(1)),
+                        128);
         assertTrue(map instanceof BitSetIndexToIndexMultiMap);
     }
 }

@@ -10,8 +10,6 @@
 
 package com.yandex.yoctodb.util.mutable.impl;
 
-import com.google.common.collect.Multimap;
-import com.google.common.collect.TreeMultimap;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.yandex.yoctodb.util.mutable.IndexToIndexMultiMap;
@@ -22,7 +20,6 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collection;
-import java.util.Map;
 
 /**
  * {@link IntIndexToIndexMultiMap} implementation based on {@link Integer}s
@@ -55,25 +52,27 @@ import java.util.Map;
  */
 @NotThreadSafe
 public final class IntIndexToIndexMultiMap implements IndexToIndexMultiMap {
-    private final Multimap<Integer, Integer> map = TreeMultimap.create();
+    private final Collection<? extends Collection<Integer>> map;
+    private final long sizeInBytes;
 
-    @Override
-    public void put(final int key, final int value) {
-        if (key < 0)
-            throw new IllegalArgumentException("Negative key");
-        if (value < 0)
-            throw new IllegalArgumentException("Negative value");
-
-        map.put(key, value);
+    public IntIndexToIndexMultiMap(
+            @NotNull
+            final Collection<? extends Collection<Integer>> map) {
+        this.map = map;
+        long elements = 0;
+        for (Collection<Integer> ids : map) {
+            elements += ids.size();
+        }
+        this.sizeInBytes =
+                4L + // type
+                4L + // keys count
+                (8L + 4L) * map.size() + // offsets + sizes
+                4L * elements;    // set elements
     }
 
     @Override
     public long getSizeInBytes() {
-        return 4L + // type
-               4L + // keys count
-               8L * map.keySet().size() + // offsets
-               4L * map.keySet().size() + // sizes
-               4L * map.size();    // set elements
+        return sizeInBytes;
     }
 
     @Override
@@ -86,28 +85,21 @@ public final class IntIndexToIndexMultiMap implements IndexToIndexMultiMap {
                         V1DatabaseFormat.MultiMapType.LIST_BASED.getCode()));
 
         // Keys count
-        os.write(Ints.toByteArray(map.keySet().size()));
+        os.write(Ints.toByteArray(map.size()));
 
         // Offsets
         long offset = 0L;
-        int index = 0;
-        for (Map.Entry<Integer, Collection<Integer>> entry :
-                map.asMap().entrySet()) {
-            if (entry.getKey() != index) {
-                throw new IllegalStateException("Indexes are not continuous");
-            }
-
+        for (Collection<Integer> value : map) {
             os.write(Longs.toByteArray(offset));
-            offset += 4L + 4L * entry.getValue().size();
-
-            index++;
+            offset += 4L + 4L * value.size();
         }
 
         // Sets
-        for (Collection<Integer> value : map.asMap().values()) {
+        for (Collection<Integer> value : map) {
             os.write(Ints.toByteArray(value.size()));
 
             for (Integer v : value) {
+                assert v >= 0;
                 os.write(Ints.toByteArray(v));
             }
         }
@@ -116,8 +108,7 @@ public final class IntIndexToIndexMultiMap implements IndexToIndexMultiMap {
     @Override
     public String toString() {
         return "IntIndexToIndexMultiMap{" +
-               "keys=" + map.keySet().size() +
-               ", values" + map.size() +
+               "keys=" + map.size() +
                '}';
     }
 }

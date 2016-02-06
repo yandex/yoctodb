@@ -100,16 +100,7 @@ public abstract class AbstractV1FullIndex
         // Building index
 
         final IndexToIndexMultiMap valueToDocumentsIndex =
-                new IntIndexToIndexMultiMap();
-
-        int key = 0;
-        for (Map.Entry<UnsignedByteArray, Collection<Integer>> entry :
-                valueToDocuments.asMap().entrySet()) {
-            for (Integer d : entry.getValue()) {
-                valueToDocumentsIndex.put(key, d);
-            }
-            key++;
-        }
+                new IntIndexToIndexMultiMap(valueToDocuments.asMap().values());
 
         final ByteArraySortedSet values;
         if (fixedLength) {

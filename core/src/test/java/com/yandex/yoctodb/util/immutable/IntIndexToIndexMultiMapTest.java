@@ -10,13 +10,14 @@
 
 package com.yandex.yoctodb.util.immutable;
 
+import com.google.common.collect.TreeMultimap;
 import com.yandex.yoctodb.util.buf.Buffer;
-import org.junit.Assert;
-import org.junit.Test;
 import com.yandex.yoctodb.util.immutable.impl.IntIndexToIndexMultiMap;
 import com.yandex.yoctodb.util.mutable.BitSet;
 import com.yandex.yoctodb.util.mutable.impl.LongArrayBitSet;
 import com.yandex.yoctodb.v1.V1DatabaseFormat;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -56,18 +57,20 @@ public class IntIndexToIndexMultiMapTest {
     private Buffer prepareData(
             final int keys,
             final int values) throws IOException {
-        final com.yandex.yoctodb.util.mutable.IndexToIndexMultiMap indexToIndexMultiMap =
-                new com.yandex.yoctodb.util.mutable.impl.IntIndexToIndexMultiMap();
+        final TreeMultimap<Integer, Integer> elements = TreeMultimap.create();
         for (int i = 0; i < keys; i++) {
             //same elements
-            indexToIndexMultiMap.put(i, (keys - i) % values);
-            indexToIndexMultiMap.put(i, (keys - i) % values);
-            indexToIndexMultiMap.put(i, (keys - i) % values);
-            indexToIndexMultiMap.put(i, (keys - i) % values);
+            elements.put(i, (keys - i) % values);
+            elements.put(i, (keys - i) % values);
+            elements.put(i, (keys - i) % values);
+            elements.put(i, (keys - i) % values);
 
-            indexToIndexMultiMap.put(i, (2 * keys - i) % values);
-            indexToIndexMultiMap.put(i, (3 * keys - i) % values);
+            elements.put(i, (2 * keys - i) % values);
+            elements.put(i, (3 * keys - i) % values);
         }
+        final com.yandex.yoctodb.util.mutable.IndexToIndexMultiMap indexToIndexMultiMap =
+                new com.yandex.yoctodb.util.mutable.impl.IntIndexToIndexMultiMap(
+                        elements.asMap().values());
 
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
         indexToIndexMultiMap.writeTo(os);

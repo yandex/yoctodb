@@ -26,7 +26,6 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collection;
-import java.util.Map;
 
 /**
  * Index supporting filtering by specific field
@@ -89,17 +88,8 @@ public final class V1FilterableIndex
         // Building the index
         final IndexToIndexMultiMap valueToDocumentsIndex =
                 IndexToIndexMultiMapFactory.buildIndexToIndexMultiMap(
-                        valueToDocuments.keySet().size(),
+                        valueToDocuments.asMap().values(),
                         databaseDocumentsCount);
-
-        int key = 0;
-        for (Map.Entry<UnsignedByteArray, Collection<Integer>> entry :
-                valueToDocuments.asMap().entrySet()) {
-            for (Integer d : entry.getValue()) {
-                valueToDocumentsIndex.put(key, d);
-            }
-            key++;
-        }
 
         final OutputStreamWritable values;
         if (fixedLength) {

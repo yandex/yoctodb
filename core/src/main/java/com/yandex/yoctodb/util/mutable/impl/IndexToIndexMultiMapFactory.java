@@ -12,8 +12,13 @@ package com.yandex.yoctodb.util.mutable.impl;
 
 import com.yandex.yoctodb.util.mutable.IndexToIndexMultiMap;
 
+import java.util.Collection;
+
 /**
+ * Chooses the optimal {@link IndexToIndexMultiMap} implementation
+ *
  * @author svyatoslav
+ * @author incubos
  */
 public final class IndexToIndexMultiMapFactory {
 
@@ -27,9 +32,10 @@ public final class IndexToIndexMultiMapFactory {
     }
 
     public static IndexToIndexMultiMap buildIndexToIndexMultiMap(
-            final int uniqueValuesCount,
+            final Collection<? extends Collection<Integer>> valueToDocuments,
             final int documentsCount) {
-        if (uniqueValuesCount <= 0)
+        final int uniqueValuesCount = valueToDocuments.size();
+        if (uniqueValuesCount == 0)
             throw new IllegalArgumentException("Nonpositive values count");
         if (documentsCount <= 0)
             throw new IllegalArgumentException("Nonpositive documents count");
@@ -37,9 +43,11 @@ public final class IndexToIndexMultiMapFactory {
         if (((long) uniqueValuesCount) * documentsCount / 64L <
             documentsCount * 4L) {
             // BitSet might be more effective
-            return new BitSetIndexToIndexMultiMap(documentsCount);
+            return new BitSetIndexToIndexMultiMap(
+                    valueToDocuments,
+                    documentsCount);
         } else {
-            return new IntIndexToIndexMultiMap();
+            return new IntIndexToIndexMultiMap(valueToDocuments);
         }
     }
 }
