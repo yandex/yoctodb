@@ -64,6 +64,14 @@ public class UnsignedByteArraysTest {
         assertTrue(from("Тест").compareTo(from("Тест2")) < 0);
     }
 
+    @Test
+    public void testHashCode() {
+        assertEquals(from("").hashCode(), from("").hashCode());
+        assertEquals(from("a").hashCode(), from("a").hashCode());
+        assertNotEquals(from("a").hashCode(), from("").hashCode());
+        assertNotEquals(from("a").hashCode(), from("b").hashCode());
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void testBooleanTooBig() {
         toBoolean(from(new byte[]{0x0, 0x1}));

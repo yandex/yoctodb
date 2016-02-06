@@ -11,7 +11,6 @@
 package com.yandex.yoctodb.util.mutable.impl;
 
 import com.google.common.primitives.Ints;
-import com.yandex.yoctodb.util.OutputStreamWritable;
 import com.yandex.yoctodb.util.UnsignedByteArray;
 import com.yandex.yoctodb.util.mutable.ByteArraySortedSet;
 import net.jcip.annotations.NotThreadSafe;
@@ -19,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.SortedSet;
 
 /**
  * {@link ByteArraySortedSet} with fixed size elements
@@ -28,61 +28,50 @@ import java.io.OutputStream;
 @NotThreadSafe
 public final class FixedLengthByteArraySortedSet
         extends AbstractByteArraySortedSet {
-    private int elementSize = -1;
+    public FixedLengthByteArraySortedSet(
+            final SortedSet<UnsignedByteArray> elements) {
+        super(elements);
 
-    @NotNull
-    @Override
-    public UnsignedByteArray add(
-            @NotNull
-            final UnsignedByteArray e) {
-        if (elementSize == -1) {
-            elementSize = e.length();
-        }
-
-        if (e.length() != elementSize)
-            throw new IllegalArgumentException(
-                    "Element length <" + e.length() +
-                    "> is not equal to expected <" + elementSize + ">");
-
-        return super.add(e);
+        if (elements.isEmpty())
+            throw new IllegalArgumentException("Empty set");
     }
 
     @Override
     public long getSizeInBytes() {
-        if (sortedElements == null) {
-            build();
-        }
-
         return 4L + // Element size
                4L + // Element count
-               ((long) elementSize) * sortedElements.size();
+               elements.first().getSizeInBytes() * elements.size();
     }
 
     @Override
     public void writeTo(
             @NotNull
             final OutputStream os) throws IOException {
-        if (sortedElements == null) {
-            build();
-        }
+        assert elements.first().getSizeInBytes() <= Integer.MAX_VALUE;
 
         // Element size
-        os.write(Ints.toByteArray(elementSize));
+        os.write(Ints.toByteArray((int) elements.first().getSizeInBytes()));
 
         // Element count
-        os.write(Ints.toByteArray(sortedElements.size()));
+        os.write(Ints.toByteArray(elements.size()));
 
         // Elements
-        for (OutputStreamWritable e : sortedElements.keySet())
+        long elementSize = -1;
+        for (UnsignedByteArray e : elements) {
+            if (elementSize == -1)
+                elementSize = e.getSizeInBytes();
+
+            assert elementSize == e.getSizeInBytes() : "Variable size";
+
             e.writeTo(os);
+        }
     }
 
     @Override
     public String toString() {
         return "FixedLengthByteArraySortedSet{" +
-               "elementsCount=" +
-               (sortedElements == null ? elements.size() : sortedElements.size()) +
-               ", elementSize=" + elementSize +
+               "elementsCount=" + elements.size() +
+               ", elementSize=" + elements.first().getSizeInBytes() +
                '}';
     }
 }

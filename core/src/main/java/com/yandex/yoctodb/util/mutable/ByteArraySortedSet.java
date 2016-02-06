@@ -10,40 +10,26 @@
 
 package com.yandex.yoctodb.util.mutable;
 
+import com.yandex.yoctodb.util.OutputStreamWritable;
+import com.yandex.yoctodb.util.UnsignedByteArray;
 import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.NotNull;
-import com.yandex.yoctodb.util.UnsignedByteArray;
-import com.yandex.yoctodb.util.OutputStreamWritable;
 
 import java.util.NoSuchElementException;
 
 /**
- * {@link com.yandex.yoctodb.util.UnsignedByteArray} mutable sorted set with basic operations.
- *
- * The contract is to {@code add} some elements and then call
- * {@code indexOf} to extract their indexes.
+ * {@link com.yandex.yoctodb.util.UnsignedByteArray} mutable sorted set with
+ * basic operations
  *
  * @author incubos
  */
 @NotThreadSafe
 public interface ByteArraySortedSet extends OutputStreamWritable {
     /**
-     * Adds element to this set
-     *
-     * @param e element to add
-     *
-     * @return element added or existing element
-     */
-    @NotNull
-    UnsignedByteArray add(
-            @NotNull
-            UnsignedByteArray e);
-
-    /**
      * Returns index of the element
      *
      * @param e element
-     * @return  index of the element or {@link NoSuchElementException}
+     * @return index of the element or {@link NoSuchElementException}
      */
     int indexOf(
             @NotNull

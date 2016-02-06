@@ -10,13 +10,11 @@
 
 package com.yandex.yoctodb.v1.mutable.segment;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
+import com.google.common.collect.TreeMultimap;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.yandex.yoctodb.util.OutputStreamWritable;
 import com.yandex.yoctodb.util.UnsignedByteArray;
-import com.yandex.yoctodb.util.mutable.ByteArraySortedSet;
 import com.yandex.yoctodb.util.mutable.IndexToIndexMultiMap;
 import com.yandex.yoctodb.util.mutable.impl.FixedLengthByteArraySortedSet;
 import com.yandex.yoctodb.util.mutable.impl.IndexToIndexMultiMapFactory;
@@ -41,10 +39,8 @@ public final class V1FilterableIndex
         implements IndexSegment {
     @NotNull
     private final byte[] fieldName;
-    @NotNull
-    private final ByteArraySortedSet values;
-    @NotNull
-    private final Multimap<UnsignedByteArray, Integer> valueToDocuments;
+    private TreeMultimap<UnsignedByteArray, Integer> valueToDocuments =
+            TreeMultimap.create();
     private final boolean fixedLength;
     private int databaseDocumentsCount = -1;
 
@@ -54,12 +50,6 @@ public final class V1FilterableIndex
             final boolean fixedLength) {
         this.fieldName = fieldName.getBytes();
         this.fixedLength = fixedLength;
-        if (fixedLength) {
-            this.values = new FixedLengthByteArraySortedSet();
-        } else {
-            this.values = new VariableLengthByteArraySortedSet();
-        }
-        this.valueToDocuments = HashMultimap.create();
     }
 
     @NotNull
@@ -76,7 +66,7 @@ public final class V1FilterableIndex
         checkNotFrozen();
 
         for (UnsignedByteArray value : values) {
-            valueToDocuments.put(this.values.add(value), documentId);
+            valueToDocuments.put(value, documentId);
         }
 
         return this;
@@ -102,14 +92,28 @@ public final class V1FilterableIndex
                         valueToDocuments.keySet().size(),
                         databaseDocumentsCount);
 
+        int key = 0;
         for (Map.Entry<UnsignedByteArray, Collection<Integer>> entry :
                 valueToDocuments.asMap().entrySet()) {
-            final int key = values.indexOf(entry.getKey());
-
             for (Integer d : entry.getValue()) {
                 valueToDocumentsIndex.put(key, d);
             }
+            key++;
         }
+
+        final OutputStreamWritable values;
+        if (fixedLength) {
+            values =
+                    new FixedLengthByteArraySortedSet(
+                            valueToDocuments.keySet());
+        } else {
+            values =
+                    new VariableLengthByteArraySortedSet(
+                            valueToDocuments.keySet());
+        }
+
+        // Free memory
+        valueToDocuments = null;
 
         return new OutputStreamWritable() {
             @Override

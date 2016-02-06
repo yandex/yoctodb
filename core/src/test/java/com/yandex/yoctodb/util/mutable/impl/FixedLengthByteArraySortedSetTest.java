@@ -10,10 +10,14 @@
 
 package com.yandex.yoctodb.util.mutable.impl;
 
+import com.yandex.yoctodb.util.UnsignedByteArray;
 import com.yandex.yoctodb.util.mutable.ByteArraySortedSet;
 import org.junit.Test;
 
-import java.util.NoSuchElementException;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import static com.yandex.yoctodb.util.UnsignedByteArrays.from;
 import static org.junit.Assert.assertEquals;
@@ -25,65 +29,64 @@ import static org.junit.Assert.assertTrue;
  * @author incubos
  */
 public class FixedLengthByteArraySortedSetTest {
-    @Test
-    public void freeze() {
-        new FixedLengthByteArraySortedSet().build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void notFreezeTwice() {
-        final AbstractByteArraySortedSet set =
-                new FixedLengthByteArraySortedSet();
-        set.build();
-        set.build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void frozenIsImmutable() {
-        final ByteArraySortedSet set = new FixedLengthByteArraySortedSet();
-        set.add(from(1));
-        set.getSizeInBytes();
-        set.add(from(2));
+    @Test(expected = IllegalArgumentException.class)
+    public void empty() {
+        new FixedLengthByteArraySortedSet(new TreeSet<UnsignedByteArray>());
     }
 
     @Test
     public void indexing() {
-        final ByteArraySortedSet set = new FixedLengthByteArraySortedSet();
-        final int elements = 3;
-        for (int i = 0; i < elements; i++)
-            set.add(from(i));
-        for (int i = 0; i < elements; i++)
+        final SortedSet<UnsignedByteArray> elements =
+                new TreeSet<UnsignedByteArray>();
+        final int size = 3;
+        for (int i = 0; i < size; i++)
+            elements.add(from(i));
+        final ByteArraySortedSet set =
+                new FixedLengthByteArraySortedSet(
+                        elements);
+        for (int i = 0; i < size; i++)
             assertEquals(i, set.indexOf(from(i)));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void expectFixed() {
-        final ByteArraySortedSet set = new FixedLengthByteArraySortedSet();
-        set.add(from(1));
-        set.add(from(1L));
+    @Test(expected = AssertionError.class)
+    public void expectFixed() throws IOException {
+        final SortedSet<UnsignedByteArray> elements =
+                new TreeSet<UnsignedByteArray>();
+        elements.add(from(1));
+        elements.add(from(1L));
+        new FixedLengthByteArraySortedSet(elements)
+                .writeTo(new ByteArrayOutputStream());
     }
 
-    @Test(expected = NoSuchElementException.class)
+    @Test(expected = AssertionError.class)
     public void notFound() {
-        final ByteArraySortedSet set = new FixedLengthByteArraySortedSet();
-        final int elements = 3;
-        for (int i = 0; i < elements; i++)
-            set.add(from(i));
-        set.indexOf(from(elements + 1));
+        final SortedSet<UnsignedByteArray> elements =
+                new TreeSet<UnsignedByteArray>();
+        final int size = 3;
+        for (int i = 0; i < size; i++)
+            elements.add(from(i));
+        final ByteArraySortedSet set =
+                new FixedLengthByteArraySortedSet(
+                        elements);
+        set.indexOf(from(size + 1));
     }
 
     @Test
     public void string() {
-        final ByteArraySortedSet set = new FixedLengthByteArraySortedSet();
-        final int elements = 10;
-        for (int i = 0; i < elements; i++)
-            set.add(from(i));
+        final SortedSet<UnsignedByteArray> elements =
+                new TreeSet<UnsignedByteArray>();
+        final int size = 10;
+        for (int i = 0; i < size; i++)
+            elements.add(from(i));
+        final ByteArraySortedSet set =
+                new FixedLengthByteArraySortedSet(
+                        elements);
         final String unfrozen = set.toString();
-        assertTrue(unfrozen.contains(Integer.toString(elements)));
+        assertTrue(unfrozen.contains(Integer.toString(size)));
         assertTrue(unfrozen.contains(Integer.toString(Integer.BYTES)));
         set.getSizeInBytes();
         final String frozen = set.toString();
-        assertTrue(frozen.contains(Integer.toString(elements)));
+        assertTrue(frozen.contains(Integer.toString(size)));
         assertTrue(frozen.contains(Integer.toString(Integer.BYTES)));
     }
 }

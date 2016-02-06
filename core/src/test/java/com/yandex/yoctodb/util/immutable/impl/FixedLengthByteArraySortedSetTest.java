@@ -10,12 +10,15 @@
 
 package com.yandex.yoctodb.util.immutable.impl;
 
+import com.yandex.yoctodb.util.UnsignedByteArray;
 import com.yandex.yoctodb.util.buf.Buffer;
 import com.yandex.yoctodb.util.immutable.ByteArraySortedSet;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import static com.yandex.yoctodb.util.UnsignedByteArrays.from;
 import static org.junit.Assert.assertEquals;
@@ -30,11 +33,14 @@ public class FixedLengthByteArraySortedSetTest {
     private final int VALUES = 128;
 
     private ByteArraySortedSet build() throws IOException {
-        final com.yandex.yoctodb.util.mutable.ByteArraySortedSet mutable =
-                new com.yandex.yoctodb.util.mutable.impl.FixedLengthByteArraySortedSet();
+        final SortedSet<UnsignedByteArray> elements =
+                new TreeSet<UnsignedByteArray>();
         for (long i = 0L; i < VALUES; i++) {
-            mutable.add(from(i / 2));
+            elements.add(from(i / 2));
         }
+        final com.yandex.yoctodb.util.mutable.ByteArraySortedSet mutable =
+                new com.yandex.yoctodb.util.mutable.impl.FixedLengthByteArraySortedSet(
+                        elements);
 
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         mutable.writeTo(baos);
