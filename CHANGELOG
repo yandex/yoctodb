@@ -1,3 +1,8 @@
+0.0.13
+  * #11: More compact mutable `V1FilterableIndex` representation
+  * #12: More compact mutable `IntIndexToIndexMultiMap` representation
+  * #13: Nullify references to segments converted to `Writable` in `V1DatabaseBuilder`
+
 0.0.12
   * #20: Support for retrieval of SORTABLE/FULL field values
   * UnsignedByteArray to primitive transformation
