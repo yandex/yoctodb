@@ -10,6 +10,7 @@
 
 package com.yandex.yoctodb.util.immutable.impl;
 
+import com.google.common.collect.TreeMultimap;
 import com.yandex.yoctodb.util.buf.Buffer;
 import com.yandex.yoctodb.util.immutable.IndexToIndexMultiMap;
 import com.yandex.yoctodb.util.immutable.IntToIntArray;
@@ -34,11 +35,13 @@ public class IntIndexToIndexMultiMapTest {
     private final int VALUES = 128;
 
     private IndexToIndexMultiMap build() throws IOException {
-        final com.yandex.yoctodb.util.mutable.IndexToIndexMultiMap mutable =
-                new com.yandex.yoctodb.util.mutable.impl.IntIndexToIndexMultiMap();
+        final TreeMultimap<Integer, Integer> elements = TreeMultimap.create();
         for (int i = 0; i < VALUES; i++) {
-            mutable.put(i / 2, i);
+            elements.put(i / 2, i);
         }
+        final com.yandex.yoctodb.util.mutable.IndexToIndexMultiMap mutable =
+                new com.yandex.yoctodb.util.mutable.impl.IntIndexToIndexMultiMap(
+                        elements.asMap().values());
 
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         mutable.writeTo(baos);

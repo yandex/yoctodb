@@ -20,11 +20,4 @@ import com.yandex.yoctodb.util.OutputStreamWritable;
  */
 @NotThreadSafe
 public interface IndexToIndexMultiMap extends OutputStreamWritable {
-    /**
-     * Add unsigned key with unsigned value
-     *
-     * @param key   unsigned key
-     * @param value unsigned value
-     */
-    void put(int key, int value);
 }

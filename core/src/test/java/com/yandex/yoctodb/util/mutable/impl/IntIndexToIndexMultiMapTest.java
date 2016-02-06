@@ -10,12 +10,14 @@
 
 package com.yandex.yoctodb.util.mutable.impl;
 
+import com.google.common.collect.TreeMultimap;
 import com.yandex.yoctodb.util.mutable.IndexToIndexMultiMap;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -24,37 +26,23 @@ import static org.junit.Assert.assertTrue;
  * @author incubos
  */
 public class IntIndexToIndexMultiMapTest {
-    @Test(expected = IllegalArgumentException.class)
-    public void negativeKey() {
-        final IndexToIndexMultiMap set = new IntIndexToIndexMultiMap();
-        set.put(-1, 0);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void negativeValue() {
-        final IndexToIndexMultiMap set = new IntIndexToIndexMultiMap();
-        set.put(0, -1);
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noncontinuous() throws IOException {
-        final IndexToIndexMultiMap set = new IntIndexToIndexMultiMap();
-        set.put(0, 0);
-        set.put(2, 1);
-        set.writeTo(new ByteArrayOutputStream());
+    @Test(expected = AssertionError.class)
+    public void negativeValue() throws IOException {
+        new IntIndexToIndexMultiMap(
+                singletonList(singletonList(-1)))
+                .writeTo(new ByteArrayOutputStream());
     }
 
     @Test
     public void string() {
+        final TreeMultimap<Integer, Integer> elements = TreeMultimap.create();
         final int documents = 10;
-        final IndexToIndexMultiMap set = new IntIndexToIndexMultiMap();
         for (int i = 0; i < documents; i++)
-            set.put(i / 2, i);
+            elements.put(i / 2, i);
+        final IndexToIndexMultiMap set =
+                new IntIndexToIndexMultiMap(
+                        elements.asMap().values());
         final String text = set.toString();
         assertTrue(text.contains(Integer.toString(documents / 2)));
-        assertTrue(text.contains(Integer.toString(documents)));
-        set.getSizeInBytes();
-        assertTrue(text.contains(Integer.toString(documents / 2)));
-        assertTrue(text.contains(Integer.toString(documents)));
     }
 }

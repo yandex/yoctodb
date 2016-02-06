@@ -32,8 +32,6 @@ public final class LongArrayBitSet implements ArrayBitSet {
     private final int size;
 
     private LongArrayBitSet(final int size) {
-        assert size > 0;
-
         this.size = size;
         this.words = new long[arraySize(size)];
     }

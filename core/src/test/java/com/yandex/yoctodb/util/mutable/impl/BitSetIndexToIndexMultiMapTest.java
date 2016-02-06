@@ -10,12 +10,16 @@
 
 package com.yandex.yoctodb.util.mutable.impl;
 
+import com.google.common.collect.TreeMultimap;
 import com.yandex.yoctodb.util.mutable.IndexToIndexMultiMap;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
 
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -26,50 +30,37 @@ import static org.junit.Assert.assertTrue;
 public class BitSetIndexToIndexMultiMapTest {
     @Test(expected = IllegalArgumentException.class)
     public void negativeDocuments() {
-        new BitSetIndexToIndexMultiMap(-1);
+        new BitSetIndexToIndexMultiMap(
+                Collections.<Collection<Integer>>emptyList(),
+                -1);
+    }
+
+    @Test(expected = AssertionError.class)
+    public void wrongDocument() throws IOException {
+        new BitSetIndexToIndexMultiMap(
+                singletonList(singletonList(1)),
+                1)
+                .writeTo(new ByteArrayOutputStream());
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void wrongDocument() {
-        final IndexToIndexMultiMap set = new BitSetIndexToIndexMultiMap(1);
-        set.put(1, 1);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void negativeKey() {
-        final IndexToIndexMultiMap set = new BitSetIndexToIndexMultiMap(1);
-        set.put(-1, 0);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void negativeValue() {
-        final IndexToIndexMultiMap set = new BitSetIndexToIndexMultiMap(1);
-        set.put(0, -1);
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void unfreezing() throws IOException {
-        final IndexToIndexMultiMap set = new BitSetIndexToIndexMultiMap(2);
-        set.put(0, 0);
-        set.writeTo(new ByteArrayOutputStream());
-        set.put(0, 1);
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noncontinuous() throws IOException {
-        final IndexToIndexMultiMap set = new BitSetIndexToIndexMultiMap(2);
-        set.put(0, 0);
-        set.put(2, 1);
-        set.writeTo(new ByteArrayOutputStream());
+    public void negativeValue() throws IOException {
+        new BitSetIndexToIndexMultiMap(
+                singletonList(singletonList(1)),
+                -1)
+                .writeTo(new ByteArrayOutputStream());
     }
 
     @Test
     public void string() {
+        final TreeMultimap<Integer, Integer> elements = TreeMultimap.create();
         final int documents = 10;
-        final IndexToIndexMultiMap set =
-                new BitSetIndexToIndexMultiMap(documents);
         for (int i = 0; i < documents; i++)
-            set.put(i / 2, i);
+            elements.put(i / 2, i);
+        final IndexToIndexMultiMap set =
+                new BitSetIndexToIndexMultiMap(
+                        elements.asMap().values(),
+                        documents);
         final String text = set.toString();
         assertTrue(text.contains(Integer.toString(documents / 2)));
         assertTrue(text.contains(Integer.toString(documents)));

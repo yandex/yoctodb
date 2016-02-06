@@ -10,6 +10,7 @@
 
 package com.yandex.yoctodb.util.immutable.impl;
 
+import com.google.common.collect.TreeMultimap;
 import com.google.common.primitives.Ints;
 import com.yandex.yoctodb.util.buf.Buffer;
 import com.yandex.yoctodb.util.immutable.IndexToIndexMultiMap;
@@ -30,11 +31,13 @@ public class IndexToIndexMultiMapReaderTest {
 
     @Test
     public void buildInt() throws IOException {
-        final com.yandex.yoctodb.util.mutable.IndexToIndexMultiMap mutable =
-                new com.yandex.yoctodb.util.mutable.impl.IntIndexToIndexMultiMap();
+        final TreeMultimap<Integer, Integer> elements = TreeMultimap.create();
         for (int i = 0; i < DOCS; i++) {
-            mutable.put(i / 2, i);
+            elements.put(i / 2, i);
         }
+        final com.yandex.yoctodb.util.mutable.IndexToIndexMultiMap mutable =
+                new com.yandex.yoctodb.util.mutable.impl.IntIndexToIndexMultiMap(
+                        elements.asMap().values());
 
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         mutable.writeTo(baos);
@@ -49,11 +52,14 @@ public class IndexToIndexMultiMapReaderTest {
 
     @Test
     public void buildBitSet() throws IOException {
-        final com.yandex.yoctodb.util.mutable.IndexToIndexMultiMap mutable =
-                new com.yandex.yoctodb.util.mutable.impl.BitSetIndexToIndexMultiMap(DOCS);
+        final TreeMultimap<Integer, Integer> elements = TreeMultimap.create();
         for (int i = 0; i < DOCS; i++) {
-            mutable.put(i / 2, i);
+            elements.put(i / 2, i);
         }
+        final com.yandex.yoctodb.util.mutable.IndexToIndexMultiMap mutable =
+                new com.yandex.yoctodb.util.mutable.impl.BitSetIndexToIndexMultiMap(
+                        elements.asMap().values(),
+                        DOCS);
 
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         mutable.writeTo(baos);

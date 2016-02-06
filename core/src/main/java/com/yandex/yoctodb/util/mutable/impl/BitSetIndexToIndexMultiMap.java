@@ -10,8 +10,6 @@
 
 package com.yandex.yoctodb.util.mutable.impl;
 
-import com.google.common.collect.Multimap;
-import com.google.common.collect.TreeMultimap;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.yandex.yoctodb.util.mutable.ArrayBitSet;
@@ -23,48 +21,32 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collection;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 /**
+ * {@link IndexToIndexMultiMap} implementation based on {@link LongArrayBitSet}s
+ *
  * @author svyatoslav
+ * @author incubos
  */
 @NotThreadSafe
 public final class BitSetIndexToIndexMultiMap implements IndexToIndexMultiMap {
     private final int documentsCount;
-    private Multimap<Integer, Integer> rawMap = TreeMultimap.create();
+    @NotNull
+    private final Collection<? extends Collection<Integer>> map;
 
-    private SortedMap<Integer, ArrayBitSet> map = null;
-
-    public BitSetIndexToIndexMultiMap(final int documentsCount) {
+    public BitSetIndexToIndexMultiMap(
+            @NotNull
+            final Collection<? extends Collection<Integer>> map,
+            final int documentsCount) {
         if (documentsCount < 0)
             throw new IllegalArgumentException("Negative document count");
 
+        this.map = map;
         this.documentsCount = documentsCount;
     }
 
     @Override
-    public void put(final int key, final int value) {
-        if (map != null)
-            throw new IllegalStateException("The collection is frozen");
-
-        if (key < 0)
-            throw new IllegalArgumentException("Negative key");
-        if (value < 0)
-            throw new IllegalArgumentException("Negative value");
-        if (value >= documentsCount)
-            throw new IllegalArgumentException("Value out of bounds");
-
-        rawMap.put(key, value);
-    }
-
-    @Override
     public long getSizeInBytes() {
-        if (map == null) {
-            build();
-        }
-
         return 4L + // Type
                4L + // Keys count
                4L + // Bit set size in longs
@@ -75,10 +57,6 @@ public final class BitSetIndexToIndexMultiMap implements IndexToIndexMultiMap {
     public void writeTo(
             @NotNull
             final OutputStream os) throws IOException {
-        if (map == null) {
-            build();
-        }
-
         // Type
         os.write(Ints.toByteArray(V1DatabaseFormat.MultiMapType.LONG_ARRAY_BIT_SET_BASED.getCode()));
 
@@ -89,41 +67,23 @@ public final class BitSetIndexToIndexMultiMap implements IndexToIndexMultiMap {
         os.write(Ints.toByteArray(LongArrayBitSet.arraySize(documentsCount)));
 
         // Sets
-        for (ArrayBitSet value : map.values()) {
-            for (long currentWord : value.toArray()) {
+        final ArrayBitSet docs = LongArrayBitSet.zero(documentsCount);
+        for (Collection<Integer> ids : map) {
+            docs.clear();
+            for (int docId : ids) {
+                assert 0 <= docId && docId < documentsCount;
+                docs.set(docId);
+            }
+            for (long currentWord : docs.toArray()) {
                 os.write(Longs.toByteArray(currentWord));
             }
         }
     }
 
-    private void build() {
-        map = new TreeMap<Integer, ArrayBitSet>();
-        int index = 0;
-        for (Map.Entry<Integer, Collection<Integer>> entry :
-                rawMap.asMap().entrySet()) {
-            if (entry.getKey() != index) {
-                throw new IllegalStateException("Indexes are not continuous");
-            }
-
-            final ArrayBitSet docs = LongArrayBitSet.zero(documentsCount);
-            for (int docId : entry.getValue()) {
-                docs.set(docId);
-            }
-
-            map.put(index, docs);
-
-            index++;
-        }
-
-        // Releasing resources
-        rawMap = null;
-    }
-
     @Override
     public String toString() {
         return "BitSetIndexToIndexMultiMap{" +
-               "values=" +
-               (map == null ? rawMap.keySet().size() : map.keySet().size()) +
+               "values=" + map.size() +
                ", documentsCount=" + documentsCount +
                '}';
     }

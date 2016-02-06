@@ -10,6 +10,7 @@
 
 package com.yandex.yoctodb.util.immutable.impl;
 
+import com.google.common.collect.TreeMultimap;
 import com.yandex.yoctodb.util.buf.Buffer;
 import com.yandex.yoctodb.util.immutable.IndexToIndexMultiMap;
 import com.yandex.yoctodb.util.mutable.BitSet;
@@ -19,6 +20,8 @@ import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -32,11 +35,14 @@ public class BitSetIndexToIndexMultiMapTest {
     private final int DOCS = 128;
 
     private IndexToIndexMultiMap build() throws IOException {
-        final com.yandex.yoctodb.util.mutable.IndexToIndexMultiMap mutable =
-                new com.yandex.yoctodb.util.mutable.impl.BitSetIndexToIndexMultiMap(DOCS);
+        final TreeMultimap<Integer, Integer> elements = TreeMultimap.create();
         for (int i = 0; i < DOCS; i++) {
-            mutable.put(i / 2, i);
+            elements.put(i / 2, i);
         }
+        final com.yandex.yoctodb.util.mutable.IndexToIndexMultiMap mutable =
+                new com.yandex.yoctodb.util.mutable.impl.BitSetIndexToIndexMultiMap(
+                        elements.asMap().values(),
+                        DOCS);
 
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         mutable.writeTo(baos);
@@ -58,7 +64,9 @@ public class BitSetIndexToIndexMultiMapTest {
     @Test
     public void buildEmpty() throws IOException {
         final com.yandex.yoctodb.util.mutable.IndexToIndexMultiMap mutable =
-                new com.yandex.yoctodb.util.mutable.impl.BitSetIndexToIndexMultiMap(0);
+                new com.yandex.yoctodb.util.mutable.impl.BitSetIndexToIndexMultiMap(
+                        Collections.<Collection<Integer>>emptyList(),
+                        0);
 
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         mutable.writeTo(baos);
