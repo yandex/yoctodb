@@ -10,8 +10,7 @@
 
 package com.yandex.yoctodb.v1.mutable.segment;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
+import com.google.common.collect.TreeMultimap;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.yandex.yoctodb.util.OutputStreamWritable;
@@ -44,12 +43,11 @@ public abstract class AbstractV1FullIndex
         implements IndexSegment {
     @NotNull
     private final byte[] fieldName;
-    @NotNull
-    private final ByteArraySortedSet values;
-    @NotNull
-    private final Multimap<UnsignedByteArray, Integer> valueToDocuments;
-    @NotNull
-    private final Map<Integer, UnsignedByteArray> documentToValue;
+    private final boolean fixedLength;
+    private TreeMultimap<UnsignedByteArray, Integer> valueToDocuments =
+            TreeMultimap.create();
+    private Map<Integer, UnsignedByteArray> documentToValue =
+            new HashMap<Integer, UnsignedByteArray>();
     private int currentDocumentId = 0;
     private final V1DatabaseFormat.SegmentType segmentType;
 
@@ -60,14 +58,8 @@ public abstract class AbstractV1FullIndex
             @NotNull
             final V1DatabaseFormat.SegmentType segmentType) {
         this.fieldName = fieldName.getBytes();
-        if (fixedLength) {
-            this.values = new FixedLengthByteArraySortedSet();
-        } else {
-            this.values = new VariableLengthByteArraySortedSet();
-        }
+        this.fixedLength = fixedLength;
         this.segmentType = segmentType;
-        this.documentToValue = new HashMap<Integer, UnsignedByteArray>();
-        this.valueToDocuments = HashMultimap.create();
     }
 
     @NotNull
@@ -86,7 +78,7 @@ public abstract class AbstractV1FullIndex
         checkNotFrozen();
 
         final UnsignedByteArray value = values.iterator().next();
-        valueToDocuments.put(this.values.add(value), documentId);
+        valueToDocuments.put(value, documentId);
         documentToValue.put(documentId, value);
         currentDocumentId++;
 
@@ -110,13 +102,24 @@ public abstract class AbstractV1FullIndex
         final IndexToIndexMultiMap valueToDocumentsIndex =
                 new IntIndexToIndexMultiMap();
 
+        int key = 0;
         for (Map.Entry<UnsignedByteArray, Collection<Integer>> entry :
                 valueToDocuments.asMap().entrySet()) {
-            final int key = values.indexOf(entry.getKey());
-
             for (Integer d : entry.getValue()) {
                 valueToDocumentsIndex.put(key, d);
             }
+            key++;
+        }
+
+        final ByteArraySortedSet values;
+        if (fixedLength) {
+            values =
+                    new FixedLengthByteArraySortedSet(
+                            valueToDocuments.keySet());
+        } else {
+            values =
+                    new VariableLengthByteArraySortedSet(
+                            valueToDocuments.keySet());
         }
 
         final IndexToIndexMap documentToValueIndex = new IntIndexToIndexMap();
@@ -126,6 +129,10 @@ public abstract class AbstractV1FullIndex
                     entry.getKey(),
                     values.indexOf(entry.getValue()));
         }
+
+        // Free memory
+        valueToDocuments = null;
+        documentToValue = null;
 
         return new OutputStreamWritable() {
             @Override

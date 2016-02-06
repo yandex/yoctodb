@@ -19,10 +19,7 @@ import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static com.yandex.yoctodb.util.UnsignedByteArrays.from;
 import static org.junit.Assert.assertEquals;
@@ -62,12 +59,14 @@ public class ByteArraySortedSetTest {
     }
 
     private Buffer prepareDataFromFixedLengthByteArraySortedSet(
-            final Collection<UnsignedByteArray> elements) throws IOException {
-        final com.yandex.yoctodb.util.mutable.impl.FixedLengthByteArraySortedSet fixedLengthByteArrayIndexedList =
-                new com.yandex.yoctodb.util.mutable.impl.FixedLengthByteArraySortedSet();
-        for (UnsignedByteArray element : elements) {
-            fixedLengthByteArrayIndexedList.add(element);
+            final Collection<UnsignedByteArray> items) throws IOException {
+        final SortedSet<UnsignedByteArray> elements =
+                new TreeSet<UnsignedByteArray>();
+        for (UnsignedByteArray element : items) {
+            elements.add(element);
         }
+        final com.yandex.yoctodb.util.mutable.impl.FixedLengthByteArraySortedSet fixedLengthByteArrayIndexedList =
+                new com.yandex.yoctodb.util.mutable.impl.FixedLengthByteArraySortedSet(elements);
 
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
         fixedLengthByteArrayIndexedList.writeTo(os);
@@ -107,12 +106,14 @@ public class ByteArraySortedSetTest {
     }
 
     private Buffer prepareDataFromVariableLengthByteArraySortedSet(
-            final Collection<UnsignedByteArray> elements) throws IOException {
-        final com.yandex.yoctodb.util.mutable.impl.VariableLengthByteArraySortedSet fixedLengthByteArrayIndexedList =
-                new com.yandex.yoctodb.util.mutable.impl.VariableLengthByteArraySortedSet();
-        for (UnsignedByteArray element : elements) {
-            fixedLengthByteArrayIndexedList.add(element);
+            final Collection<UnsignedByteArray> items) throws IOException {
+        final SortedSet<UnsignedByteArray> elements =
+                new TreeSet<UnsignedByteArray>();
+        for (UnsignedByteArray element : items) {
+            elements.add(element);
         }
+        final com.yandex.yoctodb.util.mutable.impl.VariableLengthByteArraySortedSet fixedLengthByteArrayIndexedList =
+                new com.yandex.yoctodb.util.mutable.impl.VariableLengthByteArraySortedSet(elements);
 
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
         fixedLengthByteArrayIndexedList.writeTo(os);

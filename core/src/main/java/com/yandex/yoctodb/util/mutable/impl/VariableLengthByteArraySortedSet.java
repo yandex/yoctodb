@@ -20,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.SortedSet;
 
 /**
  * {@link ByteArraySortedSet} with variable sized elements
@@ -29,51 +30,52 @@ import java.io.OutputStream;
 @NotThreadSafe
 public final class VariableLengthByteArraySortedSet
         extends AbstractByteArraySortedSet {
+    private final long sizeInBytes;
+
+    public VariableLengthByteArraySortedSet(
+            @NotNull
+            final SortedSet<UnsignedByteArray> elements) {
+        super(elements);
+
+        long elementSize = 0;
+        for (OutputStreamWritable e : elements)
+            elementSize += e.getSizeInBytes();
+
+        this.sizeInBytes =
+                4L + // Element count
+                8L * (elements.size() + 1) + // Element offsets
+                elementSize; // Element array size
+    }
 
     @Override
     public long getSizeInBytes() {
-        if (sortedElements == null) {
-            build();
-        }
-
-        long elementSize = 0;
-        for (OutputStreamWritable e : sortedElements.keySet())
-            elementSize += e.getSizeInBytes();
-
-        return 4L + // Element count
-               8L * (sortedElements.size() + 1) + // Element offsets
-               elementSize; // Element array size
+        return sizeInBytes;
     }
 
     @Override
     public void writeTo(
             @NotNull
             final OutputStream os) throws IOException {
-        if (sortedElements == null) {
-            build();
-        }
-
         // Element count
-        os.write(Ints.toByteArray(sortedElements.size()));
+        os.write(Ints.toByteArray(elements.size()));
 
         // Element offsets
         long elementOffset = 0;
-        for (OutputStreamWritable e : sortedElements.keySet()) {
+        for (OutputStreamWritable e : elements) {
             os.write(Longs.toByteArray(elementOffset));
             elementOffset += e.getSizeInBytes();
         }
         os.write(Longs.toByteArray(elementOffset));
 
         // Elements
-        for (UnsignedByteArray e : sortedElements.keySet())
+        for (OutputStreamWritable e : elements)
             e.writeTo(os);
     }
 
     @Override
     public String toString() {
         return "VariableLengthByteArraySortedSet{" +
-               "elementsCount=" +
-               (sortedElements == null ? elements.size() : sortedElements.size()) +
+               "elementsCount=" + elements.size() +
                '}';
     }
 }
