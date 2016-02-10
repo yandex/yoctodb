@@ -85,9 +85,5 @@ public final class V1DocumentBuilder extends AbstractDocumentBuilder {
         if (payload == null) {
             throw new IllegalStateException("The payload is not set");
         }
-
-        if (fields.isEmpty()) {
-            throw new IllegalStateException("No fields in the document");
-        }
     }
 }

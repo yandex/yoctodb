@@ -39,26 +39,6 @@ import static org.junit.Assert.assertTrue;
 public class SimpleDatabaseTest {
     private final int DOCS = 128;
 
-    private static class StringProcessor implements DocumentProcessor {
-        private final List<String> results;
-
-        public StringProcessor(final List<String> results) {
-            this.results = results;
-        }
-
-        @Override
-        public boolean process(
-                final int document,
-                @NotNull
-                final Database database) {
-            final Buffer payload = database.getDocument(document);
-            final byte[] buf = new byte[(int) payload.remaining()];
-            payload.get(buf);
-            results.add(new String(buf));
-            return true;
-        }
-    }
-
     @Test
     public void buildDatabase() throws IOException {
         final DatabaseBuilder dbBuilder =
