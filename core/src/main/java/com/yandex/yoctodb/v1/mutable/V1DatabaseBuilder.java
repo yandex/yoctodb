@@ -17,6 +17,7 @@ import com.yandex.yoctodb.mutable.DocumentBuilder;
 import com.yandex.yoctodb.util.MessageDigestOutputStreamWrapper;
 import com.yandex.yoctodb.util.OutputStreamWritable;
 import com.yandex.yoctodb.util.UnsignedByteArray;
+import com.yandex.yoctodb.util.UnsignedByteArrays;
 import com.yandex.yoctodb.v1.V1DatabaseFormat;
 import com.yandex.yoctodb.v1.mutable.segment.*;
 import net.jcip.annotations.NotThreadSafe;
@@ -39,7 +40,8 @@ public final class V1DatabaseBuilder
         implements DatabaseBuilder {
     private int currentDocumentId = 0;
 
-    private V1PayloadSegment payloads = new V1PayloadSegment();
+    private final SortedMap<Integer, UnsignedByteArray> payloads =
+            new TreeMap<Integer, UnsignedByteArray>();
 
     private final Map<String, IndexSegment> indexes =
             new HashMap<String, IndexSegment>();
@@ -55,9 +57,6 @@ public final class V1DatabaseBuilder
                 "Wrong document builder implementation supplied";
 
         final V1DocumentBuilder builder = (V1DocumentBuilder) document;
-
-        // Checking all the necessary fields
-        builder.check();
 
         // Marking document as built
         builder.freeze();
@@ -113,7 +112,13 @@ public final class V1DatabaseBuilder
         }
 
         // Adding payload and moving on
-        payloads.addDocument(currentDocumentId, builder.payload);
+        if (builder.payload != null) {
+            payloads.put(
+                    currentDocumentId,
+                    UnsignedByteArrays.from(
+                            builder.payload));
+        }
+
         currentDocumentId++;
 
         return this;
@@ -127,6 +132,7 @@ public final class V1DatabaseBuilder
         freeze();
 
         // Build writables
+
         final List<OutputStreamWritable> writables =
                 new ArrayList<OutputStreamWritable>(indexes.size() + 1);
         final Iterator<IndexSegment> indexSegmentIterator =
@@ -137,8 +143,19 @@ public final class V1DatabaseBuilder
             writables.add(segment.buildWritable());
             indexSegmentIterator.remove();
         }
-        writables.add(payloads.buildWritable());
-        payloads = null;
+
+        if (payloads.isEmpty()) {
+            writables.add(
+                    new V1NonePayloadSegment(currentDocumentId)
+                            .buildWritable());
+        } else if (payloads.size() == currentDocumentId) {
+            writables.add(
+                    new V1FullPayloadSegment(payloads.values())
+                            .buildWritable());
+        } else {
+            throw new UnsupportedOperationException(
+                    "Sparse payloads not supported yet");
+        }
 
         return new OutputStreamWritable() {
             @Override

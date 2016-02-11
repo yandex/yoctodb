@@ -56,10 +56,7 @@ public class ByteArrayIndexedListTest {
     private Buffer prepareDataFromFixedLengthByteArrayIndexedList(
             final Collection<UnsignedByteArray> elements) throws IOException {
         final com.yandex.yoctodb.util.mutable.impl.FixedLengthByteArrayIndexedList fixedLengthByteArrayIndexedList =
-                new com.yandex.yoctodb.util.mutable.impl.FixedLengthByteArrayIndexedList();
-        for (UnsignedByteArray element : elements) {
-            fixedLengthByteArrayIndexedList.add(element);
-        }
+                new com.yandex.yoctodb.util.mutable.impl.FixedLengthByteArrayIndexedList(elements);
 
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
         fixedLengthByteArrayIndexedList.writeTo(os);
@@ -96,10 +93,7 @@ public class ByteArrayIndexedListTest {
     private Buffer prepareDataFromVariableLengthByteArrayIndexedLength(
             final Collection<UnsignedByteArray> elements) throws IOException {
         final com.yandex.yoctodb.util.mutable.impl.VariableLengthByteArrayIndexedList variableLengthByteArrayIndexedList =
-                new com.yandex.yoctodb.util.mutable.impl.VariableLengthByteArrayIndexedList();
-        for (UnsignedByteArray element : elements) {
-            variableLengthByteArrayIndexedList.add(element);
-        }
+                new com.yandex.yoctodb.util.mutable.impl.VariableLengthByteArrayIndexedList(elements);
 
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
         variableLengthByteArrayIndexedList.writeTo(os);

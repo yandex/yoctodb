@@ -10,18 +10,23 @@
 
 package com.yandex.yoctodb.v1.immutable.segment;
 
+import com.yandex.yoctodb.util.UnsignedByteArray;
+import com.yandex.yoctodb.util.UnsignedByteArrays;
 import com.yandex.yoctodb.util.buf.Buffer;
+import com.yandex.yoctodb.v1.mutable.segment.V1FullPayloadSegment;
 import org.junit.Assert;
 import org.junit.Test;
 import com.yandex.yoctodb.immutable.Payload;
 import com.yandex.yoctodb.util.OutputStreamWritable;
 
 import java.io.*;
+import java.util.Collection;
+import java.util.LinkedList;
 
 /**
  * @author svyatoslav
  */
-public class V1PayloadSegmentBinaryTest {
+public class V1FullPayloadSegmentBinaryTest {
 
     @Test
     public void readingWithSegmentRegistryTest() throws IOException {
@@ -48,17 +53,19 @@ public class V1PayloadSegmentBinaryTest {
 
     @Test
     public void hugePayload() throws IOException {
-        final com.yandex.yoctodb.v1.mutable.segment.V1PayloadSegment v1PayloadSegment =
-                new com.yandex.yoctodb.v1.mutable.segment.V1PayloadSegment();
-
         final byte[] payload = new byte[1024 * 1024];
         for (int i = 0; i < payload.length; i++)
             payload[i] = (byte) i;
 
+        final Collection<UnsignedByteArray> elements =
+                new LinkedList<UnsignedByteArray>();
         final int docs = 4 * 1024;
         for (int i = 0; i < docs; i++) {
-            v1PayloadSegment.addDocument(i, payload);
+            elements.add(UnsignedByteArrays.from(payload));
         }
+
+        final com.yandex.yoctodb.v1.mutable.segment.V1FullPayloadSegment v1PayloadSegment =
+                new V1FullPayloadSegment(elements);
 
         final OutputStreamWritable outputStreamWritable =
                 v1PayloadSegment.buildWritable();
@@ -92,13 +99,16 @@ public class V1PayloadSegmentBinaryTest {
     }
 
     private Buffer preparePayload() throws IOException {
-        final com.yandex.yoctodb.v1.mutable.segment.V1PayloadSegment v1PayloadSegment =
-                new com.yandex.yoctodb.v1.mutable.segment.V1PayloadSegment();
-
+        final Collection<UnsignedByteArray> elements =
+                new LinkedList<UnsignedByteArray>();
         for (int i = 0; i < 15; i++) {
             final byte[] payload = ("payload" + i).getBytes();
-            v1PayloadSegment.addDocument(i, payload);
+            elements.add(UnsignedByteArrays.from(payload));
         }
+
+        final V1FullPayloadSegment v1PayloadSegment =
+                new V1FullPayloadSegment(elements);
+
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
         final OutputStreamWritable outputStreamWritable = v1PayloadSegment.buildWritable();
         outputStreamWritable.writeTo(os);

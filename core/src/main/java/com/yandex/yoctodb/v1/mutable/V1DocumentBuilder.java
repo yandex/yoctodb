@@ -79,11 +79,4 @@ public final class V1DocumentBuilder extends AbstractDocumentBuilder {
 
         return this;
     }
-
-    @Override
-    public void check() {
-        if (payload == null) {
-            throw new IllegalStateException("The payload is not set");
-        }
-    }
 }

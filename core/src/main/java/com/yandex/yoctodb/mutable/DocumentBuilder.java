@@ -98,9 +98,4 @@ public interface DocumentBuilder {
             String value,
             @NotNull
             IndexOption index);
-
-    /**
-     * Check invariants
-     */
-    void check();
 }

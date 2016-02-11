@@ -10,27 +10,33 @@
 
 package com.yandex.yoctodb.v1.mutable.segment;
 
+import com.yandex.yoctodb.util.OutputStreamWritable;
+import com.yandex.yoctodb.util.UnsignedByteArray;
+import com.yandex.yoctodb.util.UnsignedByteArrays;
 import com.yandex.yoctodb.util.buf.Buffer;
+import com.yandex.yoctodb.v1.V1DatabaseFormat;
 import org.junit.Assert;
 import org.junit.Test;
-import com.yandex.yoctodb.util.OutputStreamWritable;
-import com.yandex.yoctodb.v1.V1DatabaseFormat;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.LinkedList;
 
 /**
  * @author svyatoslav
  */
-public class V1PayloadSegmentBinaryTest {
-
+public class V1FullPayloadSegmentBinaryTest {
     @Test
     public void writingPayloadTest() throws IOException {
-        final V1PayloadSegment v1PayloadSegment = new V1PayloadSegment();
+        final Collection<UnsignedByteArray> payloads =
+                new LinkedList<UnsignedByteArray>();
         for (int i = 0; i < 15; i++) {
             final String payload = "payload" + i;
-            v1PayloadSegment.addDocument(i, payload.getBytes());
+            payloads.add(UnsignedByteArrays.from(payload.getBytes()));
         }
+        final V1FullPayloadSegment v1PayloadSegment =
+                new V1FullPayloadSegment(payloads);
 
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
         final OutputStreamWritable outputStreamWritable = v1PayloadSegment.buildWritable();
@@ -43,7 +49,7 @@ public class V1PayloadSegmentBinaryTest {
         Assert.assertEquals(fullSizeInBytes, outputStreamWritable.getSizeInBytes());
 
         final int payloadCode = byteBuffer.getInt();
-        Assert.assertEquals(V1DatabaseFormat.SegmentType.PAYLOAD.getCode(), payloadCode);
+        Assert.assertEquals(V1DatabaseFormat.SegmentType.PAYLOAD_FULL.getCode(), payloadCode);
 
         final long elementsSizeInBytes = byteBuffer.getLong();
         Assert.assertEquals(257, elementsSizeInBytes);

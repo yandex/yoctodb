@@ -38,7 +38,6 @@ public final class ThreadLocalCachedBitSetPoolPool
     public ThreadLocalCachedBitSetPoolPool(
             final int bitSetSize,
             final int maxBitSets) {
-        assert bitSetSize > 0;
         assert maxBitSets > 0;
 
         this.bitSetSize = bitSetSize;

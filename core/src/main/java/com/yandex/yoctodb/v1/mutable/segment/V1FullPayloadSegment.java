@@ -13,7 +13,7 @@ package com.yandex.yoctodb.v1.mutable.segment;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.yandex.yoctodb.util.OutputStreamWritable;
-import com.yandex.yoctodb.util.UnsignedByteArrays;
+import com.yandex.yoctodb.util.UnsignedByteArray;
 import com.yandex.yoctodb.util.mutable.ByteArrayIndexedList;
 import com.yandex.yoctodb.util.mutable.impl.VariableLengthByteArrayIndexedList;
 import com.yandex.yoctodb.v1.V1DatabaseFormat;
@@ -22,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Collection;
 
 /**
  * Payload segment
@@ -29,31 +30,16 @@ import java.io.OutputStream;
  * @author incubos
  */
 @NotThreadSafe
-public final class V1PayloadSegment
+public final class V1FullPayloadSegment
         extends Freezable
         implements PayloadSegment {
     @NotNull
-    private final ByteArrayIndexedList payloads =
-            new VariableLengthByteArrayIndexedList();
-    private int currentDocumentId = 0;
+    private final ByteArrayIndexedList payloads;
 
-    @NotNull
-    @Override
-    public PayloadSegment addDocument(
-            final int documentId,
+    public V1FullPayloadSegment(
             @NotNull
-            final byte[] payload) {
-        if (documentId != currentDocumentId)
-            throw new IllegalArgumentException(
-                    "Wrong document ID <" + documentId + ">. Expecting <" +
-                    currentDocumentId + ">.");
-
-        checkNotFrozen();
-
-        payloads.add(UnsignedByteArrays.from(payload));
-        currentDocumentId++;
-
-        return this;
+            final Collection<UnsignedByteArray> payloads) {
+        this.payloads = new VariableLengthByteArrayIndexedList(payloads);
     }
 
     @NotNull
@@ -82,10 +68,8 @@ public final class V1PayloadSegment
                 os.write(
                         Ints.toByteArray(
                                 V1DatabaseFormat.SegmentType
-                                        .PAYLOAD
-                                        .getCode()
-                        )
-                );
+                                        .PAYLOAD_FULL
+                                        .getCode()));
 
                 // data
                 os.write(Longs.toByteArray(payloads.getSizeInBytes()));

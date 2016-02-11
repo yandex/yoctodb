@@ -21,6 +21,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import static com.yandex.yoctodb.query.QueryBuilder.*;
 import static com.yandex.yoctodb.util.UnsignedByteArrays.from;
@@ -126,5 +127,101 @@ public class PartialDocumentTest {
         final List<String> docs2 = new LinkedList<String>();
         db.execute(q2, new StringProcessor(docs2));
         assertEquals(singletonList("doc"), docs2);
+    }
+
+    @Test
+    public void emptyDatabase() throws IOException {
+        final DatabaseBuilder dbBuilder =
+                DatabaseFormat.getCurrent().newDatabaseBuilder();
+
+        final ByteArrayOutputStream os = new ByteArrayOutputStream();
+        dbBuilder.buildWritable().writeTo(os);
+        final Database db =
+                DatabaseFormat.getCurrent()
+                        .getDatabaseReader()
+                        .from(Buffer.from(os.toByteArray()));
+
+        assertEquals(0, db.getDocumentCount());
+
+        // None documents
+        final Query q1 = select();
+        assertEquals(0, db.count(q1));
+    }
+
+    @Test(expected = NoSuchElementException.class)
+    public void emptyDocument() throws IOException {
+        final DatabaseBuilder dbBuilder =
+                DatabaseFormat.getCurrent().newDatabaseBuilder();
+
+        // Document
+        dbBuilder.merge(
+                DatabaseFormat
+                        .getCurrent()
+                        .newDocumentBuilder());
+
+        final ByteArrayOutputStream os = new ByteArrayOutputStream();
+        dbBuilder.buildWritable().writeTo(os);
+        final Database db =
+                DatabaseFormat.getCurrent()
+                        .getDatabaseReader()
+                        .from(Buffer.from(os.toByteArray()));
+
+        assertEquals(1, db.getDocumentCount());
+
+        // One document
+        final Query q1 = select();
+        assertEquals(1, db.count(q1));
+
+        db.getDocument(0);
+    }
+
+    @Test
+    public void emptyPayload() throws IOException {
+        final DatabaseBuilder dbBuilder =
+                DatabaseFormat.getCurrent().newDatabaseBuilder();
+
+        // Document
+        dbBuilder.merge(
+                DatabaseFormat
+                        .getCurrent()
+                        .newDocumentBuilder()
+                        .withPayload(new byte[0]));
+
+        final ByteArrayOutputStream os = new ByteArrayOutputStream();
+        dbBuilder.buildWritable().writeTo(os);
+        final Database db =
+                DatabaseFormat.getCurrent()
+                        .getDatabaseReader()
+                        .from(Buffer.from(os.toByteArray()));
+
+        assertEquals(1, db.getDocumentCount());
+
+        // One document
+        final Query q1 = select();
+        assertEquals(1, db.count(q1));
+
+        assertEquals(0, db.getDocument(0).remaining());
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void sparseUnsupported() throws IOException {
+        final DatabaseBuilder dbBuilder =
+                DatabaseFormat.getCurrent().newDatabaseBuilder();
+
+        // Empty document
+        dbBuilder.merge(
+                DatabaseFormat
+                        .getCurrent()
+                        .newDocumentBuilder());
+
+        // Nonempty document
+        dbBuilder.merge(
+                DatabaseFormat
+                        .getCurrent()
+                        .newDocumentBuilder()
+                        .withPayload("doc".getBytes()));
+
+        final ByteArrayOutputStream os = new ByteArrayOutputStream();
+        dbBuilder.buildWritable().writeTo(os);
     }
 }

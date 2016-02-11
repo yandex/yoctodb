@@ -10,7 +10,6 @@
 
 package com.yandex.yoctodb.v1.mutable.segment;
 
-import org.jetbrains.annotations.NotNull;
 import com.yandex.yoctodb.util.OutputStreamWritableBuilder;
 
 /**
@@ -19,9 +18,4 @@ import com.yandex.yoctodb.util.OutputStreamWritableBuilder;
  * @author incubos
  */
 public interface PayloadSegment extends OutputStreamWritableBuilder {
-    @NotNull
-    PayloadSegment addDocument(
-            final int documentId,
-            @NotNull
-            final byte[] payload);
 }

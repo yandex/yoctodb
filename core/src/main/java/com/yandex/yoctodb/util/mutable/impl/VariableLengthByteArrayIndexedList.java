@@ -20,8 +20,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Collection;
 
 /**
  * {@link ByteArrayIndexedList} with variable sized elements
@@ -31,16 +30,19 @@ import java.util.List;
 @NotThreadSafe
 public final class VariableLengthByteArrayIndexedList
         implements ByteArrayIndexedList {
-    private final List<UnsignedByteArray> elements =
-            new LinkedList<UnsignedByteArray>();
-    private long elementSize = 0;
+    @NotNull
+    private final Collection<UnsignedByteArray> elements;
+    private final long elementSize;
 
-    @Override
-    public void add(
+    public VariableLengthByteArrayIndexedList(
             @NotNull
-            final UnsignedByteArray e) {
-        elements.add(e);
-        elementSize += e.length();
+            final Collection<UnsignedByteArray> elements) {
+        this.elements = elements;
+        long elementSize = 0;
+        for (UnsignedByteArray element : elements) {
+            elementSize += element.length();
+        }
+        this.elementSize = elementSize;
     }
 
     @Override

@@ -10,10 +10,8 @@
 
 package com.yandex.yoctodb.util.mutable;
 
-import net.jcip.annotations.NotThreadSafe;
-import org.jetbrains.annotations.NotNull;
-import com.yandex.yoctodb.util.UnsignedByteArray;
 import com.yandex.yoctodb.util.OutputStreamWritable;
+import net.jcip.annotations.NotThreadSafe;
 
 /**
  * Indexed list of {@link com.yandex.yoctodb.util.UnsignedByteArray}s
@@ -22,7 +20,4 @@ import com.yandex.yoctodb.util.OutputStreamWritable;
  */
 @NotThreadSafe
 public interface ByteArrayIndexedList extends OutputStreamWritable {
-    void add(
-            @NotNull
-            UnsignedByteArray e);
 }
