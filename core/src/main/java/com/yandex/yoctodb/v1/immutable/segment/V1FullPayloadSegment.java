@@ -24,11 +24,11 @@ import org.jetbrains.annotations.NotNull;
  * @author incubos
  */
 @Immutable
-public final class V1PayloadSegment implements Payload, Segment {
+public final class V1FullPayloadSegment implements Payload, Segment {
     @NotNull
     private final ByteArrayIndexedList payloads;
 
-    private V1PayloadSegment(
+    private V1FullPayloadSegment(
             @NotNull
             final ByteArrayIndexedList payloads) {
         this.payloads = payloads;
@@ -49,7 +49,7 @@ public final class V1PayloadSegment implements Payload, Segment {
 
     static void registerReader() {
         SegmentRegistry.register(
-                V1DatabaseFormat.SegmentType.PAYLOAD.getCode(),
+                V1DatabaseFormat.SegmentType.PAYLOAD_FULL.getCode(),
                 new SegmentReader() {
                     @NotNull
                     @Override
@@ -60,7 +60,7 @@ public final class V1PayloadSegment implements Payload, Segment {
                                 VariableLengthByteArrayIndexedList.from(
                                         Segments.extract(buffer));
 
-                        return new V1PayloadSegment(payloads);
+                        return new V1FullPayloadSegment(payloads);
                     }
                 });
     }

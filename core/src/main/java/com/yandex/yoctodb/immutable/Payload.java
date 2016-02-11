@@ -14,6 +14,8 @@ import com.yandex.yoctodb.util.buf.Buffer;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.NoSuchElementException;
+
 /**
  * Payload segment interface
  *
@@ -24,5 +26,5 @@ public interface Payload {
     int getSize();
 
     @NotNull
-    Buffer getPayload(int i);
+    Buffer getPayload(int i) throws NoSuchElementException;
 }

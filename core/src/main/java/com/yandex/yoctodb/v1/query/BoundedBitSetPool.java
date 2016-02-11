@@ -38,7 +38,6 @@ public final class BoundedBitSetPool implements BitSetPool {
             @NotNull
             final Deque<BitSet> free,
             final int maxBitSets) {
-        assert bitSetSize > 0;
         assert maxBitSets > 0;
         assert free.size() <= maxBitSets;
 

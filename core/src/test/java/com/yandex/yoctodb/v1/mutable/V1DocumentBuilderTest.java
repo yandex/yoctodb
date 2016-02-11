@@ -39,11 +39,4 @@ public class V1DocumentBuilderTest {
                 .withField("k", "0", DocumentBuilder.IndexOption.FULL)
                 .withField("k", 0, DocumentBuilder.IndexOption.FULL);
     }
-
-    @Test(expected = IllegalStateException.class)
-    public void payloadIsObligatory() {
-        new V1DocumentBuilder()
-                .withField("k", "v", DocumentBuilder.IndexOption.FULL)
-                .check();
-    }
 }

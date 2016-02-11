@@ -64,7 +64,8 @@ public final class V1DatabaseFormat extends DatabaseFormat {
     // Segment types
     public enum SegmentType {
         // External segments should start from 10E6
-        PAYLOAD(1),
+        PAYLOAD_FULL(1), // All documents have payload
+        PAYLOAD_NONE(2), // No documents have any payload
         FIXED_LENGTH_FILTER(1000),
         VARIABLE_LENGTH_FILTER(2000),
         FIXED_LENGTH_SORTABLE_INDEX(3000),

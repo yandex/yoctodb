@@ -67,8 +67,6 @@ public class VariableLengthByteArrayIndexedList
         final long start = offsets.getLong(base);
         final long end = offsets.getLong(base + 8L);
 
-        assert start < end;
-
         return elements.slice(start, end - start);
     }
 

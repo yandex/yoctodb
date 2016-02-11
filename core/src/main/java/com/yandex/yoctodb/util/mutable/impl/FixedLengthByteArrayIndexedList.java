@@ -19,8 +19,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Collection;
 
 /**
  * {@link ByteArrayIndexedList} with fixed size elements
@@ -30,25 +29,18 @@ import java.util.List;
 @NotThreadSafe
 public final class FixedLengthByteArrayIndexedList
         implements ByteArrayIndexedList {
-    private final List<UnsignedByteArray> elements =
-            new LinkedList<UnsignedByteArray>();
+    @NotNull
+    private final Collection<UnsignedByteArray> elements;
 
     private int elementSize = -1;
 
-    @Override
-    public void add(
+    public FixedLengthByteArrayIndexedList(
             @NotNull
-            final UnsignedByteArray e) {
-        if (elementSize == -1) {
-            elementSize = e.length();
-        }
+            final Collection<UnsignedByteArray> elements) {
+        assert !elements.isEmpty();
 
-        if (e.length() != elementSize)
-            throw new IllegalArgumentException(
-                    "Element length <" + e.length() +
-                    "> is not equal to expected <" + elementSize + ">");
-
-        elements.add(e);
+        this.elements = elements;
+        this.elementSize = elements.iterator().next().length();
     }
 
     @Override
@@ -69,8 +61,10 @@ public final class FixedLengthByteArrayIndexedList
         os.write(Ints.toByteArray(elements.size()));
 
         // Elements
-        for (OutputStreamWritable e : elements)
+        for (OutputStreamWritable e : elements) {
+            assert e.getSizeInBytes() == elementSize : "Wrong size";
             e.writeTo(os);
+        }
     }
 
     @Override
