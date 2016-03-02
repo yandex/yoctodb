@@ -11,6 +11,7 @@
 package com.yandex.yoctodb.query;
 
 import com.yandex.yoctodb.immutable.IndexedDatabase;
+import com.yandex.yoctodb.util.mutable.ArrayBitSetPool;
 import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,7 +30,7 @@ public interface Query {
     /**
      * Calculate filtering result not taking into account skip/limit
      *
-     * @param database      database
+     * @param database   database
      * @param bitSetPool {@link BitSet} factory
      * @return read-only filtering result or {@code null} if empty
      */
@@ -38,7 +39,7 @@ public interface Query {
             @NotNull
             IndexedDatabase database,
             @NotNull
-            BitSetPool bitSetPool);
+            ArrayBitSetPool bitSetPool);
 
     /**
      * Return sorted results not taking into account skip/limit
@@ -55,7 +56,7 @@ public interface Query {
             @NotNull
             IndexedDatabase database,
             @NotNull
-            BitSetPool bitSetPool);
+            ArrayBitSetPool bitSetPool);
 
     int getSkip();
 

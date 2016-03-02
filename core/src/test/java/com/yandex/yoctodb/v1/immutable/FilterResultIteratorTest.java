@@ -10,7 +10,9 @@
 
 package com.yandex.yoctodb.v1.immutable;
 
+import com.yandex.yoctodb.immutable.IndexedDatabase;
 import com.yandex.yoctodb.query.QueryBuilder;
+import com.yandex.yoctodb.util.mutable.impl.ThreadLocalCachedArrayBitSetPool;
 import org.junit.Test;
 
 import java.util.Collections;
@@ -25,6 +27,7 @@ public class FilterResultIteratorTest {
     public void unsupportedRemove() {
         new FilterResultIterator(
                 QueryBuilder.select(),
-                Collections.<V1QueryContext>emptyIterator()).remove();
+                Collections.<IndexedDatabase>emptyIterator(),
+                new ThreadLocalCachedArrayBitSetPool(1)).remove();
     }
 }

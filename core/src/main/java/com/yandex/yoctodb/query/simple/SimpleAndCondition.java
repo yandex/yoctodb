@@ -11,14 +11,16 @@
 package com.yandex.yoctodb.query.simple;
 
 import com.yandex.yoctodb.immutable.FilterableIndexProvider;
-import com.yandex.yoctodb.query.BitSetPool;
 import com.yandex.yoctodb.query.Condition;
+import com.yandex.yoctodb.util.mutable.ArrayBitSet;
+import com.yandex.yoctodb.util.mutable.ArrayBitSetPool;
 import com.yandex.yoctodb.util.mutable.BitSet;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * {@code AND} condition
@@ -46,25 +48,30 @@ public final class SimpleAndCondition implements Condition {
             @NotNull
             final BitSet to,
             @NotNull
-            final BitSetPool bitSetPool) {
+            final ArrayBitSetPool bitSetPool) {
         if (clauses.size() == 1) {
             final Condition c = clauses.iterator().next();
             return c.set(indexProvider, to, bitSetPool);
         } else {
             assert !clauses.isEmpty();
 
-            final BitSet result = bitSetPool.borrowSet();
+            final ArrayBitSet result = bitSetPool.borrowSet(to.getSize());
             result.set();
-            final BitSet clauseResult = bitSetPool.borrowSet();
+            final ArrayBitSet clauseResult = bitSetPool.borrowSet(to.getSize());
             try {
-                    for (final Condition clause : clauses) {
-                        clauseResult.clear();
-                        if (!clause.set(indexProvider, clauseResult, bitSetPool)) {
-                            return false;
-                        } else if (!result.and(clauseResult)) {
-                            return false;
-                        }
+                final Iterator<Condition> iter = clauses.iterator();
+                while (iter.hasNext()) {
+                    if (!iter.next().set(
+                            indexProvider,
+                            clauseResult,
+                            bitSetPool)) {
+                        return false;
+                    } else if (!result.and(clauseResult)) {
+                        return false;
                     }
+                    if (iter.hasNext())
+                        clauseResult.clear();
+                }
 
                 return to.or(result);
             } finally {

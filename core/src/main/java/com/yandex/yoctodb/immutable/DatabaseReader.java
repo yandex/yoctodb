@@ -11,6 +11,8 @@
 package com.yandex.yoctodb.immutable;
 
 import com.yandex.yoctodb.util.buf.Buffer;
+import com.yandex.yoctodb.util.mutable.ArrayBitSetPool;
+import com.yandex.yoctodb.util.mutable.impl.ThreadLocalCachedArrayBitSetPool;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.NotNull;
 
@@ -24,32 +26,34 @@ import java.util.Collection;
  */
 @ThreadSafe
 public abstract class DatabaseReader {
-    public static final int DEFAULT_QUERY_DEPTH = 4;
-
     @NotNull
-    public Database from(
+    public IndexedDatabase from(
             @NotNull
             final Buffer buffer) throws IOException {
-        return from(buffer, DEFAULT_QUERY_DEPTH, true);
+        return from(buffer, new ThreadLocalCachedArrayBitSetPool(), true);
     }
 
     @NotNull
-    public abstract Database from(
+    public abstract IndexedDatabase from(
             @NotNull
             Buffer b,
-            int bitSetsPerRequest,
+            @NotNull
+            ArrayBitSetPool bitSetPool,
             boolean checksum) throws IOException;
 
     @NotNull
     public abstract Database composite(
             @NotNull
-            Collection<Database> databases,
-            int bitSetsPerRequest);
+            Collection<? extends IndexedDatabase> databases,
+            @NotNull
+            ArrayBitSetPool bitSetPool);
 
     @NotNull
     public Database composite(
             @NotNull
-            Collection<Database> databases) throws IOException {
-        return composite(databases, DEFAULT_QUERY_DEPTH);
+            final Collection<? extends IndexedDatabase> databases) {
+        return composite(
+                databases,
+                new ThreadLocalCachedArrayBitSetPool());
     }
 }

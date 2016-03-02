@@ -27,33 +27,58 @@ import java.util.Arrays;
  */
 @NotThreadSafe
 public final class LongArrayBitSet implements ArrayBitSet {
+    private final int size;
+    private final int usedWords;
     @NotNull
     private final long[] words;
-    private final int size;
 
-    private LongArrayBitSet(final int size) {
+    private LongArrayBitSet(
+            final int size,
+            @NotNull
+            final long[] words) {
+        assert size >= 0;
+        assert words.length >= arraySize(size);
+
         this.size = size;
-        this.words = new long[arraySize(size)];
+        this.usedWords = arraySize(size);
+        this.words = words;
     }
 
     public static int arraySize(final int size) {
         return (size >>> 6) + 1;
     }
 
-    public static ArrayBitSet one(final int size) {
-        final LongArrayBitSet result = new LongArrayBitSet(size);
-        // Filling with ones
-        Arrays.fill(result.words, 0, result.words.length - 1, -1L);
-        final int shift = size & 0x3f;
-        if (shift != 0) {
-            result.words[result.words.length - 1] = ~(-1L << shift);
-        }
-
+    @NotNull
+    public static ArrayBitSet zero(
+            final int size,
+            @NotNull
+            final long[] words) {
+        final LongArrayBitSet result = new LongArrayBitSet(size, words);
+        Arrays.fill(result.words, 0, result.usedWords, 0L);
         return result;
     }
 
+    @NotNull
     public static ArrayBitSet zero(final int size) {
-        return new LongArrayBitSet(size);
+        return new LongArrayBitSet(size, new long[arraySize(size)]);
+    }
+
+    @NotNull
+    public static ArrayBitSet one(final int size) {
+        final LongArrayBitSet result =
+                new LongArrayBitSet(
+                        size,
+                        new long[arraySize(size)]);
+
+        // Filling with ones
+        final int last = result.usedWords - 1;
+        Arrays.fill(result.words, 0, last, -1L);
+        final int shift = size & 0x3f;
+        if (shift != 0) {
+            result.words[last] = ~(-1L << shift);
+        }
+
+        return result;
     }
 
     @Override
@@ -64,8 +89,8 @@ public final class LongArrayBitSet implements ArrayBitSet {
     @Override
     public int cardinality() {
         int result = 0;
-        for (long w : words) {
-            result += Long.bitCount(w);
+        for (int i = 0; i < usedWords; i++) {
+            result += Long.bitCount(words[i]);
         }
 
         return result;
@@ -96,7 +121,7 @@ public final class LongArrayBitSet implements ArrayBitSet {
     }
 
     public void clear() {
-        Arrays.fill(words, 0L);
+        Arrays.fill(words, 0, usedWords, 0L);
     }
 
     @Override
@@ -104,7 +129,8 @@ public final class LongArrayBitSet implements ArrayBitSet {
         boolean notEmpty = false;
 
         // Inverse all the words except last one
-        for (int i = 0; i < words.length - 1; i++) {
+        final int last = usedWords - 1;
+        for (int i = 0; i < last; i++) {
             words[i] = ~words[i];
             if (words[i] != 0)
                 notEmpty = true;
@@ -113,7 +139,6 @@ public final class LongArrayBitSet implements ArrayBitSet {
         // Fix bits in last word
         final int shift = size & 0x3f;
         if (shift != 0) {
-            final int last = words.length - 1;
             words[last] = ~words[last] & ~(-1L << shift);
 
             if (words[last] != 0)
@@ -125,10 +150,11 @@ public final class LongArrayBitSet implements ArrayBitSet {
 
     public void set() {
         // Filling with ones
-        Arrays.fill(words, 0, words.length - 1, -1L);
+        final int last = usedWords - 1;
+        Arrays.fill(words, 0, last, -1L);
         final int shift = size & 0x3f;
         if (shift != 0) {
-            words[words.length - 1] = ~(-1L << shift);
+            words[last] = ~(-1L << shift);
         }
     }
 
@@ -140,7 +166,7 @@ public final class LongArrayBitSet implements ArrayBitSet {
 
         boolean notEmpty = false;
         final long[] from = ((ArrayBitSet) set).toArray();
-        for (int i = 0; i < words.length; i++) {
+        for (int i = 0; i < usedWords; i++) {
             final long word = words[i] & from[i];
             words[i] = word;
             if (word != 0) {
@@ -159,7 +185,7 @@ public final class LongArrayBitSet implements ArrayBitSet {
 
         boolean notEmpty = false;
         final long[] from = ((ArrayBitSet) set).toArray();
-        for (int i = 0; i < words.length; i++) {
+        for (int i = 0; i < usedWords; i++) {
             final long word = words[i] | from[i];
             words[i] = word;
             if (word != 0) {
@@ -179,9 +205,9 @@ public final class LongArrayBitSet implements ArrayBitSet {
         boolean notEmpty = false;
         long currentPosition = startPosition;
 
-        assert words.length == bitSetSizeInLongs;
+        assert usedWords == bitSetSizeInLongs;
 
-        for (int i = 0; i < words.length; i++) {
+        for (int i = 0; i < usedWords; i++) {
             final long currentWord =
                     longArrayBitSetInByteBuffer.getLong(
                             currentPosition);
@@ -230,7 +256,7 @@ public final class LongArrayBitSet implements ArrayBitSet {
             if (word != 0) {
                 return (u << 6) | Long.numberOfTrailingZeros(word);
             }
-            if (++u == words.length) {
+            if (++u == usedWords) {
                 return -1;
             }
             word = words[u];

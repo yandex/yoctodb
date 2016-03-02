@@ -8,9 +8,8 @@
  * A copy of the License is also available at http://mozilla.org/MPL/2.0/.
  */
 
-package com.yandex.yoctodb.query;
+package com.yandex.yoctodb.util.mutable;
 
-import com.yandex.yoctodb.util.mutable.BitSet;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -18,21 +17,17 @@ import org.jetbrains.annotations.NotNull;
  *
  * @author incubos
  */
-public interface BitSetPool {
-    int getBitSetSize();
-
+public interface ArrayBitSetPool {
     /**
-     * Borrow a {@link BitSet} instance.
+     * Borrow a zeroed {@link ArrayBitSet} instance.
      *
-     * IMPORTANT! There is no contract on {@link BitSet} content, so a user
-     * has to prepare it for future use after getting.
-     *
-     * @return An instance of {@link BitSet}
+     * @param size size of {@link ArrayBitSet}
+     * @return An instance of {@link ArrayBitSet}
      */
     @NotNull
-    BitSet borrowSet();
+    ArrayBitSet borrowSet(int size);
 
     void returnSet(
             @NotNull
-            final BitSet set);
+            ArrayBitSet set);
 }

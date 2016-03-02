@@ -90,16 +90,6 @@ public class DeMorganQueryTest {
         }
     }
 
-    @Test(expected = NoSuchElementException.class)
-    public void tooDeep() throws IOException {
-        final Database db = buildDatabase();
-        Condition clause = eq("x", from(0));
-        for (int i = 0; i < DatabaseReader.DEFAULT_QUERY_DEPTH; i++) {
-            clause = and(clause, clause);
-        }
-        db.count(select().where(clause));
-    }
-
     @Test(expected = IllegalArgumentException.class)
     public void illegalOr() throws IOException {
         new SimpleOrCondition(Collections.<Condition>emptyList());

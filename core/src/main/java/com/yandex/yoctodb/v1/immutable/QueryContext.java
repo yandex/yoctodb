@@ -10,35 +10,42 @@
 
 package com.yandex.yoctodb.v1.immutable;
 
-import com.yandex.yoctodb.immutable.Database;
 import com.yandex.yoctodb.immutable.IndexedDatabase;
-import com.yandex.yoctodb.query.BitSetPool;
-import com.yandex.yoctodb.query.BitSetPoolPool;
+import com.yandex.yoctodb.util.mutable.ArrayBitSetPool;
+import com.yandex.yoctodb.util.mutable.BitSet;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.Closeable;
-
 /**
- * Contains {@link Database} and {@link BitSetPool}
+ * Pair of database and its document {@link BitSet}
  *
  * @author incubos
  */
-public final class V1QueryContext implements Closeable {
+public final class QueryContext {
+    @NotNull
+    private final BitSet docs;
     @NotNull
     private final IndexedDatabase database;
     @NotNull
-    private final BitSetPoolPool bitSetPoolPool;
-    @NotNull
-    private final BitSetPool bitSetPool;
+    private final ArrayBitSetPool bitSetPool;
 
-    protected V1QueryContext(
+    public QueryContext(
+            @NotNull
+            final BitSet docs,
             @NotNull
             final IndexedDatabase database,
             @NotNull
-            final BitSetPoolPool bitSetPoolPool) {
+            final ArrayBitSetPool bitSetPool) {
+        assert !docs.isEmpty();
+        assert database.getDocumentCount() == docs.getSize();
+
+        this.docs = docs;
         this.database = database;
-        this.bitSetPoolPool = bitSetPoolPool;
-        this.bitSetPool = bitSetPoolPool.borrowPool();
+        this.bitSetPool = bitSetPool;
+    }
+
+    @NotNull
+    public BitSet getDocs() {
+        return docs;
     }
 
     @NotNull
@@ -46,12 +53,8 @@ public final class V1QueryContext implements Closeable {
         return database;
     }
 
-    public @NotNull BitSetPool getBitSetPool() {
+    @NotNull
+    public ArrayBitSetPool getBitSetPool() {
         return bitSetPool;
-    }
-
-    @Override
-    public void close() {
-        bitSetPoolPool.returnPool(bitSetPool);
     }
 }

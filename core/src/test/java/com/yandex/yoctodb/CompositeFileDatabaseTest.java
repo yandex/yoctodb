@@ -13,6 +13,7 @@ package com.yandex.yoctodb;
 import com.yandex.yoctodb.immutable.Database;
 import com.yandex.yoctodb.immutable.DatabaseReader;
 import com.yandex.yoctodb.immutable.DocumentProvider;
+import com.yandex.yoctodb.immutable.IndexedDatabase;
 import com.yandex.yoctodb.mutable.DatabaseBuilder;
 import com.yandex.yoctodb.mutable.DocumentBuilder;
 import com.yandex.yoctodb.query.DocumentProcessor;
@@ -57,7 +58,7 @@ public class CompositeFileDatabaseTest {
 
     @Test
     public void build() throws IOException {
-        final Database db1 =
+        final IndexedDatabase db1 =
                 READER.from(Buffer.from(
                         new RandomAccessFile(
                                 buildDatabase1("1.dat"),
@@ -65,7 +66,7 @@ public class CompositeFileDatabaseTest {
 
         assertEquals(DOCS, db1.getDocumentCount());
 
-        final Database db2 =
+        final IndexedDatabase db2 =
                 READER.from(Buffer.from(
                         new RandomAccessFile(
                                 buildDatabase2("2.dat"),
@@ -187,13 +188,13 @@ public class CompositeFileDatabaseTest {
 
     @Test
     public void filter() throws IOException {
-        final Database db1 =
+        final IndexedDatabase db1 =
                 READER.from(
                         Buffer.from(
                                 new RandomAccessFile(
                                         buildDatabase1("1.dat"),
                                         "r").getChannel()));
-        final Database db2 =
+        final IndexedDatabase db2 =
                 READER.from(
                         Buffer.from(
                                 new RandomAccessFile(
@@ -205,7 +206,8 @@ public class CompositeFileDatabaseTest {
         for (int i = 0; i < DOCS; i++) {
             final Query q = select().where(eq("index", from(i)));
 
-            final Iterator<Database> dbs = Arrays.asList(db1, db2).iterator();
+            final Iterator<IndexedDatabase> dbs =
+                    Arrays.asList(db1, db2).iterator();
             assertEquals(
                     2,
                     db.executeAndUnlimitedCount(
@@ -313,13 +315,13 @@ public class CompositeFileDatabaseTest {
 
     @Test
     public void filterDatabase() throws IOException {
-        final Database db1 =
+        final IndexedDatabase db1 =
                 READER.from(
                         Buffer.from(
                                 new RandomAccessFile(
                                         buildDatabase1("1.dat"),
                                         "r").getChannel()));
-        final Database db2 =
+        final IndexedDatabase db2 =
                 READER.from(
                         Buffer.from(
                                 new RandomAccessFile(
@@ -360,13 +362,13 @@ public class CompositeFileDatabaseTest {
 
     @Test
     public void sort() throws IOException {
-        final Database db1 =
+        final IndexedDatabase db1 =
                 READER.from(
                         Buffer.from(
                                 new RandomAccessFile(
                                         buildDatabase1("1.dat"),
                                         "r").getChannel()));
-        final Database db2 =
+        final IndexedDatabase db2 =
                 READER.from(
                         Buffer.from(
                                 new RandomAccessFile(
@@ -415,13 +417,13 @@ public class CompositeFileDatabaseTest {
 
     @Test
     public void sortAndFilter() throws IOException {
-        final Database db1 =
+        final IndexedDatabase db1 =
                 READER.from(
                         Buffer.from(
                                 new RandomAccessFile(
                                         buildDatabase1("1.dat"),
                                         "r").getChannel()));
-        final Database db2 =
+        final IndexedDatabase db2 =
                 READER.from(
                         Buffer.from(
                                 new RandomAccessFile(
@@ -472,13 +474,13 @@ public class CompositeFileDatabaseTest {
 
     @Test
     public void emptyRangeRight() throws IOException {
-        final Database db1 =
+        final IndexedDatabase db1 =
                 READER.from(
                         Buffer.from(
                                 new RandomAccessFile(
                                         buildDatabase1("1.dat"),
                                         "r").getChannel()));
-        final Database db2 =
+        final IndexedDatabase db2 =
                 READER.from(
                         Buffer.from(
                                 new RandomAccessFile(
@@ -511,13 +513,13 @@ public class CompositeFileDatabaseTest {
 
     @Test
     public void emptyRangeLeft() throws IOException {
-        final Database db1 =
+        final IndexedDatabase db1 =
                 READER.from(
                         Buffer.from(
                                 new RandomAccessFile(
                                         buildDatabase1("1.dat"),
                                         "r").getChannel()));
-        final Database db2 =
+        final IndexedDatabase db2 =
                 READER.from(
                         Buffer.from(
                                 new RandomAccessFile(
@@ -550,13 +552,13 @@ public class CompositeFileDatabaseTest {
 
     @Test
     public void unindexedFieldSearch() throws IOException {
-        final Database db1 =
+        final IndexedDatabase db1 =
                 READER.from(
                         Buffer.from(
                                 new RandomAccessFile(
                                         buildDatabase1("1.dat"),
                                         "r").getChannel()));
-        final Database db2 =
+        final IndexedDatabase db2 =
                 READER.from(
                         Buffer.from(
                                 new RandomAccessFile(
@@ -590,7 +592,7 @@ public class CompositeFileDatabaseTest {
 
     @Test
     public void emptyCompositeDatabaseFieldSearch() throws IOException {
-        final Database db = READER.composite(new ArrayList<Database>());
+        final Database db = READER.composite(new ArrayList<IndexedDatabase>());
 
         final Query query =
                 select().where(
@@ -626,13 +628,13 @@ public class CompositeFileDatabaseTest {
 
     @Test
     public void noSortNoLimitSearch() throws IOException {
-        final Database db1 =
+        final IndexedDatabase db1 =
                 READER.from(
                         Buffer.from(
                                 new RandomAccessFile(
                                         buildDatabase1("1.dat"),
                                         "r").getChannel()));
-        final Database db2 =
+        final IndexedDatabase db2 =
                 READER.from(
                         Buffer.from(
                                 new RandomAccessFile(
@@ -659,13 +661,13 @@ public class CompositeFileDatabaseTest {
 
     @Test
     public void extractFieldValues() throws IOException {
-        final Database db1 =
+        final IndexedDatabase db1 =
                 READER.from(
                         Buffer.from(
                                 new RandomAccessFile(
                                         buildDatabase1("1.dat"),
                                         "r").getChannel()));
-        final Database db2 =
+        final IndexedDatabase db2 =
                 READER.from(
                         Buffer.from(
                                 new RandomAccessFile(

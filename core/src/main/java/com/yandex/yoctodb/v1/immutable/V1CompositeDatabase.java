@@ -18,6 +18,7 @@ import com.yandex.yoctodb.query.DocumentProcessor;
 import com.yandex.yoctodb.query.Query;
 import com.yandex.yoctodb.query.ScoredDocument;
 import com.yandex.yoctodb.util.buf.Buffer;
+import com.yandex.yoctodb.util.mutable.ArrayBitSetPool;
 import com.yandex.yoctodb.util.mutable.BitSet;
 import com.yandex.yoctodb.util.mutable.impl.ReadOnlyOneBitSet;
 import net.jcip.annotations.Immutable;
@@ -42,23 +43,19 @@ public final class V1CompositeDatabase implements Database {
         }
     };
     @NotNull
-    private final List<V1QueryContextFactory> databases;
+    private final List<IndexedDatabase> databases;
+    @NotNull
+    private final ArrayBitSetPool bitSetPool;
     @NotNull
     private final int[] documentOffsets;
     private final int documentCount;
 
     public V1CompositeDatabase(
             @NotNull
-            final Collection<V1Database> databases,
-            final int bitSetsPerRequest) {
-        this.databases = new ArrayList<V1QueryContextFactory>(databases.size());
-        for (IndexedDatabase db : databases) {
-            this.databases.add(
-                    new V1QueryContextFactory(
-                            db,
-                            bitSetsPerRequest));
-        }
-
+            final Collection<? extends IndexedDatabase> databases,
+            @NotNull
+            final ArrayBitSetPool bitSetPool) {
+        this.databases = new ArrayList<IndexedDatabase>(databases);
         this.documentOffsets = new int[databases.size()];
         int documentCount = 0;
         int i = 0;
@@ -68,6 +65,7 @@ public final class V1CompositeDatabase implements Database {
             i++;
         }
         this.documentCount = documentCount;
+        this.bitSetPool = bitSetPool;
     }
 
     @Override
@@ -103,97 +101,68 @@ public final class V1CompositeDatabase implements Database {
                         fieldName);
     }
 
-    @NotNull
-    private Collection<V1QueryContext> borrowContexts() {
-        final Collection<V1QueryContext> result =
-                new ArrayList<V1QueryContext>(databases.size());
-        for (V1QueryContextFactory factory : databases) {
-            result.add(factory.newContext());
-        }
-        return result;
-    }
-
-    private void returnContexts(
-            @NotNull
-            final Iterable<V1QueryContext> contexts) {
-        for (V1QueryContext ctx : contexts) {
-            ctx.close();
-        }
-    }
-
     @Override
     public void execute(
             @NotNull
             final Query query,
             @NotNull
             final DocumentProcessor processor) {
-        final Collection<V1QueryContext> contexts = borrowContexts();
-        try {
-            final Iterator<ScoredDocument<?>> iterator;
+        final Iterator<ScoredDocument<?>> iterator;
 
-            // Doing merging iff there is sorting
-            if (query.hasSorting()) {
-                final List<Iterator<? extends ScoredDocument<?>>> results =
-                        new ArrayList<Iterator<? extends ScoredDocument<?>>>(
-                                contexts.size());
-                for (V1QueryContext context : contexts) {
-                    final BitSet docs =
-                            query.filteredUnlimited(
-                                    context.getDatabase(),
-                                    context.getBitSetPool());
+        // Doing merging iff there is sorting
+        if (query.hasSorting()) {
+            final List<Iterator<? extends ScoredDocument<?>>> results =
+                    new ArrayList<Iterator<? extends ScoredDocument<?>>>(
+                            databases.size());
+            for (IndexedDatabase db : databases) {
+                final BitSet docs = query.filteredUnlimited(db, bitSetPool);
 
-                    if (docs == null) {
-                        continue;
-                    }
-
-                    assert !docs.isEmpty();
-
-                    results.add(
-                            query.sortedUnlimited(
-                                    docs,
-                                    context.getDatabase(),
-                                    context.getBitSetPool()));
+                if (docs == null) {
+                    continue;
                 }
 
-                if (results.isEmpty()) {
-                    return;
-                }
+                assert !docs.isEmpty();
 
-                iterator =
-                        Iterators.mergeSorted(
-                                results,
-                                SCORED_DOCUMENT_COMPARATOR);
-            } else {
-                iterator =
-                        Iterators.concat(
-                                new FilterResultIterator(
-                                        query,
-                                        contexts.iterator()));
+                results.add(query.sortedUnlimited(docs, db, bitSetPool));
             }
 
-            // Skipping values
-            if (query.getSkip() != 0) {
-                Iterators.advance(iterator, query.getSkip());
+            if (results.isEmpty()) {
+                return;
             }
 
-            // Limited
-            final Iterator<ScoredDocument<?>> limitedIterator;
-            if (query.getLimit() == Integer.MAX_VALUE) {
-                limitedIterator = iterator;
-            } else {
-                limitedIterator = Iterators.limit(iterator, query.getLimit());
-            }
+            iterator =
+                    Iterators.mergeSorted(
+                            results,
+                            SCORED_DOCUMENT_COMPARATOR);
+        } else {
+            iterator =
+                    Iterators.concat(
+                            new FilterResultIterator(
+                                    query,
+                                    databases.iterator(),
+                                    bitSetPool));
+        }
 
-            while (limitedIterator.hasNext()) {
-                final ScoredDocument<?> document = limitedIterator.next();
-                if (!processor.process(
-                        document.getDocument(),
-                        document.getDatabase())) {
-                    return;
-                }
+        // Skipping values
+        if (query.getSkip() != 0) {
+            Iterators.advance(iterator, query.getSkip());
+        }
+
+        // Limited
+        final Iterator<ScoredDocument<?>> limitedIterator;
+        if (query.getLimit() == Integer.MAX_VALUE) {
+            limitedIterator = iterator;
+        } else {
+            limitedIterator = Iterators.limit(iterator, query.getLimit());
+        }
+
+        while (limitedIterator.hasNext()) {
+            final ScoredDocument<?> document = limitedIterator.next();
+            if (!processor.process(
+                    document.getDocument(),
+                    document.getDatabase())) {
+                return;
             }
-        } finally {
-            returnContexts(contexts);
         }
     }
 
@@ -203,118 +172,100 @@ public final class V1CompositeDatabase implements Database {
             final Query query,
             @NotNull
             final DocumentProcessor processor) {
-        final Collection<V1QueryContext> contexts = borrowContexts();
-        try {
-            int result = 0;
-            final Iterator<ScoredDocument<?>> iterator;
+        int result = 0;
+        final Iterator<ScoredDocument<?>> iterator;
 
-            // Doing merging iff there is sorting
-            if (query.hasSorting()) {
-                final List<Iterator<? extends ScoredDocument<?>>> results =
-                        new ArrayList<Iterator<? extends ScoredDocument<?>>>(
-                                contexts.size());
-                for (V1QueryContext context : contexts) {
-                    final BitSet docs =
-                            query.filteredUnlimited(
-                                    context.getDatabase(),
-                                    context.getBitSetPool());
-                    if (docs != null) {
-                        assert !docs.isEmpty();
+        // Doing merging iff there is sorting
+        if (query.hasSorting()) {
+            final List<Iterator<? extends ScoredDocument<?>>> results =
+                    new ArrayList<Iterator<? extends ScoredDocument<?>>>(
+                            databases.size());
+            for (IndexedDatabase db : databases) {
+                final BitSet docs = query.filteredUnlimited(db, bitSetPool);
+                if (docs != null) {
+                    assert !docs.isEmpty();
 
-                        final int dbSize =
-                                context.getDatabase().getDocumentCount();
-                        final int count = docs.cardinality();
-                        if (count == dbSize) {
-                            results.add(
-                                    query.sortedUnlimited(
-                                            new ReadOnlyOneBitSet(dbSize),
-                                            context.getDatabase(),
-                                            context.getBitSetPool())
-                            );
-                        } else {
-                            results.add(
-                                    query.sortedUnlimited(
-                                            docs,
-                                            context.getDatabase(),
-                                            context.getBitSetPool()));
-                        }
-                        result += count;
+                    final int dbSize = db.getDocumentCount();
+                    final int count = docs.cardinality();
+                    final BitSet filter;
+                    if (count == dbSize) {
+                        filter = new ReadOnlyOneBitSet(dbSize);
+                    } else {
+                        filter = docs;
                     }
+                    results.add(
+                            query.sortedUnlimited(
+                                    filter,
+                                    db,
+                                    bitSetPool));
+                    result += count;
                 }
+            }
 
-                if (results.isEmpty()) {
-                    return 0;
-                }
+            if (results.isEmpty()) {
+                return 0;
+            }
 
-                iterator =
-                        Iterators.mergeSorted(
-                                results,
-                                SCORED_DOCUMENT_COMPARATOR
-                        );
-            } else {
-                final List<DatabaseDocs> results =
-                        new ArrayList<DatabaseDocs>(contexts.size());
-                for (V1QueryContext context : contexts) {
-                    final BitSet docs =
-                            query.filteredUnlimited(
-                                    context.getDatabase(),
-                                    context.getBitSetPool());
-                    if (docs != null) {
-                        assert !docs.isEmpty();
+            iterator =
+                    Iterators.mergeSorted(
+                            results,
+                            SCORED_DOCUMENT_COMPARATOR
+                    );
+        } else {
+            final List<QueryContext> results =
+                    new ArrayList<QueryContext>(databases.size());
+            for (IndexedDatabase db : databases) {
+                final BitSet docs = query.filteredUnlimited(db, bitSetPool);
+                if (docs != null) {
+                    assert !docs.isEmpty();
 
-                        final int dbSize =
-                                context.getDatabase().getDocumentCount();
-                        final int count = docs.cardinality();
-                        if (count == dbSize) {
-                            results.add(
-                                    new DatabaseDocs(
-                                            context,
-                                            new ReadOnlyOneBitSet(dbSize))
-                            );
-                        } else {
-                            results.add(new DatabaseDocs(context, docs));
-                        }
-                        result += count;
+                    final int dbSize = db.getDocumentCount();
+                    final int count = docs.cardinality();
+                    final BitSet filter;
+                    if (count == dbSize) {
+                        filter = new ReadOnlyOneBitSet(dbSize);
+                    } else {
+                        filter = docs;
                     }
-                }
-
-                if (results.isEmpty()) {
-                    return 0;
-                }
-
-                iterator =
-                        Iterators.concat(
-                                new SortResultIterator(
-                                        query,
-                                        results.iterator()));
-            }
-
-            // Skipping values
-            if (query.getSkip() != 0) {
-                Iterators.advance(iterator, query.getSkip());
-            }
-
-            // Limited
-            final Iterator<ScoredDocument<?>> limitedIterator;
-            if (query.getLimit() == Integer.MAX_VALUE) {
-                limitedIterator = iterator;
-            } else {
-                limitedIterator = Iterators.limit(iterator, query.getLimit());
-            }
-
-            while (limitedIterator.hasNext()) {
-                final ScoredDocument<?> document = limitedIterator.next();
-                if (!processor.process(
-                        document.getDocument(),
-                        document.getDatabase())) {
-                    return result;
+                    results.add(new QueryContext(filter, db, bitSetPool));
+                    result += count;
                 }
             }
 
-            return result;
-        } finally {
-            returnContexts(contexts);
+            if (results.isEmpty()) {
+                return 0;
+            }
+
+            iterator =
+                    Iterators.concat(
+                            new SortResultIterator(
+                                    query,
+                                    results.iterator()));
         }
+
+        // Skipping values
+        if (query.getSkip() != 0) {
+            Iterators.advance(iterator, query.getSkip());
+        }
+
+        // Limited
+        final Iterator<ScoredDocument<?>> limitedIterator;
+        if (query.getLimit() == Integer.MAX_VALUE) {
+            limitedIterator = iterator;
+        } else {
+            limitedIterator = Iterators.limit(iterator, query.getLimit());
+        }
+
+        while (limitedIterator.hasNext()) {
+            final ScoredDocument<?> document = limitedIterator.next();
+            if (!processor.process(
+                    document.getDocument(),
+                    document.getDatabase())) {
+                return result;
+            }
+        }
+
+        return result;
     }
 
     @Override
@@ -322,19 +273,11 @@ public final class V1CompositeDatabase implements Database {
             @NotNull
             final Query query) {
         int count = 0;
-        final Iterable<V1QueryContext> contexts = borrowContexts();
-        try {
-            for (V1QueryContext ctx : contexts) {
-                final BitSet docs =
-                        query.filteredUnlimited(
-                                ctx.getDatabase(),
-                                ctx.getBitSetPool());
-                if (docs != null) {
-                    count += docs.cardinality();
-                }
+        for (IndexedDatabase db : databases) {
+            final BitSet docs = query.filteredUnlimited(db, bitSetPool);
+            if (docs != null) {
+                count += docs.cardinality();
             }
-        } finally {
-            returnContexts(contexts);
         }
 
         return Math.min(

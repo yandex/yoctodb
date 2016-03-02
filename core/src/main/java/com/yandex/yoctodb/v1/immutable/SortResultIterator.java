@@ -26,13 +26,13 @@ public class SortResultIterator
     @NotNull
     private final Query query;
     @NotNull
-    private final Iterator<DatabaseDocs> dbs;
+    private final Iterator<QueryContext> dbs;
 
     public SortResultIterator(
             @NotNull
             final Query query,
             @NotNull
-            final Iterator<DatabaseDocs> dbs) {
+            final Iterator<QueryContext> dbs) {
         this.query = query;
         this.dbs = dbs;
     }
@@ -45,11 +45,11 @@ public class SortResultIterator
     @NotNull
     @Override
     public Iterator<? extends ScoredDocument<?>> next() {
-        final DatabaseDocs db = dbs.next();
+        final QueryContext db = dbs.next();
         return query.sortedUnlimited(
-                db.docs,
-                db.ctx.getDatabase(),
-                db.ctx.getBitSetPool());
+                db.getDocs(),
+                db.getDatabase(),
+                db.getBitSetPool());
     }
 
     @Override

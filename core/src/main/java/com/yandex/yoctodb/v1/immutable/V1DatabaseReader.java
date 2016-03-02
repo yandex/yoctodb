@@ -12,17 +12,16 @@ package com.yandex.yoctodb.v1.immutable;
 
 import com.yandex.yoctodb.immutable.*;
 import com.yandex.yoctodb.util.buf.Buffer;
+import com.yandex.yoctodb.util.mutable.ArrayBitSetPool;
 import com.yandex.yoctodb.v1.V1DatabaseFormat;
 import com.yandex.yoctodb.v1.immutable.segment.Segment;
 import com.yandex.yoctodb.v1.immutable.segment.SegmentRegistry;
-import com.yandex.yoctodb.v1.query.ThreadLocalCachedBitSetPoolPool;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -66,10 +65,11 @@ public class V1DatabaseReader extends DatabaseReader {
 
     @NotNull
     @Override
-    public Database from(
+    public IndexedDatabase from(
             @NotNull
             final Buffer buffer,
-            final int bitSetsPerRequest,
+            @NotNull
+            final ArrayBitSetPool bitSetPool,
             final boolean checksum) throws IOException {
         // Checking the magic
         for (int i = 0; i < V1DatabaseFormat.MAGIC.length; i++)
@@ -152,28 +152,16 @@ public class V1DatabaseReader extends DatabaseReader {
 
         assert payload != null : "No payload found";
 
-        return new V1Database(
-                payload,
-                filters,
-                sorters,
-                new ThreadLocalCachedBitSetPoolPool(
-                        payload.getSize(),
-                        bitSetsPerRequest));
+        return new V1Database(payload, filters, sorters, bitSetPool);
     }
 
     @NotNull
     @Override
     public Database composite(
             @NotNull
-            final Collection<Database> databases,
-            final int bitSetsPerRequest) {
-        final Collection<V1Database> dbs =
-                new ArrayList<V1Database>(databases.size());
-
-        for (Database database : databases) {
-            dbs.add((V1Database) database);
-        }
-
-        return new V1CompositeDatabase(dbs, bitSetsPerRequest);
+            final Collection<? extends IndexedDatabase> databases,
+            @NotNull
+            final ArrayBitSetPool bitSetPool) {
+        return new V1CompositeDatabase(databases, bitSetPool);
     }
 }

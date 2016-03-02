@@ -13,8 +13,9 @@ package com.yandex.yoctodb.query.simple;
 import com.google.common.base.Joiner;
 import com.yandex.yoctodb.immutable.IndexedDatabase;
 import com.yandex.yoctodb.query.*;
+import com.yandex.yoctodb.util.mutable.ArrayBitSet;
+import com.yandex.yoctodb.util.mutable.ArrayBitSetPool;
 import com.yandex.yoctodb.util.mutable.BitSet;
-import com.yandex.yoctodb.query.BitSetPool;
 import com.yandex.yoctodb.util.mutable.impl.ReadOnlyOneBitSet;
 import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.NotNull;
@@ -91,13 +92,14 @@ public final class SimpleSelect implements Select {
             @NotNull
             final IndexedDatabase database,
             @NotNull
-            final BitSetPool bitSetPool) {
+            final ArrayBitSetPool bitSetPool) {
         if (conditions.isEmpty()) {
-            return new ReadOnlyOneBitSet(bitSetPool.getBitSetSize());
+            return new ReadOnlyOneBitSet(database.getDocumentCount());
         } else {
             final Condition where = new SimpleAndCondition(conditions);
-            final BitSet result = bitSetPool.borrowSet();
-            result.clear();
+            final ArrayBitSet result =
+                    bitSetPool.borrowSet(
+                            database.getDocumentCount());
             if (where.set(database, result, bitSetPool)) {
                 return result;
             } else {
@@ -115,7 +117,7 @@ public final class SimpleSelect implements Select {
             @NotNull
             final IndexedDatabase database,
             @NotNull
-            final BitSetPool bitSetPool) {
+            final ArrayBitSetPool bitSetPool) {
         assert !docs.isEmpty();
 
         // Shortcut if there is not sorting

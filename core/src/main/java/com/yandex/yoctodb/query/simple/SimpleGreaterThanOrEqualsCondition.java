@@ -10,14 +10,14 @@
 
 package com.yandex.yoctodb.query.simple;
 
+import com.yandex.yoctodb.immutable.FilterableIndex;
 import com.yandex.yoctodb.immutable.FilterableIndexProvider;
-import com.yandex.yoctodb.query.BitSetPool;
+import com.yandex.yoctodb.util.UnsignedByteArray;
 import com.yandex.yoctodb.util.buf.Buffer;
+import com.yandex.yoctodb.util.mutable.ArrayBitSetPool;
+import com.yandex.yoctodb.util.mutable.BitSet;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
-import com.yandex.yoctodb.immutable.FilterableIndex;
-import com.yandex.yoctodb.util.UnsignedByteArray;
-import com.yandex.yoctodb.util.mutable.BitSet;
 
 /**
  * Greater than or equals condition
@@ -50,7 +50,7 @@ public final class SimpleGreaterThanOrEqualsCondition
             @NotNull
             final BitSet to,
             @NotNull
-            final BitSetPool bitSetPool) {
+            final ArrayBitSetPool bitSetPool) {
         final FilterableIndex index = indexProvider.getFilter(getFieldName());
         return index != null && index.greaterThan(to, value, true);
     }
