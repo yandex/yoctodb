@@ -1,3 +1,8 @@
+0.0.14
+  * #9: Support for a database of documents without payload
+  * #10: Support for documents without fields
+  * #19: Support for user-provided BitSet pool implementations
+
 0.0.13
   * #11: More compact mutable `V1FilterableIndex` representation
   * #12: More compact mutable `IntIndexToIndexMultiMap` representation
