@@ -10,8 +10,10 @@
 
 package com.yandex.yoctodb.v1.immutable;
 
+import com.yandex.yoctodb.immutable.IndexedDatabase;
 import com.yandex.yoctodb.query.Query;
 import com.yandex.yoctodb.query.ScoredDocument;
+import com.yandex.yoctodb.util.mutable.ArrayBitSetPool;
 import com.yandex.yoctodb.util.mutable.BitSet;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,37 +30,36 @@ public class FilterResultIterator
     @NotNull
     private final Query query;
     @NotNull
-    private final Iterator<V1QueryContext> contexts;
+    private final Iterator<? extends IndexedDatabase> databases;
+    @NotNull
+    private final ArrayBitSetPool bitSetPool;
 
     public FilterResultIterator(
             @NotNull
             final Query query,
             @NotNull
-            final Iterator<V1QueryContext> contexts) {
+            final Iterator<? extends IndexedDatabase> databases,
+            @NotNull
+            final ArrayBitSetPool bitSetPool) {
         this.query = query;
-        this.contexts = contexts;
+        this.databases = databases;
+        this.bitSetPool = bitSetPool;
     }
 
     @Override
     public boolean hasNext() {
-        return contexts.hasNext();
+        return databases.hasNext();
     }
 
     @NotNull
     @Override
     public Iterator<? extends ScoredDocument<?>> next() {
-        final V1QueryContext ctx = contexts.next();
-        final BitSet docs =
-                query.filteredUnlimited(
-                        ctx.getDatabase(),
-                        ctx.getBitSetPool());
+        final IndexedDatabase db = databases.next();
+        final BitSet docs = query.filteredUnlimited(db, bitSetPool);
         if (docs == null) {
             return Collections.emptyIterator();
         } else {
-            return query.sortedUnlimited(
-                    docs,
-                    ctx.getDatabase(),
-                    ctx.getBitSetPool());
+            return query.sortedUnlimited(docs, db, bitSetPool);
         }
     }
 

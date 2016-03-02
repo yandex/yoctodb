@@ -25,7 +25,6 @@ import com.yandex.yoctodb.v1.V1DatabaseFormat;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.util.Iterator;
 
 /**

@@ -10,14 +10,14 @@
 
 package com.yandex.yoctodb.query.simple;
 
+import com.yandex.yoctodb.immutable.FilterableIndex;
 import com.yandex.yoctodb.immutable.FilterableIndexProvider;
-import com.yandex.yoctodb.query.BitSetPool;
+import com.yandex.yoctodb.util.UnsignedByteArray;
 import com.yandex.yoctodb.util.buf.Buffer;
+import com.yandex.yoctodb.util.mutable.ArrayBitSetPool;
+import com.yandex.yoctodb.util.mutable.BitSet;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
-import com.yandex.yoctodb.immutable.FilterableIndex;
-import com.yandex.yoctodb.util.UnsignedByteArray;
-import com.yandex.yoctodb.util.mutable.BitSet;
 
 /**
  * Range condition
@@ -49,7 +49,7 @@ public final class SimpleRangeCondition extends AbstractTermCondition {
         if (to.length() == 0)
             throw new IllegalArgumentException("Empty to value");
         if (!(from.compareTo(to) < 0 ||
-                from.equals(to) && fromInclusive && toInclusive))
+              from.equals(to) && fromInclusive && toInclusive))
             throw new IllegalArgumentException("Empty range");
 
         this.from = from.toByteBuffer();
@@ -65,9 +65,9 @@ public final class SimpleRangeCondition extends AbstractTermCondition {
             @NotNull
             final BitSet dest,
             @NotNull
-            final BitSetPool bitSetPool) {
+            final ArrayBitSetPool bitSetPool) {
         final FilterableIndex index = indexProvider.getFilter(getFieldName());
         return index != null &&
-                index.between(dest, from, fromInclusive, to, toInclusive);
+               index.between(dest, from, fromInclusive, to, toInclusive);
     }
 }

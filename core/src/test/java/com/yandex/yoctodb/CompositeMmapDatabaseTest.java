@@ -12,6 +12,7 @@ package com.yandex.yoctodb;
 
 import com.yandex.yoctodb.immutable.Database;
 import com.yandex.yoctodb.immutable.DatabaseReader;
+import com.yandex.yoctodb.immutable.IndexedDatabase;
 import com.yandex.yoctodb.mutable.DatabaseBuilder;
 import com.yandex.yoctodb.mutable.DocumentBuilder;
 import com.yandex.yoctodb.query.DocumentProcessor;
@@ -55,11 +56,11 @@ public class CompositeMmapDatabaseTest {
 
     @Test
     public void build() throws IOException {
-        final Database db1 = READER.from(mmap(buildDatabase1("1.dat")));
+        final IndexedDatabase db1 = READER.from(mmap(buildDatabase1("1.dat")));
 
         Assert.assertEquals(DOCS, db1.getDocumentCount());
 
-        final Database db2 = READER.from(mmap(buildDatabase2("2.dat")));
+        final IndexedDatabase db2 = READER.from(mmap(buildDatabase2("2.dat")));
 
         Assert.assertEquals(DOCS, db2.getDocumentCount());
 
@@ -176,8 +177,8 @@ public class CompositeMmapDatabaseTest {
 
     @Test
     public void sortAndFilter() throws IOException {
-        final Database db1 = READER.from(mmap(buildDatabase1("1.dat")));
-        final Database db2 = READER.from(mmap(buildDatabase2("2.dat")));
+        final IndexedDatabase db1 = READER.from(mmap(buildDatabase1("1.dat")));
+        final IndexedDatabase db2 = READER.from(mmap(buildDatabase2("2.dat")));
 
         final Database db = READER.composite(Arrays.asList(db1, db2));
 
@@ -209,8 +210,8 @@ public class CompositeMmapDatabaseTest {
 
     @Test
     public void emptyRangeRight() throws IOException {
-        final Database db1 = READER.from(mmap(buildDatabase1("1.dat")));
-        final Database db2 = READER.from(mmap(buildDatabase2("2.dat")));
+        final IndexedDatabase db1 = READER.from(mmap(buildDatabase1("1.dat")));
+        final IndexedDatabase db2 = READER.from(mmap(buildDatabase2("2.dat")));
 
         final Database db = READER.composite(Arrays.asList(db1, db2));
 
@@ -234,8 +235,8 @@ public class CompositeMmapDatabaseTest {
 
     @Test
     public void emptyRangeLeft() throws IOException {
-        final Database db1 = READER.from(mmap(buildDatabase1("1.dat")));
-        final Database db2 = READER.from(mmap(buildDatabase2("2.dat")));
+        final IndexedDatabase db1 = READER.from(mmap(buildDatabase1("1.dat")));
+        final IndexedDatabase db2 = READER.from(mmap(buildDatabase2("2.dat")));
 
         final Database db = READER.composite(Arrays.asList(db1, db2));
 
@@ -259,8 +260,8 @@ public class CompositeMmapDatabaseTest {
 
     @Test
     public void unindexedFieldSearh() throws IOException {
-        final Database db1 = READER.from(mmap(buildDatabase1("1.dat")));
-        final Database db2 = READER.from(mmap(buildDatabase2("2.dat")));
+        final IndexedDatabase db1 = READER.from(mmap(buildDatabase1("1.dat")));
+        final IndexedDatabase db2 = READER.from(mmap(buildDatabase2("2.dat")));
 
         final Database db = READER.composite(Arrays.asList(db1, db2));
 
@@ -285,7 +286,7 @@ public class CompositeMmapDatabaseTest {
 
     @Test
     public void emptyCompositeDatabaseFieldSearh() throws IOException {
-        final Database db = READER.composite(new ArrayList<Database>());
+        final Database db = READER.composite(new ArrayList<IndexedDatabase>());
 
         final List<Integer> docs = new ArrayList<Integer>();
 
@@ -317,8 +318,8 @@ public class CompositeMmapDatabaseTest {
 
     @Test
     public void noSortNoLimitSearch() throws IOException {
-        final Database db1 = READER.from(mmap(buildDatabase1("1.dat")));
-        final Database db2 = READER.from(mmap(buildDatabase2("2.dat")));
+        final IndexedDatabase db1 = READER.from(mmap(buildDatabase1("1.dat")));
+        final IndexedDatabase db2 = READER.from(mmap(buildDatabase2("2.dat")));
 
         final Database db = READER.composite(Arrays.asList(db1, db2));
 

@@ -12,8 +12,11 @@ package com.yandex.yoctodb.v1.immutable;
 
 import com.google.common.collect.Iterators;
 import com.yandex.yoctodb.immutable.*;
-import com.yandex.yoctodb.query.*;
+import com.yandex.yoctodb.query.DocumentProcessor;
+import com.yandex.yoctodb.query.Query;
+import com.yandex.yoctodb.query.ScoredDocument;
 import com.yandex.yoctodb.util.buf.Buffer;
+import com.yandex.yoctodb.util.mutable.ArrayBitSetPool;
 import com.yandex.yoctodb.util.mutable.BitSet;
 import com.yandex.yoctodb.util.mutable.impl.ReadOnlyOneBitSet;
 import net.jcip.annotations.Immutable;
@@ -39,7 +42,7 @@ public final class V1Database implements IndexedDatabase {
     @NotNull
     private final Map<String, SortableIndex> sorters;
     @NotNull
-    private final BitSetPoolPool bitSetPoolPool;
+    private final ArrayBitSetPool bitSetPool;
 
     public V1Database(
             @NotNull
@@ -49,7 +52,7 @@ public final class V1Database implements IndexedDatabase {
             @NotNull
             final Map<String, SortableIndex> sorters,
             @NotNull
-            final BitSetPoolPool bitSetPoolPool) {
+            final ArrayBitSetPool bitSetPool) {
         this.payload = payload;
         this.filters =
                 Collections.unmodifiableMap(
@@ -57,7 +60,7 @@ public final class V1Database implements IndexedDatabase {
         this.sorters =
                 Collections.unmodifiableMap(
                         new HashMap<String, SortableIndex>(sorters));
-        this.bitSetPoolPool = bitSetPoolPool;
+        this.bitSetPool = bitSetPool;
     }
 
     @NotNull
@@ -106,34 +109,29 @@ public final class V1Database implements IndexedDatabase {
             final Query query,
             @NotNull
             final DocumentProcessor processor) {
-        final BitSetPool bitSetPool = bitSetPoolPool.borrowPool();
-        try {
-            final BitSet docs = query.filteredUnlimited(this, bitSetPool);
-            if (docs == null) {
+        final BitSet docs = query.filteredUnlimited(this, bitSetPool);
+        if (docs == null) {
+            return;
+        }
+
+        final Iterator<? extends ScoredDocument<?>> unlimited =
+                query.sortedUnlimited(docs, this, bitSetPool);
+
+        if (query.getSkip() != 0) {
+            Iterators.advance(unlimited, query.getSkip());
+        }
+
+        final Iterator<? extends ScoredDocument<?>> limited;
+        if (query.getLimit() == Integer.MAX_VALUE) {
+            limited = unlimited;
+        } else {
+            limited = Iterators.limit(unlimited, query.getLimit());
+        }
+
+        while (limited.hasNext()) {
+            if (!processor.process(limited.next().getDocument(), this)) {
                 return;
             }
-
-            final Iterator<? extends ScoredDocument<?>> unlimited =
-                    query.sortedUnlimited(docs, this, bitSetPool);
-
-            if (query.getSkip() != 0) {
-                Iterators.advance(unlimited, query.getSkip());
-            }
-
-            final Iterator<? extends ScoredDocument<?>> limited;
-            if (query.getLimit() == Integer.MAX_VALUE) {
-                limited = unlimited;
-            } else {
-                limited = Iterators.limit(unlimited, query.getLimit());
-            }
-
-            while (limited.hasNext()) {
-                if (!processor.process(limited.next().getDocument(), this)) {
-                    return;
-                }
-            }
-        } finally {
-            bitSetPoolPool.returnPool(bitSetPool);
         }
     }
 
@@ -143,69 +141,59 @@ public final class V1Database implements IndexedDatabase {
             final Query query,
             @NotNull
             final DocumentProcessor processor) {
-        final BitSetPool bitSetPool = bitSetPoolPool.borrowPool();
-        try {
-            final BitSet docs = query.filteredUnlimited(this, bitSetPool);
-            if (docs == null) {
-                return 0;
-            }
-
-            assert !docs.isEmpty();
-
-            final int result = docs.cardinality();
-            final Iterator<? extends ScoredDocument<?>> unlimited;
-            if (result == getDocumentCount()) {
-                unlimited =
-                        query.sortedUnlimited(
-                                new ReadOnlyOneBitSet(getDocumentCount()),
-                                this,
-                                bitSetPool);
-            } else {
-                unlimited = query.sortedUnlimited(docs, this, bitSetPool);
-            }
-
-            if (query.getSkip() != 0) {
-                Iterators.advance(unlimited, query.getSkip());
-            }
-
-            final Iterator<? extends ScoredDocument<?>> limited;
-            if (query.getLimit() == Integer.MAX_VALUE) {
-                limited = unlimited;
-            } else {
-                limited = Iterators.limit(unlimited, query.getLimit());
-            }
-
-            while (limited.hasNext()) {
-                if (!processor.process(limited.next().getDocument(), this)) {
-                    return result;
-                }
-            }
-
-            return result;
-        } finally {
-            bitSetPoolPool.returnPool(bitSetPool);
+        final BitSet docs = query.filteredUnlimited(this, bitSetPool);
+        if (docs == null) {
+            return 0;
         }
+
+        assert !docs.isEmpty();
+
+        final int result = docs.cardinality();
+        final Iterator<? extends ScoredDocument<?>> unlimited;
+        if (result == getDocumentCount()) {
+            unlimited =
+                    query.sortedUnlimited(
+                            new ReadOnlyOneBitSet(getDocumentCount()),
+                            this,
+                            bitSetPool);
+        } else {
+            unlimited = query.sortedUnlimited(docs, this, bitSetPool);
+        }
+
+        if (query.getSkip() != 0) {
+            Iterators.advance(unlimited, query.getSkip());
+        }
+
+        final Iterator<? extends ScoredDocument<?>> limited;
+        if (query.getLimit() == Integer.MAX_VALUE) {
+            limited = unlimited;
+        } else {
+            limited = Iterators.limit(unlimited, query.getLimit());
+        }
+
+        while (limited.hasNext()) {
+            if (!processor.process(limited.next().getDocument(), this)) {
+                return result;
+            }
+        }
+
+        return result;
     }
 
     @Override
     public int count(
             @NotNull
             final Query query) {
-        final BitSetPool bitSetPool = bitSetPoolPool.borrowPool();
-        try {
-            final BitSet docs = query.filteredUnlimited(this, bitSetPool);
-            if (docs == null) {
-                return 0;
-            } else {
-                return Math.min(
-                        Math.max(
-                                docs.cardinality() - query.getSkip(),
-                                0),
-                        query.getLimit()
-                );
-            }
-        } finally {
-            bitSetPoolPool.returnPool(bitSetPool);
+        final BitSet docs = query.filteredUnlimited(this, bitSetPool);
+        if (docs == null) {
+            return 0;
+        } else {
+            return Math.min(
+                    Math.max(
+                            docs.cardinality() - query.getSkip(),
+                            0),
+                    query.getLimit()
+            );
         }
     }
 }

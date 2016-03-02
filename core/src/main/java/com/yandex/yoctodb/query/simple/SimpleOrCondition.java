@@ -11,8 +11,8 @@
 package com.yandex.yoctodb.query.simple;
 
 import com.yandex.yoctodb.immutable.FilterableIndexProvider;
-import com.yandex.yoctodb.query.BitSetPool;
 import com.yandex.yoctodb.query.Condition;
+import com.yandex.yoctodb.util.mutable.ArrayBitSetPool;
 import com.yandex.yoctodb.util.mutable.BitSet;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
@@ -46,7 +46,7 @@ public final class SimpleOrCondition implements Condition {
             @NotNull
             final BitSet to,
             @NotNull
-            final BitSetPool bitSetPool) {
+            final ArrayBitSetPool bitSetPool) {
         boolean notEmpty = false;
         for (Condition clause : clauses)
             if (clause.set(indexProvider, to, bitSetPool))

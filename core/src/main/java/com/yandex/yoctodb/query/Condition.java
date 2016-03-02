@@ -11,6 +11,7 @@
 package com.yandex.yoctodb.query;
 
 import com.yandex.yoctodb.immutable.FilterableIndexProvider;
+import com.yandex.yoctodb.util.mutable.ArrayBitSetPool;
 import com.yandex.yoctodb.util.mutable.BitSet;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
@@ -40,5 +41,5 @@ public interface Condition {
             @NotNull
             BitSet to,
             @NotNull
-            BitSetPool bitSetPool);
+            ArrayBitSetPool bitSetPool);
 }

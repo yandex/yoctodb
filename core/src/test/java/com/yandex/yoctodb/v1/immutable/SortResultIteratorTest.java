@@ -25,6 +25,6 @@ public class SortResultIteratorTest {
     public void unsupportedRemove() {
         new SortResultIterator(
                 QueryBuilder.select(),
-                Collections.<DatabaseDocs>emptyIterator()).remove();
+                Collections.<QueryContext>emptyIterator()).remove();
     }
 }
