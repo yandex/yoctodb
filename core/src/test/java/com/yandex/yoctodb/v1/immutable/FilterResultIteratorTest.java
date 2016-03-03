@@ -28,6 +28,6 @@ public class FilterResultIteratorTest {
         new FilterResultIterator(
                 QueryBuilder.select(),
                 Collections.<IndexedDatabase>emptyIterator(),
-                new ThreadLocalCachedArrayBitSetPool(1)).remove();
+                new ThreadLocalCachedArrayBitSetPool()).remove();
     }
 }
