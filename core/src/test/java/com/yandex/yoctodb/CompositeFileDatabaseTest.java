@@ -12,28 +12,27 @@ package com.yandex.yoctodb;
 
 import com.yandex.yoctodb.immutable.Database;
 import com.yandex.yoctodb.immutable.DatabaseReader;
-import com.yandex.yoctodb.immutable.DocumentProvider;
 import com.yandex.yoctodb.immutable.IndexedDatabase;
 import com.yandex.yoctodb.mutable.DatabaseBuilder;
-import com.yandex.yoctodb.mutable.DocumentBuilder;
 import com.yandex.yoctodb.query.DocumentProcessor;
 import com.yandex.yoctodb.query.Query;
 import com.yandex.yoctodb.util.buf.Buffer;
 import org.jetbrains.annotations.NotNull;
-import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption.*;
 import static com.yandex.yoctodb.query.QueryBuilder.*;
 import static com.yandex.yoctodb.util.UnsignedByteArrays.from;
+import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -56,44 +55,100 @@ public class CompositeFileDatabaseTest {
     private static final DatabaseFormat FORMAT = DatabaseFormat.getCurrent();
     private static final DatabaseReader READER = FORMAT.getDatabaseReader();
 
+    private static IndexedDatabase db1;
+    private static IndexedDatabase db2;
+    private static Database db;
+
+    private static File buildDatabase1(final String name) throws IOException {
+        final File file = new File(BASE, name);
+
+        final DatabaseBuilder builder = FORMAT.newDatabaseBuilder();
+
+        for (int i = 0; i < DOCS; i++) {
+            builder.merge(
+                    FORMAT.newDocumentBuilder()
+                            .withField("field1", "1", FILTERABLE)
+                            .withField("field2", "2", FILTERABLE)
+                            .withField("index", i, FULL)
+                            .withField("relevance", -i, SORTABLE)
+                            .withPayload(("payload1=" + i).getBytes())
+            );
+        }
+
+        final OutputStream os =
+                new BufferedOutputStream(new FileOutputStream(file));
+        try {
+            builder.buildWritable().writeTo(os);
+        } finally {
+            os.close();
+        }
+
+        return file;
+    }
+
+    private static File buildDatabase2(final String name) throws IOException {
+        final File file = new File(BASE, name);
+
+        final DatabaseBuilder builder = FORMAT.newDatabaseBuilder();
+
+        for (int i = 0; i < DOCS; i++) {
+            builder.merge(
+                    FORMAT.newDocumentBuilder()
+                            .withField("field1", "2", FILTERABLE)
+                            .withField("field2", "1", FILTERABLE)
+                            .withField("index", i, FULL)
+                            .withField("relevance", i, SORTABLE)
+                            .withPayload(("payload2=" + i).getBytes())
+            );
+        }
+
+        final OutputStream os =
+                new BufferedOutputStream(new FileOutputStream(file));
+        try {
+            builder.buildWritable().writeTo(os);
+        } finally {
+            os.close();
+        }
+
+        return file;
+    }
+
+    @BeforeClass
+    public static void beforeAll() throws IOException {
+        db1 = READER.from(Buffer.from(
+                new RandomAccessFile(
+                        buildDatabase1("1.dat"),
+                        "r").getChannel()));
+
+        db2 = READER.from(Buffer.from(
+                new RandomAccessFile(
+                        buildDatabase2("2.dat"),
+                        "r").getChannel()));
+
+        db = READER.composite(asList(db1, db2));
+    }
+
+    @AfterClass
+    public static void afterAll() throws IOException {
+        for (String name : new File(BASE).list())
+            if (!new File(BASE, name).delete()) {
+                throw new IOException();
+            }
+
+        if (!new File(BASE).delete()) {
+            throw new IOException();
+        }
+    }
+
     @Test
     public void build() throws IOException {
-        final IndexedDatabase db1 =
-                READER.from(Buffer.from(
-                        new RandomAccessFile(
-                                buildDatabase1("1.dat"),
-                                "r").getChannel()));
-
         assertEquals(DOCS, db1.getDocumentCount());
-
-        final IndexedDatabase db2 =
-                READER.from(Buffer.from(
-                        new RandomAccessFile(
-                                buildDatabase2("2.dat"),
-                                "r").getChannel()));
-
         assertEquals(DOCS, db2.getDocumentCount());
-
-        final Database db = READER.composite(Arrays.asList(db1, db2));
-
         assertEquals(2 * DOCS, db.getDocumentCount());
     }
 
     @Test
-    public void accessDocuments() throws IOException {
-        final Database db =
-                READER.composite(
-                        Arrays.asList(
-                                READER.from(
-                                        Buffer.from(
-                                                new RandomAccessFile(
-                                                        buildDatabase1("1.dat"),
-                                                        "r").getChannel())),
-                                READER.from(
-                                        Buffer.from(
-                                                new RandomAccessFile(
-                                                        buildDatabase2("2.dat"),
-                                                        "r").getChannel()))));
+    public void accessDocuments() {
         for (int i = 0; i < DOCS; i++) {
             assertEquals(
                     Buffer.from(("payload1=" + i).getBytes()),
@@ -107,21 +162,7 @@ public class CompositeFileDatabaseTest {
     }
 
     @Test
-    public void skipAndLimit() throws IOException {
-        final Database db =
-                READER.composite(
-                        Arrays.asList(
-                                READER.from(
-                                        Buffer.from(
-                                                new RandomAccessFile(
-                                                        buildDatabase1("1.dat"),
-                                                        "r").getChannel())),
-                                READER.from(
-                                        Buffer.from(
-                                                new RandomAccessFile(
-                                                        buildDatabase2("2.dat"),
-                                                        "r").getChannel()))));
-
+    public void skipAndLimit() {
         // skip
         final Query qSkip = select().skip(DOCS / 4);
         final AtomicInteger idSkip = new AtomicInteger(DOCS / 4);
@@ -187,27 +228,12 @@ public class CompositeFileDatabaseTest {
     }
 
     @Test
-    public void filter() throws IOException {
-        final IndexedDatabase db1 =
-                READER.from(
-                        Buffer.from(
-                                new RandomAccessFile(
-                                        buildDatabase1("1.dat"),
-                                        "r").getChannel()));
-        final IndexedDatabase db2 =
-                READER.from(
-                        Buffer.from(
-                                new RandomAccessFile(
-                                        buildDatabase2("2.dat"),
-                                        "r").getChannel()));
-
-        final Database db = READER.composite(Arrays.asList(db1, db2));
-
+    public void filter() {
         for (int i = 0; i < DOCS; i++) {
             final Query q = select().where(eq("index", from(i)));
 
             final Iterator<IndexedDatabase> dbs =
-                    Arrays.asList(db1, db2).iterator();
+                    asList(db1, db2).iterator();
             assertEquals(
                     2,
                     db.executeAndUnlimitedCount(
@@ -314,21 +340,7 @@ public class CompositeFileDatabaseTest {
     }
 
     @Test
-    public void filterDatabase() throws IOException {
-        final IndexedDatabase db1 =
-                READER.from(
-                        Buffer.from(
-                                new RandomAccessFile(
-                                        buildDatabase1("1.dat"),
-                                        "r").getChannel()));
-        final IndexedDatabase db2 =
-                READER.from(
-                        Buffer.from(
-                                new RandomAccessFile(
-                                        buildDatabase2("2.dat"),
-                                        "r").getChannel()));
-        final Database db = READER.composite(Arrays.asList(db1, db2));
-
+    public void filterDatabase() {
         final Query query =
                 select()
                         .where(eq("field1", from("2")))
@@ -361,21 +373,7 @@ public class CompositeFileDatabaseTest {
     }
 
     @Test
-    public void sort() throws IOException {
-        final IndexedDatabase db1 =
-                READER.from(
-                        Buffer.from(
-                                new RandomAccessFile(
-                                        buildDatabase1("1.dat"),
-                                        "r").getChannel()));
-        final IndexedDatabase db2 =
-                READER.from(
-                        Buffer.from(
-                                new RandomAccessFile(
-                                        buildDatabase2("2.dat"),
-                                        "r").getChannel()));
-        final Database db = READER.composite(Arrays.asList(db1, db2));
-
+    public void sort() {
         final Query query =
                 select().orderBy(asc("relevance")).and(desc("index"));
 
@@ -416,22 +414,7 @@ public class CompositeFileDatabaseTest {
     }
 
     @Test
-    public void sortAndFilter() throws IOException {
-        final IndexedDatabase db1 =
-                READER.from(
-                        Buffer.from(
-                                new RandomAccessFile(
-                                        buildDatabase1("1.dat"),
-                                        "r").getChannel()));
-        final IndexedDatabase db2 =
-                READER.from(
-                        Buffer.from(
-                                new RandomAccessFile(
-                                        buildDatabase2("2.dat"),
-                                        "r").getChannel()));
-
-        final Database db = READER.composite(Arrays.asList(db1, db2));
-
+    public void sortAndFilter() {
         for (int i = 0; i < DOCS; i++) {
             final Query query =
                     select().where(eq("index", from(i)))
@@ -444,12 +427,12 @@ public class CompositeFileDatabaseTest {
             db.execute(query, processor);
 
             assertEquals(2, docs.size());
-            assertEquals(Arrays.asList(-i, i), docs);
+            assertEquals(asList(-i, i), docs);
 
             docs.clear();
 
             assertEquals(2, db.executeAndUnlimitedCount(query, processor));
-            assertEquals(Arrays.asList(-i, i), docs);
+            assertEquals(asList(-i, i), docs);
         }
 
         for (int i = 0; i < DOCS; i++) {
@@ -463,32 +446,17 @@ public class CompositeFileDatabaseTest {
             db.execute(query, processor);
 
             assertEquals(2, docs.size());
-            assertEquals(Arrays.asList(-i, i), docs);
+            assertEquals(asList(-i, i), docs);
 
             docs.clear();
 
             assertEquals(2, db.executeAndUnlimitedCount(query, processor));
-            assertEquals(Arrays.asList(-i, i), docs);
+            assertEquals(asList(-i, i), docs);
         }
     }
 
     @Test
-    public void emptyRangeRight() throws IOException {
-        final IndexedDatabase db1 =
-                READER.from(
-                        Buffer.from(
-                                new RandomAccessFile(
-                                        buildDatabase1("1.dat"),
-                                        "r").getChannel()));
-        final IndexedDatabase db2 =
-                READER.from(
-                        Buffer.from(
-                                new RandomAccessFile(
-                                        buildDatabase2("2.dat"),
-                                        "r").getChannel()));
-
-        final Database db = READER.composite(Arrays.asList(db1, db2));
-
+    public void emptyRangeRight() {
         final Query query =
                 select().where(
                         in(
@@ -512,22 +480,7 @@ public class CompositeFileDatabaseTest {
     }
 
     @Test
-    public void emptyRangeLeft() throws IOException {
-        final IndexedDatabase db1 =
-                READER.from(
-                        Buffer.from(
-                                new RandomAccessFile(
-                                        buildDatabase1("1.dat"),
-                                        "r").getChannel()));
-        final IndexedDatabase db2 =
-                READER.from(
-                        Buffer.from(
-                                new RandomAccessFile(
-                                        buildDatabase2("2.dat"),
-                                        "r").getChannel()));
-
-        final Database db = READER.composite(Arrays.asList(db1, db2));
-
+    public void emptyRangeLeft() {
         final Query query =
                 select().where(
                         in(
@@ -551,22 +504,7 @@ public class CompositeFileDatabaseTest {
     }
 
     @Test
-    public void unindexedFieldSearch() throws IOException {
-        final IndexedDatabase db1 =
-                READER.from(
-                        Buffer.from(
-                                new RandomAccessFile(
-                                        buildDatabase1("1.dat"),
-                                        "r").getChannel()));
-        final IndexedDatabase db2 =
-                READER.from(
-                        Buffer.from(
-                                new RandomAccessFile(
-                                        buildDatabase2("2.dat"),
-                                        "r").getChannel()));
-
-        final Database db = READER.composite(Arrays.asList(db1, db2));
-
+    public void unindexedFieldSearch() {
         final List<Integer> docs = new ArrayList<Integer>();
 
         final Query query =
@@ -591,7 +529,7 @@ public class CompositeFileDatabaseTest {
     }
 
     @Test
-    public void emptyCompositeDatabaseFieldSearch() throws IOException {
+    public void emptyCompositeDatabaseFieldSearch() {
         final Database db = READER.composite(new ArrayList<IndexedDatabase>());
 
         final Query query =
@@ -627,22 +565,7 @@ public class CompositeFileDatabaseTest {
     }
 
     @Test
-    public void noSortNoLimitSearch() throws IOException {
-        final IndexedDatabase db1 =
-                READER.from(
-                        Buffer.from(
-                                new RandomAccessFile(
-                                        buildDatabase1("1.dat"),
-                                        "r").getChannel()));
-        final IndexedDatabase db2 =
-                READER.from(
-                        Buffer.from(
-                                new RandomAccessFile(
-                                        buildDatabase2("2.dat"),
-                                        "r").getChannel()));
-
-        final Database db = READER.composite(Arrays.asList(db1, db2));
-
+    public void noSortNoLimitSearch() {
         final Query query = select().where(gt("index", from(-1)));
 
         final List<Integer> docs = new ArrayList<Integer>();
@@ -660,22 +583,7 @@ public class CompositeFileDatabaseTest {
     }
 
     @Test
-    public void extractFieldValues() throws IOException {
-        final IndexedDatabase db1 =
-                READER.from(
-                        Buffer.from(
-                                new RandomAccessFile(
-                                        buildDatabase1("1.dat"),
-                                        "r").getChannel()));
-        final IndexedDatabase db2 =
-                READER.from(
-                        Buffer.from(
-                                new RandomAccessFile(
-                                        buildDatabase2("2.dat"),
-                                        "r").getChannel()));
-
-        final DocumentProvider db = READER.composite(Arrays.asList(db1, db2));
-
+    public void extractFieldValues() {
         for (int i = 0; i < 2 * DOCS; i++) {
             final int id = i % DOCS;
             assertEquals(
@@ -684,99 +592,6 @@ public class CompositeFileDatabaseTest {
             assertEquals(
                     from(-id).toByteBuffer(),
                     db.getFieldValue(id, "relevance"));
-        }
-    }
-
-    private File buildDatabase1(final String name) throws IOException {
-        final File file = new File(BASE, name);
-
-        final DatabaseBuilder builder = FORMAT.newDatabaseBuilder();
-
-        for (int i = 0; i < DOCS; i++) {
-            builder.merge(
-                    FORMAT.newDocumentBuilder()
-                            .withField(
-                                    "field1",
-                                    "1",
-                                    DocumentBuilder.IndexOption.FILTERABLE)
-                            .withField(
-                                    "field2",
-                                    "2",
-                                    DocumentBuilder.IndexOption.FILTERABLE)
-                            .withField(
-                                    "index",
-                                    i,
-                                    DocumentBuilder.IndexOption.FULL)
-                            .withField(
-                                    "relevance",
-                                    -i,
-                                    DocumentBuilder.IndexOption.SORTABLE)
-                            .withPayload(("payload1=" + i).getBytes())
-            );
-        }
-
-        final OutputStream os =
-                new BufferedOutputStream(new FileOutputStream(file));
-        try {
-            builder.buildWritable().writeTo(os);
-        } finally {
-            os.close();
-        }
-
-        return file;
-    }
-
-    private File buildDatabase2(final String name) throws IOException {
-        final File file = new File(BASE, name);
-
-        final DatabaseBuilder builder = FORMAT.newDatabaseBuilder();
-
-        for (int i = 0; i < DOCS; i++) {
-            builder.merge(
-                    FORMAT.newDocumentBuilder()
-                            .withField(
-                                    "field1",
-                                    "2",
-                                    DocumentBuilder.IndexOption.FILTERABLE)
-                            .withField(
-                                    "field2",
-                                    "1",
-                                    DocumentBuilder.IndexOption.FILTERABLE)
-                            .withField(
-                                    "index",
-                                    i,
-                                    DocumentBuilder.IndexOption.FULL)
-                            .withField(
-                                    "relevance",
-                                    i,
-                                    DocumentBuilder.IndexOption.SORTABLE)
-                            .withPayload(("payload2=" + i).getBytes())
-            );
-        }
-
-        final OutputStream os =
-                new BufferedOutputStream(new FileOutputStream(file));
-        try {
-            builder.buildWritable().writeTo(os);
-        } finally {
-            os.close();
-        }
-
-        return file;
-    }
-
-    @After
-    public void afterEach() throws IOException {
-        for (String name : new File(BASE).list())
-            if (!new File(BASE, name).delete()) {
-                throw new IOException();
-            }
-    }
-
-    @AfterClass
-    public static void afterAll() throws IOException {
-        if (!new File(BASE).delete()) {
-            throw new IOException();
         }
     }
 }
