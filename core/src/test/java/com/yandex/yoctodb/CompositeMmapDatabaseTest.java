@@ -16,9 +16,9 @@ import com.yandex.yoctodb.immutable.IndexedDatabase;
 import com.yandex.yoctodb.mutable.DatabaseBuilder;
 import com.yandex.yoctodb.query.DocumentProcessor;
 import com.yandex.yoctodb.query.Query;
+import com.yandex.yoctodb.util.mutable.impl.RejectingArrayBitSetPool;
 import org.jetbrains.annotations.NotNull;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -116,8 +116,16 @@ public class CompositeMmapDatabaseTest {
 
     @BeforeClass
     public static void beforeAll() throws IOException {
-        db1 = READER.from(mmap(buildDatabase1("1.dat")));
-        db2 = READER.from(mmap(buildDatabase2("2.dat")));
+        db1 =
+                READER.from(
+                        mmap(buildDatabase1("1.dat")),
+                        RejectingArrayBitSetPool.INSTANCE,
+                        true);
+        db2 =
+                READER.from(
+                        mmap(buildDatabase2("2.dat")),
+                        RejectingArrayBitSetPool.INSTANCE,
+                        true);
         db = READER.composite(asList(db1, db2));
     }
 

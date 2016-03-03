@@ -17,6 +17,7 @@ import com.yandex.yoctodb.mutable.DatabaseBuilder;
 import com.yandex.yoctodb.query.DocumentProcessor;
 import com.yandex.yoctodb.query.Query;
 import com.yandex.yoctodb.util.buf.Buffer;
+import com.yandex.yoctodb.util.mutable.impl.RejectingArrayBitSetPool;
 import org.jetbrains.annotations.NotNull;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -115,15 +116,21 @@ public class CompositeFileDatabaseTest {
 
     @BeforeClass
     public static void beforeAll() throws IOException {
-        db1 = READER.from(Buffer.from(
-                new RandomAccessFile(
-                        buildDatabase1("1.dat"),
-                        "r").getChannel()));
+        db1 = READER.from(
+                Buffer.from(
+                        new RandomAccessFile(
+                                buildDatabase1("1.dat"),
+                                "r").getChannel()),
+                RejectingArrayBitSetPool.INSTANCE,
+                true);
 
-        db2 = READER.from(Buffer.from(
-                new RandomAccessFile(
-                        buildDatabase2("2.dat"),
-                        "r").getChannel()));
+        db2 = READER.from(
+                Buffer.from(
+                        new RandomAccessFile(
+                                buildDatabase2("2.dat"),
+                                "r").getChannel()),
+                RejectingArrayBitSetPool.INSTANCE,
+                true);
 
         db = READER.composite(asList(db1, db2));
     }
