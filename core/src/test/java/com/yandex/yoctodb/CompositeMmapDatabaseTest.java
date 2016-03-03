@@ -14,7 +14,6 @@ import com.yandex.yoctodb.immutable.Database;
 import com.yandex.yoctodb.immutable.DatabaseReader;
 import com.yandex.yoctodb.immutable.IndexedDatabase;
 import com.yandex.yoctodb.mutable.DatabaseBuilder;
-import com.yandex.yoctodb.mutable.DocumentBuilder;
 import com.yandex.yoctodb.query.DocumentProcessor;
 import com.yandex.yoctodb.query.Query;
 import org.jetbrains.annotations.NotNull;
@@ -30,10 +29,12 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import static com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption.*;
 import static com.yandex.yoctodb.query.QueryBuilder.*;
 import static com.yandex.yoctodb.util.UnsignedByteArrays.from;
 import static com.yandex.yoctodb.util.buf.Buffer.mmap;
 import static java.util.Arrays.asList;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Tests for a composite database
@@ -67,22 +68,10 @@ public class CompositeMmapDatabaseTest {
         for (int i = 0; i < DOCS; i++) {
             builder.merge(
                     FORMAT.newDocumentBuilder()
-                            .withField(
-                                    "field1",
-                                    "1",
-                                    DocumentBuilder.IndexOption.FILTERABLE)
-                            .withField(
-                                    "field2",
-                                    "2",
-                                    DocumentBuilder.IndexOption.FILTERABLE)
-                            .withField(
-                                    "index",
-                                    i,
-                                    DocumentBuilder.IndexOption.FULL)
-                            .withField(
-                                    "relevance",
-                                    -i,
-                                    DocumentBuilder.IndexOption.SORTABLE)
+                            .withField("field1", "1", FILTERABLE)
+                            .withField("field2", "2", FILTERABLE)
+                            .withField("index", i, FULL)
+                            .withField("relevance", -i, SORTABLE)
                             .withPayload(("payload1=" + i).getBytes())
             );
         }
@@ -106,22 +95,10 @@ public class CompositeMmapDatabaseTest {
         for (int i = 0; i < DOCS; i++) {
             builder.merge(
                     FORMAT.newDocumentBuilder()
-                            .withField(
-                                    "field1",
-                                    "2",
-                                    DocumentBuilder.IndexOption.FILTERABLE)
-                            .withField(
-                                    "field2",
-                                    "1",
-                                    DocumentBuilder.IndexOption.FILTERABLE)
-                            .withField(
-                                    "index",
-                                    i,
-                                    DocumentBuilder.IndexOption.FULL)
-                            .withField(
-                                    "relevance",
-                                    i,
-                                    DocumentBuilder.IndexOption.SORTABLE)
+                            .withField("field1", "2", FILTERABLE)
+                            .withField("field2", "1", FILTERABLE)
+                            .withField("index", i, FULL)
+                            .withField("relevance", i, SORTABLE)
                             .withPayload(("payload2=" + i).getBytes())
             );
         }
@@ -158,52 +135,52 @@ public class CompositeMmapDatabaseTest {
 
     @Test
     public void build() {
-        Assert.assertEquals(DOCS, db1.getDocumentCount());
-        Assert.assertEquals(DOCS, db2.getDocumentCount());
-        Assert.assertEquals(2 * DOCS, db.getDocumentCount());
+        assertEquals(DOCS, db1.getDocumentCount());
+        assertEquals(DOCS, db2.getDocumentCount());
+        assertEquals(2 * DOCS, db.getDocumentCount());
     }
 
     @Test
     public void sortAndLimit() {
         // skip
         final Query qSkip = select().skip(DOCS / 4);
-        Assert.assertEquals(2 * DOCS - DOCS / 4, db.count(qSkip));
+        assertEquals(2 * DOCS - DOCS / 4, db.count(qSkip));
 
         // limit
         final Query qLimit = select().limit(DOCS / 3);
-        Assert.assertEquals(DOCS / 3, db.count(qLimit));
+        assertEquals(DOCS / 3, db.count(qLimit));
 
         // skip and limit
         final Query qSkipLimit = select().skip(DOCS / 3).limit(DOCS);
-        Assert.assertEquals(DOCS, db.count(qSkipLimit));
+        assertEquals(DOCS, db.count(qSkipLimit));
     }
 
     @Test
     public void filter() {
         for (int i = 0; i < DOCS; i++)
-            Assert.assertEquals(
+            assertEquals(
                     2,
                     db.count(select().where(eq("index", from(i)))));
 
-        Assert.assertEquals(
+        assertEquals(
                 DOCS,
                 db.count(
                         select()
                                 .where(eq("field1", from("1")))
                                 .and(eq("field2", from("2")))));
-        Assert.assertEquals(
+        assertEquals(
                 DOCS,
                 db.count(
                         select()
                                 .where(eq("field1", from("2")))
                                 .and(eq("field2", from("1")))));
-        Assert.assertEquals(
+        assertEquals(
                 0,
                 db.count(
                         select()
                                 .where(eq("field1", from("1")))
                                 .and(eq("field2", from("1")))));
-        Assert.assertEquals(
+        assertEquals(
                 0,
                 db.count(
                         select()
@@ -228,13 +205,13 @@ public class CompositeMmapDatabaseTest {
                 }
         );
 
-        Assert.assertEquals(2 * DOCS, docs.size());
+        assertEquals(2 * DOCS, docs.size());
 
         final Iterator<Integer> docsIterator = docs.iterator();
         for (int i = DOCS - 1; i >= 0; i--)
-            Assert.assertEquals(i, docsIterator.next().intValue());
+            assertEquals(i, docsIterator.next().intValue());
         for (int i = 0; i < DOCS; i++)
-            Assert.assertEquals(i, docsIterator.next().intValue());
+            assertEquals(i, docsIterator.next().intValue());
     }
 
     @Test
@@ -260,8 +237,8 @@ public class CompositeMmapDatabaseTest {
                     }
             );
 
-            Assert.assertEquals(2, docs.size());
-            Assert.assertEquals(Arrays.asList(-i, i), docs);
+            assertEquals(2, docs.size());
+            assertEquals(Arrays.asList(-i, i), docs);
         }
     }
 
@@ -282,7 +259,7 @@ public class CompositeMmapDatabaseTest {
                 new DoubleDatabaseProcessor(db1, db2, docs)
         );
 
-        Assert.assertEquals(0, docs.size());
+        assertEquals(0, docs.size());
     }
 
     @Test
@@ -302,7 +279,7 @@ public class CompositeMmapDatabaseTest {
                 new DoubleDatabaseProcessor(db1, db2, docs)
         );
 
-        Assert.assertEquals(0, docs.size());
+        assertEquals(0, docs.size());
     }
 
     @Test
@@ -322,7 +299,7 @@ public class CompositeMmapDatabaseTest {
                 new DoubleDatabaseProcessor(db1, db2, docs)
         );
 
-        Assert.assertEquals(0, docs.size());
+        assertEquals(0, docs.size());
     }
 
 
@@ -352,7 +329,7 @@ public class CompositeMmapDatabaseTest {
                 }
         );
 
-        Assert.assertEquals(0, docs.size());
+        assertEquals(0, docs.size());
     }
 
 
@@ -378,6 +355,6 @@ public class CompositeMmapDatabaseTest {
                 }
         );
 
-        Assert.assertEquals(DOCS * 2, docs.size());
+        assertEquals(DOCS * 2, docs.size());
     }
 }
