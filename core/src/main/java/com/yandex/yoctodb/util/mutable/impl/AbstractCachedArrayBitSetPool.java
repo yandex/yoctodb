@@ -19,7 +19,7 @@ import java.util.Deque;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 /**
- * Abstract LIFO {@link Deque<long[]>}-based cache of {@link ArrayBitSet}s
+ * Abstract LIFO {@link Deque}-based cache of {@link ArrayBitSet}s
  *
  * @author incubos
  */
