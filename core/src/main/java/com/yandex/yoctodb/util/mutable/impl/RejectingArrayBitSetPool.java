@@ -2,6 +2,7 @@ package com.yandex.yoctodb.util.mutable.impl;
 
 import com.yandex.yoctodb.util.mutable.ArrayBitSet;
 import com.yandex.yoctodb.util.mutable.ArrayBitSetPool;
+import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -9,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @author incubos
  */
+@ThreadSafe
 public final class RejectingArrayBitSetPool implements ArrayBitSetPool {
     public static final ArrayBitSetPool INSTANCE =
             new RejectingArrayBitSetPool();

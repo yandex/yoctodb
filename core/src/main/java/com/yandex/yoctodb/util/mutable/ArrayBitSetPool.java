@@ -10,6 +10,7 @@
 
 package com.yandex.yoctodb.util.mutable;
 
+import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -17,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @author incubos
  */
+@ThreadSafe
 public interface ArrayBitSetPool {
     /**
      * Borrow a zeroed {@link ArrayBitSet} instance.
