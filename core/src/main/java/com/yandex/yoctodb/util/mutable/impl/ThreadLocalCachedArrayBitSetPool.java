@@ -11,7 +11,7 @@
 package com.yandex.yoctodb.util.mutable.impl;
 
 import com.yandex.yoctodb.util.mutable.ArrayBitSet;
-import com.yandex.yoctodb.util.mutable.ArrayBitSetPool;
+import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayDeque;
@@ -22,13 +22,9 @@ import java.util.Deque;
  *
  * @author incubos
  */
-public final class ThreadLocalCachedArrayBitSetPool implements ArrayBitSetPool {
-    public static final int DEFAULT_SIZE_HINT = 1;
-    public static final float DEFAULT_LOAD_FACTOR = 0.75f;
-
-    private final int minSize;
-    private final float loadFactor;
-
+@ThreadSafe
+public final class ThreadLocalCachedArrayBitSetPool
+        extends AbstractCachedArrayBitSetPool {
     private static class Cache extends ThreadLocal<Deque<long[]>> {
         @Override
         protected Deque<long[]> initialValue() {
@@ -39,50 +35,18 @@ public final class ThreadLocalCachedArrayBitSetPool implements ArrayBitSetPool {
     @NotNull
     private final ThreadLocal<Deque<long[]>> cache = new Cache();
 
-    private static int sizeToAllocate(final int bits, final float loadFactor) {
-        return (int) (LongArrayBitSet.arraySize(bits) / loadFactor);
-    }
-
     public ThreadLocalCachedArrayBitSetPool(
             final int sizeHint,
             final float loadFactor) {
-        assert sizeHint > 0;
-        assert 0.0f < loadFactor && loadFactor <= 1.0f;
-
-        this.minSize = sizeToAllocate(sizeHint, loadFactor);
-        this.loadFactor = loadFactor;
+        super(sizeHint, loadFactor);
     }
 
     public ThreadLocalCachedArrayBitSetPool() {
         this(DEFAULT_SIZE_HINT, DEFAULT_LOAD_FACTOR);
     }
 
-    @NotNull
-    private long[] allocate(final int size) {
-        final int actualSize =
-                Math.max(sizeToAllocate(size, loadFactor), minSize);
-        return new long[actualSize];
-    }
-
-    @NotNull
     @Override
-    public ArrayBitSet borrowSet(final int size) {
-        assert size > 0;
-
-        final Deque<long[]> lifo = cache.get();
-        final long[] cached = lifo.poll();
-        if (cached == null)
-            return LongArrayBitSet.zero(size, allocate(size));
-        else if (cached.length < LongArrayBitSet.arraySize(size))
-            return LongArrayBitSet.zero(size, allocate(size));
-        else
-            return LongArrayBitSet.zero(size, cached);
-    }
-
-    @Override
-    public void returnSet(
-            @NotNull
-            final ArrayBitSet set) {
-        cache.get().addFirst(set.toArray());
+    protected Deque<long[]> getCache() {
+        return cache.get();
     }
 }
