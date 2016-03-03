@@ -1,3 +1,9 @@
+0.0.15
+  * Support for size hint in ThreadLocalCachedArrayBitSetPool
+  * Implemented RejectingArrayBitSetPool
+  * #20: Implemented AllocatingArrayBitSetPool
+  * #21: Implemented CachedArrayBitSetPool
+
 0.0.14
   * #9: Support for a database of documents without payload
   * #10: Support for documents without fields
