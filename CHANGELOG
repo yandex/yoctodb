@@ -1,3 +1,6 @@
+0.0.16
+  * AllocatingArrayBitSetPool is used by default
+
 0.0.15
   * Support for size hint in ThreadLocalCachedArrayBitSetPool
   * Implemented RejectingArrayBitSetPool
