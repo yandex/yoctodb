@@ -12,7 +12,7 @@ package com.yandex.yoctodb.immutable;
 
 import com.yandex.yoctodb.util.buf.Buffer;
 import com.yandex.yoctodb.util.mutable.ArrayBitSetPool;
-import com.yandex.yoctodb.util.mutable.impl.ThreadLocalCachedArrayBitSetPool;
+import com.yandex.yoctodb.util.mutable.impl.AllocatingArrayBitSetPool;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,7 +30,7 @@ public abstract class DatabaseReader {
     public IndexedDatabase from(
             @NotNull
             final Buffer buffer) throws IOException {
-        return from(buffer, new ThreadLocalCachedArrayBitSetPool(), true);
+        return from(buffer, AllocatingArrayBitSetPool.INSTANCE, true);
     }
 
     @NotNull
@@ -54,6 +54,6 @@ public abstract class DatabaseReader {
             final Collection<? extends IndexedDatabase> databases) {
         return composite(
                 databases,
-                new ThreadLocalCachedArrayBitSetPool());
+                AllocatingArrayBitSetPool.INSTANCE);
     }
 }
