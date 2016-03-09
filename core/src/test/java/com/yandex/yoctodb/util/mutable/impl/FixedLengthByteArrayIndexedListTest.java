@@ -10,6 +10,7 @@
 
 package com.yandex.yoctodb.util.mutable.impl;
 
+import com.google.common.primitives.Ints;
 import com.yandex.yoctodb.util.UnsignedByteArray;
 import com.yandex.yoctodb.util.mutable.ByteArrayIndexedList;
 import org.junit.Test;
@@ -46,6 +47,6 @@ public class FixedLengthByteArrayIndexedListTest {
                 new FixedLengthByteArrayIndexedList(elements);
         final String text = set.toString();
         assertTrue(text.contains(Integer.toString(size)));
-        assertTrue(text.contains(Integer.toString(Integer.BYTES)));
+        assertTrue(text.contains(Integer.toString(Ints.BYTES)));
     }
 }

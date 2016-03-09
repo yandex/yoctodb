@@ -10,6 +10,7 @@
 
 package com.yandex.yoctodb.util.mutable.impl;
 
+import com.google.common.primitives.Ints;
 import com.yandex.yoctodb.util.UnsignedByteArray;
 import com.yandex.yoctodb.util.mutable.ByteArraySortedSet;
 import org.junit.Test;
@@ -83,10 +84,10 @@ public class FixedLengthByteArraySortedSetTest {
                         elements);
         final String unfrozen = set.toString();
         assertTrue(unfrozen.contains(Integer.toString(size)));
-        assertTrue(unfrozen.contains(Integer.toString(Integer.BYTES)));
+        assertTrue(unfrozen.contains(Integer.toString(Ints.BYTES)));
         set.getSizeInBytes();
         final String frozen = set.toString();
         assertTrue(frozen.contains(Integer.toString(size)));
-        assertTrue(frozen.contains(Integer.toString(Integer.BYTES)));
+        assertTrue(frozen.contains(Integer.toString(Ints.BYTES)));
     }
 }
