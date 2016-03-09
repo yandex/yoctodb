@@ -49,7 +49,7 @@
         <!-- Annotations -->
         <dependency>
             <groupId>org.jetbrains</groupId>
-            <artifactId>annotations</artifactId>
+            <artifactId>annotations-java5</artifactId>
         </dependency>
         <dependency>
             <groupId>net.jcip</groupId>
