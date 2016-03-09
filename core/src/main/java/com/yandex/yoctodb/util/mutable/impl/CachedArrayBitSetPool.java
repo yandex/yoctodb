@@ -25,7 +25,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 @ThreadSafe
 public final class CachedArrayBitSetPool extends AbstractCachedArrayBitSetPool {
     @NotNull
-    private final Deque<long[]> cache = new ConcurrentLinkedDeque<long[]>();
+    private final Deque<long[]> cache = new ConcurrentLinkedDeque<>();
 
     public CachedArrayBitSetPool(
             final int sizeHint,
@@ -37,6 +37,7 @@ public final class CachedArrayBitSetPool extends AbstractCachedArrayBitSetPool {
         this(DEFAULT_SIZE_HINT, DEFAULT_LOAD_FACTOR);
     }
 
+    @NotNull
     @Override
     protected Deque<long[]> getCache() {
         return cache;

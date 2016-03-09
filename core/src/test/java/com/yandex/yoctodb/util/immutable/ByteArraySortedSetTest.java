@@ -34,7 +34,7 @@ public class ByteArraySortedSetTest {
     public void buildingFromFixedLengthByteArraySortedSetTest()
             throws IOException {
         //unsorted elements
-        final List<UnsignedByteArray> elements = new ArrayList<UnsignedByteArray>();
+        final List<UnsignedByteArray> elements = new ArrayList<>();
         elements.add(UnsignedByteArrays.from(new byte[]{8, 9, 10, 11}));
         elements.add(UnsignedByteArrays.from(new byte[]{16, 17, 18, 19}));
         elements.add(UnsignedByteArrays.from(new byte[]{12, 13, 14, 15}));
@@ -61,7 +61,7 @@ public class ByteArraySortedSetTest {
     private Buffer prepareDataFromFixedLengthByteArraySortedSet(
             final Collection<UnsignedByteArray> items) throws IOException {
         final SortedSet<UnsignedByteArray> elements =
-                new TreeSet<UnsignedByteArray>();
+                new TreeSet<>();
         for (UnsignedByteArray element : items) {
             elements.add(element);
         }
@@ -81,7 +81,7 @@ public class ByteArraySortedSetTest {
     public void buildingFromVariableLengthByteArraySortedSetTest()
             throws IOException {
         //elements
-        final List<UnsignedByteArray> elements = new ArrayList<UnsignedByteArray>();
+        final List<UnsignedByteArray> elements = new ArrayList<>();
         elements.add(UnsignedByteArrays.from(new byte[]{1, 2}));
         elements.add(UnsignedByteArrays.from(new byte[]{10, 11, 12, 13, 14}));
         elements.add(UnsignedByteArrays.from(new byte[]{6, 7, 8, 9}));
@@ -108,7 +108,7 @@ public class ByteArraySortedSetTest {
     private Buffer prepareDataFromVariableLengthByteArraySortedSet(
             final Collection<UnsignedByteArray> items) throws IOException {
         final SortedSet<UnsignedByteArray> elements =
-                new TreeSet<UnsignedByteArray>();
+                new TreeSet<>();
         for (UnsignedByteArray element : items) {
             elements.add(element);
         }
@@ -126,7 +126,7 @@ public class ByteArraySortedSetTest {
 
     @Test
     public void lessThanTest() throws IOException {
-        final List<UnsignedByteArray> elements = new ArrayList<UnsignedByteArray>();
+        final List<UnsignedByteArray> elements = new ArrayList<>();
         for (int i = 0; i < SIZE; i++) {
             elements.add(from(i));
         }
@@ -160,7 +160,7 @@ public class ByteArraySortedSetTest {
 
     @Test
     public void greaterThanTest() throws IOException {
-        final List<UnsignedByteArray> elements = new ArrayList<UnsignedByteArray>();
+        final List<UnsignedByteArray> elements = new ArrayList<>();
         for (int i = 0; i < SIZE; i++) {
             elements.add(from(i));
         }

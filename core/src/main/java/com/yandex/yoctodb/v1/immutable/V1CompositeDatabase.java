@@ -55,7 +55,7 @@ public final class V1CompositeDatabase implements Database {
             final Collection<? extends IndexedDatabase> databases,
             @NotNull
             final ArrayBitSetPool bitSetPool) {
-        this.databases = new ArrayList<IndexedDatabase>(databases);
+        this.databases = new ArrayList<>(databases);
         this.documentOffsets = new int[databases.size()];
         int documentCount = 0;
         int i = 0;
@@ -112,7 +112,7 @@ public final class V1CompositeDatabase implements Database {
         // Doing merging iff there is sorting
         if (query.hasSorting()) {
             final List<Iterator<? extends ScoredDocument<?>>> results =
-                    new ArrayList<Iterator<? extends ScoredDocument<?>>>(
+                    new ArrayList<>(
                             databases.size());
             for (IndexedDatabase db : databases) {
                 final BitSet docs = query.filteredUnlimited(db, bitSetPool);
@@ -178,7 +178,7 @@ public final class V1CompositeDatabase implements Database {
         // Doing merging iff there is sorting
         if (query.hasSorting()) {
             final List<Iterator<? extends ScoredDocument<?>>> results =
-                    new ArrayList<Iterator<? extends ScoredDocument<?>>>(
+                    new ArrayList<>(
                             databases.size());
             for (IndexedDatabase db : databases) {
                 final BitSet docs = query.filteredUnlimited(db, bitSetPool);
@@ -213,7 +213,7 @@ public final class V1CompositeDatabase implements Database {
                     );
         } else {
             final List<QueryContext> results =
-                    new ArrayList<QueryContext>(databases.size());
+                    new ArrayList<>(databases.size());
             for (IndexedDatabase db : databases) {
                 final BitSet docs = query.filteredUnlimited(db, bitSetPool);
                 if (docs != null) {

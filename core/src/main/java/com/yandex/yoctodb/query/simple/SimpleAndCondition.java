@@ -38,7 +38,7 @@ public final class SimpleAndCondition implements Condition {
         if (conditions.isEmpty())
             throw new IllegalArgumentException("No conditions");
 
-        this.clauses = new ArrayList<Condition>(conditions);
+        this.clauses = new ArrayList<>(conditions);
     }
 
     @Override

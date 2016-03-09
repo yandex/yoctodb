@@ -32,7 +32,7 @@ public class ByteArrayIndexedListTest {
     public void buildingFromFixedLengthByteArrayIndexedListTest()
             throws IOException {
         //elements
-        final List<UnsignedByteArray> elements = new ArrayList<UnsignedByteArray>();
+        final List<UnsignedByteArray> elements = new ArrayList<>();
         elements.add(UnsignedByteArrays.from(new byte[]{0, 1, 2, 3}));
         elements.add(UnsignedByteArrays.from(new byte[]{4, 5, 6, 7}));
         elements.add(UnsignedByteArrays.from(new byte[]{8, 9, 10, 11}));
@@ -71,7 +71,7 @@ public class ByteArrayIndexedListTest {
     public void buildingFromVariableLengthByteArrayIndexedListTest()
             throws IOException {
         //elements
-        final List<UnsignedByteArray> elements = new ArrayList<UnsignedByteArray>();
+        final List<UnsignedByteArray> elements = new ArrayList<>();
         elements.add(UnsignedByteArrays.from(new byte[]{0}));
         elements.add(UnsignedByteArrays.from(new byte[]{1, 2}));
         elements.add(UnsignedByteArrays.from(new byte[]{3, 4, 5}));

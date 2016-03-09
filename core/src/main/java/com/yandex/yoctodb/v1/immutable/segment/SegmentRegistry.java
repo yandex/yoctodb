@@ -14,7 +14,6 @@ import com.yandex.yoctodb.util.buf.Buffer;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -37,7 +36,7 @@ public final class SegmentRegistry {
 
     // Segment readers
     private final static ConcurrentMap<Integer, SegmentReader> readers =
-            new ConcurrentHashMap<Integer, SegmentReader>();
+            new ConcurrentHashMap<>();
 
     public static void register(
             final int type,
@@ -54,7 +53,7 @@ public final class SegmentRegistry {
     public static Segment read(
             final int type,
             @NotNull
-            final Buffer buffer) throws IOException {
+            final Buffer buffer) {
         final SegmentReader reader = readers.get(type);
         if (reader == null) {
             throw new NoSuchElementException(

@@ -76,12 +76,8 @@ public class CompositeMmapDatabaseTest {
             );
         }
 
-        final OutputStream os =
-                new BufferedOutputStream(new FileOutputStream(file));
-        try {
+        try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file))) {
             builder.buildWritable().writeTo(os);
-        } finally {
-            os.close();
         }
 
         return file;
@@ -103,12 +99,8 @@ public class CompositeMmapDatabaseTest {
             );
         }
 
-        final OutputStream os =
-                new BufferedOutputStream(new FileOutputStream(file));
-        try {
+        try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file))) {
             builder.buildWritable().writeTo(os);
-        } finally {
-            os.close();
         }
 
         return file;
@@ -198,7 +190,7 @@ public class CompositeMmapDatabaseTest {
 
     @Test
     public void sort() {
-        final List<Integer> docs = new ArrayList<Integer>(2 * DOCS);
+        final List<Integer> docs = new ArrayList<>(2 * DOCS);
         db.execute(
                 select().orderBy(asc("relevance")),
                 new DocumentProcessor() {
@@ -225,7 +217,7 @@ public class CompositeMmapDatabaseTest {
     @Test
     public void sortAndFilter() {
         for (int i = 0; i < DOCS; i++) {
-            final List<Integer> docs = new ArrayList<Integer>(2);
+            final List<Integer> docs = new ArrayList<>(2);
             db.execute(
                     select().where(eq("index", from(i)))
                             .orderBy(asc("relevance")),
@@ -252,7 +244,7 @@ public class CompositeMmapDatabaseTest {
 
     @Test
     public void emptyRangeRight() {
-        final List<Integer> docs = new ArrayList<Integer>();
+        final List<Integer> docs = new ArrayList<>();
 
         db.execute(
                 select().where(
@@ -272,7 +264,7 @@ public class CompositeMmapDatabaseTest {
 
     @Test
     public void emptyRangeLeft() {
-        final List<Integer> docs = new ArrayList<Integer>();
+        final List<Integer> docs = new ArrayList<>();
 
         db.execute(
                 select().where(
@@ -292,7 +284,7 @@ public class CompositeMmapDatabaseTest {
 
     @Test
     public void unindexedFieldSearch() {
-        final List<Integer> docs = new ArrayList<Integer>();
+        final List<Integer> docs = new ArrayList<>();
 
         db.execute(
                 select().where(
@@ -313,7 +305,7 @@ public class CompositeMmapDatabaseTest {
 
     @Test
     public void emptyCompositeDatabaseFieldSearh() {
-        final List<Integer> docs = new ArrayList<Integer>();
+        final List<Integer> docs = new ArrayList<>();
 
         db.execute(
                 select().where(
@@ -343,7 +335,7 @@ public class CompositeMmapDatabaseTest {
 
     @Test
     public void noSortNoLimitSearch() {
-        final List<Integer> docs = new ArrayList<Integer>();
+        final List<Integer> docs = new ArrayList<>();
 
         db.execute(
                 select().where(gt("index", from(-1))),

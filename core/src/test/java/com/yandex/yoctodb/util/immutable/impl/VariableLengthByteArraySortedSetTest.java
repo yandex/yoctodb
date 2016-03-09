@@ -34,7 +34,7 @@ public class VariableLengthByteArraySortedSetTest {
 
     private ByteArraySortedSet build() throws IOException {
         final SortedSet<UnsignedByteArray> elements =
-                new TreeSet<UnsignedByteArray>();
+                new TreeSet<>();
         for (int i = 0; i < VALUES; i++) {
             if (i % 2 == 0)
                 elements.add(from(i / 2));

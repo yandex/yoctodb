@@ -16,7 +16,6 @@ import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Deque;
-import java.util.concurrent.ConcurrentLinkedDeque;
 
 /**
  * Abstract LIFO {@link Deque}-based cache of {@link ArrayBitSet}s

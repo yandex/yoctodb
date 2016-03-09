@@ -73,13 +73,13 @@ public class PartialDocumentTest {
 
         // First document
         final Query q1 = select().where(eq("a", from(1)));
-        final List<String> docs1 = new LinkedList<String>();
+        final List<String> docs1 = new LinkedList<>();
         db.execute(q1, new StringProcessor(docs1));
         assertEquals(singletonList("doc1"), docs1);
 
         // Second documents
         final Query q2 = select().where(eq("b", from(2)));
-        final List<String> docs2 = new LinkedList<String>();
+        final List<String> docs2 = new LinkedList<>();
         db.execute(q2, new StringProcessor(docs2));
         assertEquals(singletonList("doc2"), docs2);
 
@@ -92,7 +92,7 @@ public class PartialDocumentTest {
                 or(
                         eq("a", from(1)),
                         eq("b", from(2))));
-        final List<String> docs4 = new LinkedList<String>();
+        final List<String> docs4 = new LinkedList<>();
         db.execute(q4, new StringProcessor(docs4));
         assertEquals(asList("doc1", "doc2"), docs4);
     }
@@ -124,7 +124,7 @@ public class PartialDocumentTest {
 
         // The document
         final Query q2 = select();
-        final List<String> docs2 = new LinkedList<String>();
+        final List<String> docs2 = new LinkedList<>();
         db.execute(q2, new StringProcessor(docs2));
         assertEquals(singletonList("doc"), docs2);
     }

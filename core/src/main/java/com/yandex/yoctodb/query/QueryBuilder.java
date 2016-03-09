@@ -127,7 +127,7 @@ public final class QueryBuilder {
             final Condition c2,
             final Condition[] rest) {
         final Collection<Condition> conditions =
-                new ArrayList<Condition>(rest.length + 2);
+                new ArrayList<>(rest.length + 2);
 
         conditions.add(c1);
         conditions.add(c2);

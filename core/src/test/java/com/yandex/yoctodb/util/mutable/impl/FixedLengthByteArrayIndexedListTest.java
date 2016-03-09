@@ -38,7 +38,7 @@ public class FixedLengthByteArrayIndexedListTest {
     @Test
     public void string() {
         final Collection<UnsignedByteArray> elements =
-                new LinkedList<UnsignedByteArray>();
+                new LinkedList<>();
         final int size = 10;
         for (int i = 0; i < size; i++)
             elements.add(from(i));

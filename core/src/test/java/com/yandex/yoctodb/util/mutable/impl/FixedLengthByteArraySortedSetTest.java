@@ -37,7 +37,7 @@ public class FixedLengthByteArraySortedSetTest {
     @Test
     public void indexing() {
         final SortedSet<UnsignedByteArray> elements =
-                new TreeSet<UnsignedByteArray>();
+                new TreeSet<>();
         final int size = 3;
         for (int i = 0; i < size; i++)
             elements.add(from(i));
@@ -51,7 +51,7 @@ public class FixedLengthByteArraySortedSetTest {
     @Test(expected = AssertionError.class)
     public void expectFixed() throws IOException {
         final SortedSet<UnsignedByteArray> elements =
-                new TreeSet<UnsignedByteArray>();
+                new TreeSet<>();
         elements.add(from(1));
         elements.add(from(1L));
         new FixedLengthByteArraySortedSet(elements)
@@ -61,7 +61,7 @@ public class FixedLengthByteArraySortedSetTest {
     @Test(expected = AssertionError.class)
     public void notFound() {
         final SortedSet<UnsignedByteArray> elements =
-                new TreeSet<UnsignedByteArray>();
+                new TreeSet<>();
         final int size = 3;
         for (int i = 0; i < size; i++)
             elements.add(from(i));
@@ -74,7 +74,7 @@ public class FixedLengthByteArraySortedSetTest {
     @Test
     public void string() {
         final SortedSet<UnsignedByteArray> elements =
-                new TreeSet<UnsignedByteArray>();
+                new TreeSet<>();
         final int size = 10;
         for (int i = 0; i < size; i++)
             elements.add(from(i));

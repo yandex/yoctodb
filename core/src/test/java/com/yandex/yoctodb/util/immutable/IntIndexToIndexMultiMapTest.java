@@ -38,14 +38,14 @@ public class IntIndexToIndexMultiMapTest {
         final IndexToIndexMultiMap map = IntIndexToIndexMultiMap.from(buf);
         Assert.assertEquals(keys, map.getKeysCount());
         for (int i = 0; i < keys; i++) {
-            final Set<Integer> expected = new HashSet<Integer>();
+            final Set<Integer> expected = new HashSet<>();
             expected.add((keys - i) % values);
             expected.add((2 * keys - i) % values);
             expected.add((3 * keys - i) % values);
 
             final BitSet result = LongArrayBitSet.zero(values);
             map.get(result, i);
-            final Set<Integer> actual = new HashSet<Integer>();
+            final Set<Integer> actual = new HashSet<>();
             int id = 0;
             while (id < values && (id = result.nextSetBit(id)) >= 0) {
                 actual.add(id++);

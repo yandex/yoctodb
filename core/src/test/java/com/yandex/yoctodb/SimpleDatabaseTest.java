@@ -256,7 +256,7 @@ public class SimpleDatabaseTest {
                         .getDatabaseReader()
                         .from(Buffer.from(os.toByteArray()));
 
-        final Collection<Integer> docs = new LinkedList<Integer>();
+        final Collection<Integer> docs = new LinkedList<>();
         final DocumentProcessor processor =
                 new DocumentProcessor() {
                     @Override
@@ -348,7 +348,7 @@ public class SimpleDatabaseTest {
                         .getDatabaseReader()
                         .from(Buffer.from(os.toByteArray()));
 
-        final Collection<Integer> docs = new LinkedList<Integer>();
+        final Collection<Integer> docs = new LinkedList<>();
         final DocumentProcessor processor =
                 new DocumentProcessor() {
                     @Override
@@ -519,7 +519,7 @@ public class SimpleDatabaseTest {
                 select().where(gte("id", from(0)))
                         .and(lte("id", from(DOCS)))
                         .orderBy(desc("id"));
-        final List<String> results = new ArrayList<String>(DOCS);
+        final List<String> results = new ArrayList<>(DOCS);
         db.execute(q1, new StringProcessor(results));
 
         // Checking
@@ -558,7 +558,7 @@ public class SimpleDatabaseTest {
         final Query q1 =
                 select().where(eq("f", from(0)))
                         .orderBy(desc("f"));
-        final List<String> results = new ArrayList<String>(DOCS);
+        final List<String> results = new ArrayList<>(DOCS);
         db.execute(q1, new StringProcessor(results));
 
         // Checking
@@ -601,10 +601,10 @@ public class SimpleDatabaseTest {
         final Query q =
                 select().orderBy(desc("f1")).and(asc("f2"));
 
-        final List<String> results = new ArrayList<String>(DOCS);
+        final List<String> results = new ArrayList<>(DOCS);
         db.execute(q, new StringProcessor(results));
 
-        final List<String> expected = new ArrayList<String>(DOCS);
+        final List<String> expected = new ArrayList<>(DOCS);
         for (int i = DOCS - 2; i >= 0; i -= 2) {
             expected.add("payload" + i);
             expected.add("payload" + (i + 1));
@@ -648,7 +648,7 @@ public class SimpleDatabaseTest {
                                 from(20),
                                 true))
                         .orderBy(new SimpleDescendingOrder("id"));
-        final List<String> results = new ArrayList<String>(DOCS);
+        final List<String> results = new ArrayList<>(DOCS);
         db.execute(q1, new StringProcessor(results));
 
         // Checking
@@ -663,7 +663,7 @@ public class SimpleDatabaseTest {
                         from(1000),
                         true, from(2000),
                         true)).orderBy(new SimpleDescendingOrder("id"));
-        final List<String> results2 = new ArrayList<String>(DOCS);
+        final List<String> results2 = new ArrayList<>(DOCS);
         db.execute(q2, new StringProcessor(results2));
         assertTrue(results2.isEmpty());
     }
@@ -770,7 +770,7 @@ public class SimpleDatabaseTest {
         final Query q1 =
                 select().where(not(eq("int", from(1))));
         assertEquals(1, db.count(q1));
-        final List<Integer> ids1 = new LinkedList<Integer>();
+        final List<Integer> ids1 = new LinkedList<>();
         db.execute(q1, new DocumentProcessor() {
             @Override
             public boolean process(
@@ -786,7 +786,7 @@ public class SimpleDatabaseTest {
                 select().where(not(eq("int", from(1))))
                         .and(eq("text", from("doc2")));
         assertEquals(1, db.count(q2));
-        final List<Integer> ids2 = new LinkedList<Integer>();
+        final List<Integer> ids2 = new LinkedList<>();
         db.execute(q2, new DocumentProcessor() {
             @Override
             public boolean process(
@@ -883,7 +883,7 @@ public class SimpleDatabaseTest {
 
         assertEquals(0, db.count(query));
 
-        final List<Integer> ids = new LinkedList<Integer>();
+        final List<Integer> ids = new LinkedList<>();
         final DocumentProcessor processor = new DocumentProcessor() {
             @Override
             public boolean process(
@@ -1010,7 +1010,7 @@ public class SimpleDatabaseTest {
                         .getDatabaseReader()
                         .from(Buffer.from(os.toByteArray()));
 
-        final Collection<Integer> ids = new LinkedList<Integer>();
+        final Collection<Integer> ids = new LinkedList<>();
         final DocumentProcessor processor = new DocumentProcessor() {
             @Override
             public boolean process(

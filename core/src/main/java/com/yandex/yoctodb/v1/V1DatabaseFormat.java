@@ -34,7 +34,7 @@ public final class V1DatabaseFormat extends DatabaseFormat {
     private final static DatabaseReader DATABASE_READER = new V1DatabaseReader();
 
     private final static AtomicReference<String> messageDigestAlgorithm =
-            new AtomicReference<String>("MD5");
+            new AtomicReference<>("MD5");
 
     @NotNull
     public static String getMessageDigestAlgorithm() {
@@ -48,7 +48,7 @@ public final class V1DatabaseFormat extends DatabaseFormat {
     }
 
     private final static AtomicReference<Integer> digestSize =
-            new AtomicReference<Integer>(16); // MD5 size
+            new AtomicReference<>(16); // MD5 size
 
     @NotNull
     public static Integer getDigestSizeInBytes() {

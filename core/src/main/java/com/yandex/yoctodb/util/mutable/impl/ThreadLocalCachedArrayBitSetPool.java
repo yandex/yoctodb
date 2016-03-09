@@ -28,7 +28,7 @@ public final class ThreadLocalCachedArrayBitSetPool
     private static class Cache extends ThreadLocal<Deque<long[]>> {
         @Override
         protected Deque<long[]> initialValue() {
-            return new ArrayDeque<long[]>();
+            return new ArrayDeque<>();
         }
     }
 

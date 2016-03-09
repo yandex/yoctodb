@@ -15,6 +15,7 @@ import com.yandex.yoctodb.mutable.DatabaseBuilder;
 import com.yandex.yoctodb.query.DocumentProcessor;
 import com.yandex.yoctodb.query.Query;
 import com.yandex.yoctodb.util.buf.Buffer;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
@@ -78,13 +79,14 @@ public class GettingStartedTest {
                 select().where(and(gte("id", from(1)), lte("id", from(2))))
                         .orderBy(desc("score"));
 
-        final List<Integer> ids = new LinkedList<Integer>();
+        final List<Integer> ids = new LinkedList<>();
         db.execute(
                 sorted,
                 new DocumentProcessor() {
                     @Override
                     public boolean process(
                             final int document,
+                            @NotNull
                             final Database database) {
                         ids.add(document);
                         return true;

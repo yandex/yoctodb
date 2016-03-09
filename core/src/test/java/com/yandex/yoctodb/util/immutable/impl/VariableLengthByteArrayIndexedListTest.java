@@ -33,8 +33,7 @@ public class VariableLengthByteArrayIndexedListTest {
     private final int VALUES = 128;
 
     private ByteArrayIndexedList build() throws IOException {
-        final Collection<UnsignedByteArray> elements =
-                new LinkedList<UnsignedByteArray>();
+        final Collection<UnsignedByteArray> elements = new LinkedList<>();
         for (int i = 0; i < VALUES; i++) {
             if (i % 2 == 0)
                 elements.add(from(i));

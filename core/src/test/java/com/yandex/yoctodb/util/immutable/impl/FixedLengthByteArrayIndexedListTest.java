@@ -34,7 +34,7 @@ public class FixedLengthByteArrayIndexedListTest {
 
     private ByteArrayIndexedList build() throws IOException {
         final Collection<UnsignedByteArray> elements =
-                new LinkedList<UnsignedByteArray>();
+                new LinkedList<>();
         for (long i = 0L; i < VALUES; i++) {
             elements.add(from(i));
         }

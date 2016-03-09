@@ -76,12 +76,8 @@ public class CompositeFileDatabaseTest {
             );
         }
 
-        final OutputStream os =
-                new BufferedOutputStream(new FileOutputStream(file));
-        try {
+        try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file))) {
             builder.buildWritable().writeTo(os);
-        } finally {
-            os.close();
         }
 
         return file;
@@ -103,12 +99,8 @@ public class CompositeFileDatabaseTest {
             );
         }
 
-        final OutputStream os =
-                new BufferedOutputStream(new FileOutputStream(file));
-        try {
+        try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file))) {
             builder.buildWritable().writeTo(os);
-        } finally {
-            os.close();
         }
 
         return file;
@@ -384,7 +376,7 @@ public class CompositeFileDatabaseTest {
         final Query query =
                 select().orderBy(asc("relevance")).and(desc("index"));
 
-        final List<Integer> docs = new ArrayList<Integer>(2 * DOCS);
+        final List<Integer> docs = new ArrayList<>(2 * DOCS);
         final DocumentProcessor processor =
                 new DocumentProcessor() {
                     @Override
@@ -427,7 +419,7 @@ public class CompositeFileDatabaseTest {
                     select().where(eq("index", from(i)))
                             .orderBy(asc("relevance"));
 
-            final List<Integer> docs = new ArrayList<Integer>(2);
+            final List<Integer> docs = new ArrayList<>(2);
             final DocumentProcessor processor =
                     new DoubleDatabaseProcessor(db1, db2, docs);
 
@@ -446,7 +438,7 @@ public class CompositeFileDatabaseTest {
             final Query query =
                     select().where(eq("index", from(i)))
                             .orderBy(desc("relevance"));
-            final List<Integer> docs = new ArrayList<Integer>(2);
+            final List<Integer> docs = new ArrayList<>(2);
             final DocumentProcessor processor =
                     new DoubleDatabaseProcessor(db2, db1, docs);
 
@@ -474,7 +466,7 @@ public class CompositeFileDatabaseTest {
                                 false))
                         .orderBy(desc("relevance"));
 
-        final List<Integer> docs = new ArrayList<Integer>();
+        final List<Integer> docs = new ArrayList<>();
         final DocumentProcessor processor =
                 new DoubleDatabaseProcessor(db1, db2, docs);
 
@@ -498,7 +490,7 @@ public class CompositeFileDatabaseTest {
                                 false))
                         .orderBy(desc("relevance"));
 
-        final List<Integer> docs = new ArrayList<Integer>();
+        final List<Integer> docs = new ArrayList<>();
         final DocumentProcessor processor =
                 new DoubleDatabaseProcessor(db1, db2, docs);
 
@@ -512,7 +504,7 @@ public class CompositeFileDatabaseTest {
 
     @Test
     public void unindexedFieldSearch() {
-        final List<Integer> docs = new ArrayList<Integer>();
+        final List<Integer> docs = new ArrayList<>();
 
         final Query query =
                 select().where(
@@ -549,7 +541,7 @@ public class CompositeFileDatabaseTest {
                                 false))
                         .orderBy(desc("relevance"));
 
-        final List<Integer> docs = new ArrayList<Integer>();
+        final List<Integer> docs = new ArrayList<>();
 
         final DocumentProcessor processor =
                 new DocumentProcessor() {
@@ -575,7 +567,7 @@ public class CompositeFileDatabaseTest {
     public void noSortNoLimitSearch() {
         final Query query = select().where(gt("index", from(-1)));
 
-        final List<Integer> docs = new ArrayList<Integer>();
+        final List<Integer> docs = new ArrayList<>();
         final DocumentProcessor processor =
                 new DoubleDatabaseProcessor(db1, db2, docs);
 

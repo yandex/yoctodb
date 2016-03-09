@@ -46,8 +46,7 @@ public abstract class AbstractV1FullIndex
     private final boolean fixedLength;
     private TreeMultimap<UnsignedByteArray, Integer> valueToDocuments =
             TreeMultimap.create();
-    private Map<Integer, UnsignedByteArray> documentToValue =
-            new HashMap<Integer, UnsignedByteArray>();
+    private Map<Integer, UnsignedByteArray> documentToValue = new HashMap<>();
     private int currentDocumentId = 0;
     private final V1DatabaseFormat.SegmentType segmentType;
 

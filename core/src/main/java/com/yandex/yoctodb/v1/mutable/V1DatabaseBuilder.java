@@ -41,10 +41,10 @@ public final class V1DatabaseBuilder
     private int currentDocumentId = 0;
 
     private final SortedMap<Integer, UnsignedByteArray> payloads =
-            new TreeMap<Integer, UnsignedByteArray>();
+            new TreeMap<>();
 
     private final Map<String, IndexSegment> indexes =
-            new HashMap<String, IndexSegment>();
+            new HashMap<>();
 
     @NotNull
     @Override
@@ -134,7 +134,7 @@ public final class V1DatabaseBuilder
         // Build writables
 
         final List<OutputStreamWritable> writables =
-                new ArrayList<OutputStreamWritable>(indexes.size() + 1);
+                new ArrayList<>(indexes.size() + 1);
         final Iterator<IndexSegment> indexSegmentIterator =
                 indexes.values().iterator();
         while (indexSegmentIterator.hasNext()) {

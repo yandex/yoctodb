@@ -31,8 +31,8 @@ public final class V1DocumentBuilder extends AbstractDocumentBuilder {
 
     final TreeMultimap<String, UnsignedByteArray> fields =
             TreeMultimap.create();
-    final Map<String, IndexOption> index = new HashMap<String, IndexOption>();
-    final Map<String, LengthOption> length = new HashMap<String, LengthOption>();
+    final Map<String, IndexOption> index = new HashMap<>();
+    final Map<String, LengthOption> length = new HashMap<>();
 
     @NotNull
     @Override

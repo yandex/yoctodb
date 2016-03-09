@@ -108,10 +108,8 @@ public class V1DatabaseReader extends DatabaseReader {
 
         // Reading the segments
         Payload payload = null;
-        final Map<String, FilterableIndex> filters =
-                new HashMap<String, FilterableIndex>();
-        final Map<String, SortableIndex> sorters =
-                new HashMap<String, SortableIndex>();
+        final Map<String, FilterableIndex> filters = new HashMap<>();
+        final Map<String, SortableIndex> sorters = new HashMap<>();
         while (body.hasRemaining()) {
             final long size = body.getLong();
             final int type = body.getInt();

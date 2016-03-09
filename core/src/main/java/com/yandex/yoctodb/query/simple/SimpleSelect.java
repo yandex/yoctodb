@@ -33,9 +33,9 @@ import java.util.List;
 @NotThreadSafe
 public final class SimpleSelect implements Select {
     @NotNull
-    private final List<Condition> conditions = new LinkedList<Condition>();
+    private final List<Condition> conditions = new LinkedList<>();
     @NotNull
-    private final List<Order> sorts = new LinkedList<Order>();
+    private final List<Order> sorts = new LinkedList<>();
     private int skip = 0;
     private int limit = Integer.MAX_VALUE;
 

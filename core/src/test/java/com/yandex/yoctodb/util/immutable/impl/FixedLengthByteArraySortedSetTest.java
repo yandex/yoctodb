@@ -34,7 +34,7 @@ public class FixedLengthByteArraySortedSetTest {
 
     private ByteArraySortedSet build() throws IOException {
         final SortedSet<UnsignedByteArray> elements =
-                new TreeSet<UnsignedByteArray>();
+                new TreeSet<>();
         for (long i = 0L; i < VALUES; i++) {
             elements.add(from(i / 2));
         }

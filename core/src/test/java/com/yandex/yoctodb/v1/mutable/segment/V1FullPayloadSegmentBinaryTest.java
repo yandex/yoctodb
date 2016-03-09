@@ -29,8 +29,7 @@ import java.util.LinkedList;
 public class V1FullPayloadSegmentBinaryTest {
     @Test
     public void writingPayloadTest() throws IOException {
-        final Collection<UnsignedByteArray> payloads =
-                new LinkedList<UnsignedByteArray>();
+        final Collection<UnsignedByteArray> payloads = new LinkedList<>();
         for (int i = 0; i < 15; i++) {
             final String payload = "payload" + i;
             payloads.add(UnsignedByteArrays.from(payload.getBytes()));

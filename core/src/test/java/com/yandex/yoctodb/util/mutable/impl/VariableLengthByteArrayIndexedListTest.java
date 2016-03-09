@@ -28,8 +28,7 @@ import static org.junit.Assert.assertTrue;
 public class VariableLengthByteArrayIndexedListTest {
     @Test
     public void string() {
-        final Collection<UnsignedByteArray> elements =
-                new LinkedList<UnsignedByteArray>();
+        final Collection<UnsignedByteArray> elements = new LinkedList<>();
         final int size = 10;
         for (int i = 0; i < size; i++)
             elements.add(from(i));

@@ -28,7 +28,7 @@ import java.util.TreeMap;
 @NotThreadSafe
 public final class IntIndexToIndexMap implements IndexToIndexMap {
     private final Map<Integer, Integer> elements =
-            new TreeMap<Integer, Integer>();
+            new TreeMap<>();
 
     @Override
     public void put(final int key, final int value) {

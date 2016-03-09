@@ -29,8 +29,7 @@ import static org.junit.Assert.assertTrue;
 public class VariableLengthByteArraySortedSetTest {
     @Test
     public void indexingFixed() {
-        final SortedSet<UnsignedByteArray> elements =
-                new TreeSet<UnsignedByteArray>();
+        final SortedSet<UnsignedByteArray> elements = new TreeSet<>();
         final int size = 3;
         for (int i = 0; i < size; i++)
             elements.add(from(i));
@@ -43,8 +42,7 @@ public class VariableLengthByteArraySortedSetTest {
 
     @Test
     public void indexingVariable() {
-        final SortedSet<UnsignedByteArray> elements =
-                new TreeSet<UnsignedByteArray>();
+        final SortedSet<UnsignedByteArray> elements = new TreeSet<>();
         final byte[] e1 = new byte[]{1, 1, 0};
         final byte[] e2 = new byte[]{1, 0};
         final byte[] e3 = new byte[]{0};
@@ -64,8 +62,7 @@ public class VariableLengthByteArraySortedSetTest {
 
     @Test(expected = AssertionError.class)
     public void notFound() {
-        final SortedSet<UnsignedByteArray> elements =
-                new TreeSet<UnsignedByteArray>();
+        final SortedSet<UnsignedByteArray> elements = new TreeSet<>();
         final int size = 3;
         for (int i = 0; i < size; i++)
             elements.add(from(i));
@@ -77,8 +74,7 @@ public class VariableLengthByteArraySortedSetTest {
 
     @Test
     public void string() {
-        final SortedSet<UnsignedByteArray> elements =
-                new TreeSet<UnsignedByteArray>();
+        final SortedSet<UnsignedByteArray> elements = new TreeSet<>();
         final int size = 10;
         for (long i = 0; i < size; i++)
             elements.add(from(i));

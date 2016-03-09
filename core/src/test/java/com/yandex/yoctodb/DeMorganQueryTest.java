@@ -11,7 +11,6 @@
 package com.yandex.yoctodb;
 
 import com.yandex.yoctodb.immutable.Database;
-import com.yandex.yoctodb.immutable.DatabaseReader;
 import com.yandex.yoctodb.mutable.DatabaseBuilder;
 import com.yandex.yoctodb.mutable.DocumentBuilder;
 import com.yandex.yoctodb.query.Condition;
@@ -132,7 +131,7 @@ public class DeMorganQueryTest {
 
                     assertEquals(1, db.count(query));
 
-                    final List<Integer> ids = new LinkedList<Integer>();
+                    final List<Integer> ids = new LinkedList<>();
 
                     final int expectedId = x * 4 + y * 2 + z;
 
@@ -168,8 +167,8 @@ public class DeMorganQueryTest {
 
                     assertEquals(7, db.count(query));
 
-                    final List<Integer> actual = new LinkedList<Integer>();
-                    final List<Integer> expected = new LinkedList<Integer>();
+                    final List<Integer> actual = new LinkedList<>();
+                    final List<Integer> expected = new LinkedList<>();
 
                     final int unexpected = x * 4 + y * 2 + z;
                     for (int i = 0; i < 8; i++) {
@@ -196,7 +195,7 @@ public class DeMorganQueryTest {
     public void allUsingOr() throws IOException {
         final Database db = buildDatabase();
 
-        final Collection<Condition> ors = new LinkedList<Condition>();
+        final Collection<Condition> ors = new LinkedList<>();
 
         for (int x = 0; x < 2; x++) {
             for (int y = 0; y < 2; y++) {

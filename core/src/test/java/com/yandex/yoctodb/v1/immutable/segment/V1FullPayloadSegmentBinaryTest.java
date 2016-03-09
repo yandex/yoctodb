@@ -57,8 +57,7 @@ public class V1FullPayloadSegmentBinaryTest {
         for (int i = 0; i < payload.length; i++)
             payload[i] = (byte) i;
 
-        final Collection<UnsignedByteArray> elements =
-                new LinkedList<UnsignedByteArray>();
+        final Collection<UnsignedByteArray> elements = new LinkedList<>();
         final int docs = 4 * 1024;
         for (int i = 0; i < docs; i++) {
             elements.add(UnsignedByteArrays.from(payload));
@@ -73,13 +72,9 @@ public class V1FullPayloadSegmentBinaryTest {
         final File f = File.createTempFile("huge", "dat");
         f.deleteOnExit();
 
-        final OutputStream os =
-                new BufferedOutputStream(
-                        new FileOutputStream(f));
-        try {
+        try (OutputStream os = new BufferedOutputStream(
+                new FileOutputStream(f))) {
             outputStreamWritable.writeTo(os);
-        } finally {
-            os.close();
         }
 
         final Buffer buf =
@@ -99,8 +94,7 @@ public class V1FullPayloadSegmentBinaryTest {
     }
 
     private Buffer preparePayload() throws IOException {
-        final Collection<UnsignedByteArray> elements =
-                new LinkedList<UnsignedByteArray>();
+        final Collection<UnsignedByteArray> elements = new LinkedList<>();
         for (int i = 0; i < 15; i++) {
             final byte[] payload = ("payload" + i).getBytes();
             elements.add(UnsignedByteArrays.from(payload));

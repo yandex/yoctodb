@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
-import static com.yandex.yoctodb.DatabaseFormat.MAGIC;
 import static com.yandex.yoctodb.v1.V1DatabaseFormat.*;
 
 /**

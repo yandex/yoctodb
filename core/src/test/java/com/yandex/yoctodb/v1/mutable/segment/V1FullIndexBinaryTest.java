@@ -35,17 +35,17 @@ public class V1FullIndexBinaryTest {
         V1FullIndex v1FullIndex = new V1FullIndex(fieldName, true);
 
         //first doc
-        Collection<UnsignedByteArray> byteArraysDoc1 = new ArrayList<UnsignedByteArray>();
+        Collection<UnsignedByteArray> byteArraysDoc1 = new ArrayList<>();
         byteArraysDoc1.add(UnsignedByteArrays.from(new byte[]{7, 7, 7, 7}));
         v1FullIndex.addDocument(0, byteArraysDoc1);
 
         //second doc
-        Collection<UnsignedByteArray> byteArraysDoc2 = new ArrayList<UnsignedByteArray>();
+        Collection<UnsignedByteArray> byteArraysDoc2 = new ArrayList<>();
         byteArraysDoc2.add(UnsignedByteArrays.from(new byte[]{3, 2, 1, 0}));
         v1FullIndex.addDocument(1, byteArraysDoc2);
 
         //third doc
-        Collection<UnsignedByteArray> byteArraysDoc3 = new ArrayList<UnsignedByteArray>();
+        Collection<UnsignedByteArray> byteArraysDoc3 = new ArrayList<>();
         byteArraysDoc3.add(UnsignedByteArrays.from(new byte[]{7, 7, 7, 7}));
         v1FullIndex.addDocument(2, byteArraysDoc3);
 
@@ -80,7 +80,7 @@ public class V1FullIndexBinaryTest {
         final int elementsCount = byteBuffer.getInt();
         Assert.assertEquals(2, elementsCount);
 
-        final List<UnsignedByteArray> elements = new ArrayList<UnsignedByteArray>();
+        final List<UnsignedByteArray> elements = new ArrayList<>();
         for (int i = 0; i < elementsCount; i++) {
             final byte[] currentElementBytes = new byte[elementSize];
             byteBuffer.get(currentElementBytes);
@@ -145,17 +145,17 @@ public class V1FullIndexBinaryTest {
         final V1FullIndex v1FullIndex = new V1FullIndex("variable_length_field_name", false);
 
         //first doc
-        final Collection<UnsignedByteArray> byteArraysDoc1 = new ArrayList<UnsignedByteArray>();
+        final Collection<UnsignedByteArray> byteArraysDoc1 = new ArrayList<>();
         byteArraysDoc1.add(UnsignedByteArrays.from(new byte[]{7, 7, 7, 7, 7}));
         v1FullIndex.addDocument(0, byteArraysDoc1);
 
         //second doc
-        final Collection<UnsignedByteArray> byteArraysDoc2 = new ArrayList<UnsignedByteArray>();
+        final Collection<UnsignedByteArray> byteArraysDoc2 = new ArrayList<>();
         byteArraysDoc2.add(UnsignedByteArrays.from(new byte[]{3, 2, 1, 0}));
         v1FullIndex.addDocument(1, byteArraysDoc2);
 
         //third doc
-        final Collection<UnsignedByteArray> byteArraysDoc3 = new ArrayList<UnsignedByteArray>();
+        final Collection<UnsignedByteArray> byteArraysDoc3 = new ArrayList<>();
         byteArraysDoc3.add(UnsignedByteArrays.from(new byte[]{7, 7, 7, 7, 7}));
         v1FullIndex.addDocument(2, byteArraysDoc3);
 
@@ -198,7 +198,7 @@ public class V1FullIndexBinaryTest {
 
         Assert.assertArrayEquals(new long[]{0, 4, 9}, elementOffsets);
 
-        final List<UnsignedByteArray> elements = new ArrayList<UnsignedByteArray>();
+        final List<UnsignedByteArray> elements = new ArrayList<>();
         for (int i = 0; i < elementsCount; i++) {
             final byte[] currentElementBytes = new byte[(int) elementOffsets[i + 1] - (int) elementOffsets[i]];
             byteBuffer.get(currentElementBytes);

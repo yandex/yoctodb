@@ -61,16 +61,10 @@ public abstract class Buffer implements Comparable<Buffer> {
 
         // Mapping the file
         final MappedByteBuffer buffer;
-        final RandomAccessFile raf = new RandomAccessFile(f, "r");
-        try {
-            final FileChannel ch = raf.getChannel();
-            try {
+        try (RandomAccessFile raf = new RandomAccessFile(f, "r")) {
+            try (FileChannel ch = raf.getChannel()) {
                 buffer = ch.map(FileChannel.MapMode.READ_ONLY, 0, f.length());
-            } finally {
-                ch.close();
             }
-        } finally {
-            raf.close();
         }
 
         // Forcing data loading

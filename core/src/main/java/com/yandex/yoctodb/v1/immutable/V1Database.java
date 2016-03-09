@@ -23,10 +23,11 @@ import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
+import static java.util.Collections.unmodifiableMap;
 
 /**
  * Immutable {@link Database} implementation in V1 format
@@ -54,12 +55,8 @@ public final class V1Database implements IndexedDatabase {
             @NotNull
             final ArrayBitSetPool bitSetPool) {
         this.payload = payload;
-        this.filters =
-                Collections.unmodifiableMap(
-                        new HashMap<String, FilterableIndex>(filters));
-        this.sorters =
-                Collections.unmodifiableMap(
-                        new HashMap<String, SortableIndex>(sorters));
+        this.filters = unmodifiableMap(new HashMap<>(filters));
+        this.sorters = unmodifiableMap(new HashMap<>(sorters));
         this.bitSetPool = bitSetPool;
     }
 
