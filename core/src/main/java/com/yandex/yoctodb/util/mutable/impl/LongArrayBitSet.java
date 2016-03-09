@@ -10,6 +10,7 @@
 
 package com.yandex.yoctodb.util.mutable.impl;
 
+import com.google.common.primitives.Longs;
 import com.yandex.yoctodb.util.buf.Buffer;
 import com.yandex.yoctodb.util.mutable.ArrayBitSet;
 import com.yandex.yoctodb.util.mutable.BitSet;
@@ -211,7 +212,7 @@ public final class LongArrayBitSet implements ArrayBitSet {
             final long currentWord =
                     longArrayBitSetInByteBuffer.getLong(
                             currentPosition);
-            currentPosition += Long.BYTES;
+            currentPosition += Longs.BYTES;
             final long word = words[i] | currentWord;
             words[i] = word;
             if (word != 0) {

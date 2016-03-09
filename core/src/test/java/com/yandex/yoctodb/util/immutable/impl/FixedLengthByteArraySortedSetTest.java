@@ -10,6 +10,7 @@
 
 package com.yandex.yoctodb.util.immutable.impl;
 
+import com.google.common.primitives.Longs;
 import com.yandex.yoctodb.util.UnsignedByteArray;
 import com.yandex.yoctodb.util.buf.Buffer;
 import com.yandex.yoctodb.util.immutable.ByteArraySortedSet;
@@ -59,6 +60,6 @@ public class FixedLengthByteArraySortedSetTest {
     public void string() throws IOException {
         final String text = build().toString();
         assertTrue(text.contains(Integer.toString(VALUES / 2)));
-        assertTrue(text.contains(Integer.toString(Long.BYTES)));
+        assertTrue(text.contains(Integer.toString(Longs.BYTES)));
     }
 }
