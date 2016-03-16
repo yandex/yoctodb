@@ -38,7 +38,7 @@
 
     <modules>
         <module>core</module>
-        <module>stress</module>
+        <module>benchmark</module>
     </modules>
 
     <prerequisites>
