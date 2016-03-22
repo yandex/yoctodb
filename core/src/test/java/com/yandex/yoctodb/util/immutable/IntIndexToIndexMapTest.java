@@ -24,7 +24,7 @@ import java.io.IOException;
 public class IntIndexToIndexMapTest {
     @Test
     public void simpleTest() throws IOException {
-        for (int counter = 1; counter < 10000; counter++) {
+        for (int counter = 1; counter < 1024; counter++) {
             final Buffer buf = prepareData(counter);
             final IndexToIndexMap map = IntIndexToIndexMap.from(buf);
             Assert.assertEquals(counter, map.size());
