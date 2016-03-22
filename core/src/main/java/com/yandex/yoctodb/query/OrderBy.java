@@ -24,4 +24,7 @@ public interface OrderBy extends Select {
     OrderBy and(
             @NotNull
             Order order);
+
+    @NotNull
+    OrderBy clone();
 }

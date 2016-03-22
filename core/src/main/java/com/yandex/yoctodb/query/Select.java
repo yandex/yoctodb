@@ -35,4 +35,7 @@ public interface Select extends Query {
 
     @NotNull
     Select limit(int limit);
+
+    @NotNull
+    Select clone();
 }

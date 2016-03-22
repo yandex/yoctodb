@@ -85,6 +85,27 @@ public class QueryBuilderTest {
         assertTrue(stmt.toString().contains("age"));
     }
 
+    @Test
+    public void cloned() {
+        final Query stmt =
+                select().clone()
+                        .where(
+                        eq("key1", from("value1"))).and(
+                        eq("key2", from("value2"))).clone()
+                        .orderBy(asc("timestamp"))
+                        .orderBy(desc("id"))
+                        .skip(1)
+                        .orderBy(asc("age"))
+                        .limit(2)
+                        .orderBy(desc("rnd")).clone();
+
+        assertTrue(stmt.toString().contains("key1"));
+        assertTrue(stmt.toString().contains("key2"));
+        assertTrue(stmt.toString().contains("timestamp"));
+        assertTrue(stmt.toString().contains("id"));
+        assertTrue(stmt.toString().contains("age"));
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void emptyValues() {
         in("f");

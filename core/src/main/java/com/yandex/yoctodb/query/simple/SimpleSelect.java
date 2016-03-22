@@ -21,6 +21,7 @@ import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -33,11 +34,32 @@ import java.util.List;
 @NotThreadSafe
 public final class SimpleSelect implements Select {
     @NotNull
-    private final List<Condition> conditions = new LinkedList<>();
+    private final List<Condition> conditions;
     @NotNull
-    private final List<Order> sorts = new LinkedList<>();
-    private int skip = 0;
-    private int limit = Integer.MAX_VALUE;
+    private final List<Order> sorts;
+    private int skip;
+    private int limit;
+
+    private SimpleSelect(
+            @NotNull
+            final List<Condition> conditions,
+            @NotNull
+            final List<Order> sorts,
+            final int skip,
+            final int limit) {
+        this.conditions = conditions;
+        this.sorts = sorts;
+        this.skip = skip;
+        this.limit = limit;
+    }
+
+    public SimpleSelect() {
+        this(
+                new LinkedList<Condition>(),
+                new LinkedList<Order>(),
+                0,
+                Integer.MAX_VALUE);
+    }
 
     @NotNull
     @Override
@@ -126,6 +148,16 @@ public final class SimpleSelect implements Select {
         } else {
             return new SortingScoredDocumentIterator(database, docs, sorts);
         }
+    }
+
+    @NotNull
+    @Override
+    public SimpleSelect clone() {
+        return new SimpleSelect(
+                new ArrayList<>(conditions),
+                new ArrayList<>(sorts),
+                skip,
+                limit);
     }
 
     @Override

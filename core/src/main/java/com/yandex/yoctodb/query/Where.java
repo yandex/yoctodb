@@ -24,4 +24,7 @@ public interface Where extends Select {
     Where and(
             @NotNull
             Condition condition);
+
+    @NotNull
+    Where clone();
 }

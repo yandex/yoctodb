@@ -112,6 +112,12 @@ public final class SimpleOrderClause implements OrderBy {
         return select.sortedUnlimited(docs, database, bitSetPool);
     }
 
+    @NotNull
+    @Override
+    public OrderBy clone() {
+        return new SimpleOrderClause(select.clone());
+    }
+
     @Override
     public String toString() {
         return select.toString();

@@ -111,6 +111,12 @@ public final class SimpleWhereClause implements Where {
         return select.sortedUnlimited(docs, database, bitSetPool);
     }
 
+    @NotNull
+    @Override
+    public Where clone() {
+        return new SimpleWhereClause(select.clone());
+    }
+
     @Override
     public String toString() {
         return select.toString();
