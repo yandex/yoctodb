@@ -52,30 +52,43 @@ public final class SimpleAndCondition implements Condition {
         if (clauses.size() == 1) {
             final Condition c = clauses.iterator().next();
             return c.set(indexProvider, to, bitSetPool);
-        } else {
+        } else { // >= 2 clauses
             assert !clauses.isEmpty();
 
-            final ArrayBitSet result = bitSetPool.borrowSet(to.getSize());
-            result.set();
-            final ArrayBitSet clauseResult = bitSetPool.borrowSet(to.getSize());
-            try {
-                final Iterator<Condition> iter = clauses.iterator();
-                while (iter.hasNext()) {
-                    if (!iter.next().set(
-                            indexProvider,
-                            clauseResult,
-                            bitSetPool)) {
-                        return false;
-                    } else if (!result.and(clauseResult)) {
-                        return false;
-                    }
-                    if (iter.hasNext())
-                        clauseResult.clear();
-                }
+            final Iterator<Condition> iter = clauses.iterator();
 
-                return to.or(result);
+            // Filling result with first clause
+            final ArrayBitSet result = bitSetPool.borrowSet(to.getSize());
+            try {
+                if (!iter.next().set(
+                        indexProvider,
+                        result,
+                        bitSetPool))
+                    return false;
+
+                final ArrayBitSet clauseResult =
+                        bitSetPool.borrowSet(to.getSize());
+                try {
+                    do {
+                        if (!iter.next().set(
+                                indexProvider,
+                                clauseResult,
+                                bitSetPool))
+                            return false;
+
+                        if (!result.and(clauseResult)) {
+                            return false;
+                        }
+
+                        if (iter.hasNext())
+                            clauseResult.clear();
+                    } while (iter.hasNext());
+
+                    return to.or(result);
+                } finally {
+                    bitSetPool.returnSet(clauseResult);
+                }
             } finally {
-                bitSetPool.returnSet(clauseResult);
                 bitSetPool.returnSet(result);
             }
         }
