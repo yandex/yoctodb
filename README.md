@@ -1,4 +1,4 @@
-[![yoctodb-core](https://maven-badges.herokuapp.com/maven-central/com.yandex.yoctodb/yoctodb-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.yandex.yoctodb/yoctodb-core) [![Build Status](https://semaphoreci.com/api/v1/projects/79814465-8795-448e-8652-d52e95c632f7/685534/shields_badge.svg)](https://semaphoreci.com/incubos/yoctodb) [![Build Status](https://travis-ci.org/incubos/yoctodb.svg?branch=master)](https://travis-ci.org/incubos/yoctodb) [![Coverage Status](https://coveralls.io/repos/github/yandex/yoctodb/badge.svg?branch=master)](https://coveralls.io/github/incubos/yoctodb?branch=master)
+[![yoctodb-core](https://maven-badges.herokuapp.com/maven-central/com.yandex.yoctodb/yoctodb-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.yandex.yoctodb/yoctodb-core) [![Build Status](https://travis-ci.org/yandex/yoctodb.svg?branch=master)](https://travis-ci.org/yandex/yoctodb) [![Coverage Status](https://coveralls.io/repos/github/yandex/yoctodb/badge.svg?branch=master)](https://coveralls.io/github/yandex/yoctodb?branch=master)
 
 # YoctoDB
 
