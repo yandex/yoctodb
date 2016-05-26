@@ -243,6 +243,26 @@ public final class FileChannelBuffer extends Buffer {
                 size);
     }
 
+    @Override
+    public ByteBuffer toByteBuffer() {
+        assert limit - position <= Integer.MAX_VALUE;
+
+        final int size = (int) (limit - position);
+
+        final ByteBuffer result = ByteBuffer.allocate(size);
+
+        try {
+            final int count = ch.read(result, offset + position);
+            assert count == size;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        result.position(0);
+
+        return result;
+    }
+
     // Temporary buffers
     private final ThreadLocal<ByteBuffer> byteBufCache =
             new ThreadLocal<ByteBuffer>() {

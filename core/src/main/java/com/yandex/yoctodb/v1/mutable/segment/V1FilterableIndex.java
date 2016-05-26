@@ -17,7 +17,7 @@ import com.yandex.yoctodb.util.OutputStreamWritable;
 import com.yandex.yoctodb.util.UnsignedByteArray;
 import com.yandex.yoctodb.util.mutable.IndexToIndexMultiMap;
 import com.yandex.yoctodb.util.mutable.impl.FixedLengthByteArraySortedSet;
-import com.yandex.yoctodb.util.mutable.impl.IndexToIndexMultiMapFactory;
+import com.yandex.yoctodb.util.mutable.impl.RoaringBitSetIndexToIndexMultiMap;
 import com.yandex.yoctodb.util.mutable.impl.VariableLengthByteArraySortedSet;
 import com.yandex.yoctodb.v1.V1DatabaseFormat;
 import net.jcip.annotations.NotThreadSafe;
@@ -41,7 +41,6 @@ public final class V1FilterableIndex
     private TreeMultimap<UnsignedByteArray, Integer> valueToDocuments =
             TreeMultimap.create();
     private final boolean fixedLength;
-    private int databaseDocumentsCount = -1;
 
     public V1FilterableIndex(
             @NotNull
@@ -71,13 +70,6 @@ public final class V1FilterableIndex
         return this;
     }
 
-    @Override
-    public void setDatabaseDocumentsCount(final int documentsCount) {
-        assert documentsCount > 0;
-
-        this.databaseDocumentsCount = documentsCount;
-    }
-
     @NotNull
     @Override
     public OutputStreamWritable buildWritable() {
@@ -87,9 +79,8 @@ public final class V1FilterableIndex
 
         // Building the index
         final IndexToIndexMultiMap valueToDocumentsIndex =
-                IndexToIndexMultiMapFactory.buildIndexToIndexMultiMap(
-                        valueToDocuments.asMap().values(),
-                        databaseDocumentsCount);
+                new RoaringBitSetIndexToIndexMultiMap(
+                        valueToDocuments.asMap().values());
 
         final OutputStreamWritable values;
         if (fixedLength) {

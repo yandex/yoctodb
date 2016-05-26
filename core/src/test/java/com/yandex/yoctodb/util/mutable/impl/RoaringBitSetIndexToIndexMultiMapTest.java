@@ -17,55 +17,43 @@ import org.junit.Test;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Collections;
 
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link BitSetIndexToIndexMultiMap}
+ * Unit tests for {@link RoaringBitSetIndexToIndexMultiMap}
  *
  * @author incubos
  */
-public class BitSetIndexToIndexMultiMapTest {
-    @Test(expected = IllegalArgumentException.class)
-    public void negativeDocuments() {
-        new BitSetIndexToIndexMultiMap(
-                Collections.<Collection<Integer>>emptyList(),
-                -1);
-    }
-
+public class RoaringBitSetIndexToIndexMultiMapTest {
     @Test(expected = AssertionError.class)
-    public void wrongDocument() throws IOException {
-        new BitSetIndexToIndexMultiMap(
-                singletonList(singletonList(1)),
-                1)
+    public void negativeValue() throws IOException {
+        new RoaringBitSetIndexToIndexMultiMap(
+                singletonList(singletonList(-1)))
                 .writeTo(new ByteArrayOutputStream());
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void negativeValue() throws IOException {
-        new BitSetIndexToIndexMultiMap(
-                singletonList(singletonList(1)),
-                -1)
-                .writeTo(new ByteArrayOutputStream());
+    @Test(expected = RuntimeException.class)
+    public void ioException() throws IOException {
+        final Collection<Collection<Integer>> broken = mock(Collection.class);
+        when(broken.iterator()).thenThrow(new RuntimeException("Test"));
+
+        new RoaringBitSetIndexToIndexMultiMap(broken);
     }
 
     @Test
-    public void string() {
+    public void string() throws IOException {
         final TreeMultimap<Integer, Integer> elements = TreeMultimap.create();
         final int documents = 10;
         for (int i = 0; i < documents; i++)
             elements.put(i / 2, i);
         final IndexToIndexMultiMap set =
-                new BitSetIndexToIndexMultiMap(
-                        elements.asMap().values(),
-                        documents);
+                new RoaringBitSetIndexToIndexMultiMap(
+                        elements.asMap().values());
         final String text = set.toString();
         assertTrue(text.contains(Integer.toString(documents / 2)));
-        assertTrue(text.contains(Integer.toString(documents)));
-        set.getSizeInBytes();
-        assertTrue(text.contains(Integer.toString(documents / 2)));
-        assertTrue(text.contains(Integer.toString(documents)));
     }
 }

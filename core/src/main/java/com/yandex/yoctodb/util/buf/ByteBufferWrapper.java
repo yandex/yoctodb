@@ -144,4 +144,9 @@ public final class ByteBufferWrapper extends Buffer {
 
         return Buffer.from(slice.slice());
     }
+
+    @Override
+    public ByteBuffer toByteBuffer() {
+        return delegate.duplicate();
+    }
 }
