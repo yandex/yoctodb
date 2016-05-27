@@ -17,6 +17,7 @@ import com.yandex.yoctodb.util.mutable.BitSet;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.roaringbitmap.PeekableIntIterator;
 import org.roaringbitmap.buffer.ImmutableRoaringBitmap;
 
 import java.nio.ByteBuffer;
@@ -140,23 +141,40 @@ public class RoaringBitSetIndexToIndexMultiMap implements IndexToIndexMultiMap {
             @NotNull
             final BitSet valueFilter) {
         assert 0 <= key && key < bitSets.size();
+        assert !valueFilter.isEmpty();
 
         int[] values = null;
         int count = 0;
-        int i = 0;
 
         final ImmutableRoaringBitmap bitSet = bitSets.get(key);
-        for (int value : bitSet) {
-            if (valueFilter.get(value)) {
+        final PeekableIntIterator ids = bitSet.getIntIterator();
+
+        int nextAllowed = valueFilter.nextSetBit(0);
+        ids.advanceIfNeeded(nextAllowed);
+
+        // Contract: ids is always >= nextAllowed
+        while (ids.hasNext()) {
+            int id = ids.peekNext();
+
+            if (id == nextAllowed) {
                 // Lazy allocation
                 if (values == null) {
-                    values = new int[bitSet.getCardinality() - i];
+                    values = new int[bitSet.getCardinality()];
                 }
-                values[count] = value;
+
+                // Storing
+                values[count] = id;
                 count++;
-            } else if (values == null) {
-                i++;
+
+                // Advancing
+                id++;
             }
+
+            nextAllowed = valueFilter.nextSetBit(id);
+            if (nextAllowed < 0)
+                break;
+
+            ids.advanceIfNeeded(nextAllowed);
         }
 
         if (values == null) {

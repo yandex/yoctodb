@@ -156,8 +156,9 @@ public class RoaringBitSetIndexToIndexMultiMapTest {
 
     @Test(expected = NoSuchElementException.class)
     public void ascendingEmptyIterator() throws IOException {
-        final Iterator<IntToIntArray> iter =
-                build().ascending(LongArrayBitSet.zero(DOCS));
+        final BitSet valueFilter = LongArrayBitSet.zero(DOCS + 1);
+        valueFilter.set(DOCS);
+        final Iterator<IntToIntArray> iter = build().ascending(valueFilter);
         assertFalse(iter.hasNext());
         iter.next();
     }
@@ -205,8 +206,9 @@ public class RoaringBitSetIndexToIndexMultiMapTest {
 
     @Test(expected = NoSuchElementException.class)
     public void descendingEmptyIterator() throws IOException {
-        final Iterator<IntToIntArray> iter =
-                build().descending(LongArrayBitSet.zero(DOCS));
+        final BitSet valueFilter = LongArrayBitSet.zero(DOCS + 1);
+        valueFilter.set(DOCS);
+        final Iterator<IntToIntArray> iter = build().descending(valueFilter);
         assertFalse(iter.hasNext());
         iter.next();
     }

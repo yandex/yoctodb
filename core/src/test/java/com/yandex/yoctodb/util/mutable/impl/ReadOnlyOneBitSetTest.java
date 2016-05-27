@@ -15,6 +15,7 @@ import com.yandex.yoctodb.util.mutable.BitSet;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Unit tests for {@link ReadOnlyOneBitSet}
@@ -23,6 +24,13 @@ import static org.junit.Assert.assertEquals;
  */
 public class ReadOnlyOneBitSetTest {
     private final int SIZE = 1024;
+
+    @Test
+    public void get() {
+        final BitSet bitSet = new ReadOnlyOneBitSet(SIZE);
+        for (int i = 0; i < SIZE; i++)
+            assertTrue(bitSet.get(i));
+    }
 
     @Test
     public void size() {
