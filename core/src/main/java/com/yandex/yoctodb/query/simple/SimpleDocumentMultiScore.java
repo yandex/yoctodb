@@ -32,7 +32,7 @@ final class SimpleDocumentMultiScore
     @NotNull
     private final Buffer[] values;
 
-    public SimpleDocumentMultiScore(
+    SimpleDocumentMultiScore(
             @NotNull
             final Order.SortOrder[] orders,
             @NotNull
