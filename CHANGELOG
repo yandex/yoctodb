@@ -1,3 +1,12 @@
+0.0.17
+  * #7: Cloneable query builders
+  * #25: Switched to immutable org.roaringbitmap:RoaringBitmap implementation
+  * #27: RoaringBitSetIndexToIndexMultiMap.getFilteredValues() speed up
+  * #28: Removed extra BitSet init and postponed its allocation
+  * Removed Java 8 dependencies
+  * Switched to Java 7
+  * Using org.jetbrains:annotations-java5 instead of org.jetbrains:annotations
+
 0.0.16
   * AllocatingArrayBitSetPool is used by default
 
