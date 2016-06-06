@@ -21,7 +21,7 @@ import com.yandex.yoctodb.query.ScoredDocument;
  * @author incubos
  */
 @Immutable
-public final class SimpleScoredDocument
+final class SimpleScoredDocument
         implements ScoredDocument<SimpleScoredDocument> {
     @NotNull
     private final Database database;
@@ -29,7 +29,7 @@ public final class SimpleScoredDocument
     private final SimpleDocumentMultiScore score;
     private final int document;
 
-    public SimpleScoredDocument(
+    SimpleScoredDocument(
             @NotNull
             final Database database,
             @NotNull

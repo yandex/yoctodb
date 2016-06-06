@@ -12,7 +12,6 @@ package com.yandex.yoctodb.query.simple;
 
 import com.yandex.yoctodb.DatabaseFormat;
 import com.yandex.yoctodb.mutable.DatabaseBuilder;
-import com.yandex.yoctodb.mutable.DocumentBuilder;
 import com.yandex.yoctodb.util.buf.Buffer;
 import com.yandex.yoctodb.util.mutable.impl.ReadOnlyOneBitSet;
 import com.yandex.yoctodb.v1.immutable.V1Database;
@@ -22,6 +21,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Collections;
 
+import static com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption.FULL;
 import static com.yandex.yoctodb.query.QueryBuilder.asc;
 
 /**
@@ -30,54 +30,33 @@ import static com.yandex.yoctodb.query.QueryBuilder.asc;
  * @author incubos
  */
 public class SortingScoredDocumentIteratorTest {
+    private final DatabaseFormat FORMAT = DatabaseFormat.getCurrent();
 
-    private V1Database buildQueryContext() throws IOException {
-        final DatabaseBuilder dbBuilder =
-                DatabaseFormat.getCurrent().newDatabaseBuilder();
+    @Test(expected = UnsupportedOperationException.class)
+    public void unsupportedRemove() throws IOException {
+        final DatabaseBuilder dbBuilder = FORMAT.newDatabaseBuilder();
 
         // Document 1
         dbBuilder.merge(
-                DatabaseFormat
-                        .getCurrent()
-                        .newDocumentBuilder()
-                        .withField(
-                                "text",
-                                "doc1234",
-                                DocumentBuilder.IndexOption.FULL)
-                        .withField(
-                                "int",
-                                1,
-                                DocumentBuilder.IndexOption.FULL)
-                        .withPayload("payload1".getBytes())
-        );
+                FORMAT.newDocumentBuilder()
+                        .withField("text", "doc1234", FULL)
+                        .withField("int", 1, FULL)
+                        .withPayload("payload1".getBytes()));
 
         // Document 2
         dbBuilder.merge(
-                DatabaseFormat
-                        .getCurrent()
-                        .newDocumentBuilder()
-                        .withField(
-                                "text",
-                                "doc2",
-                                DocumentBuilder.IndexOption.FULL)
-                        .withField(
-                                "int",
-                                2,
-                                DocumentBuilder.IndexOption.FULL)
-                        .withPayload("payload2".getBytes())
-        );
+                FORMAT.newDocumentBuilder()
+                        .withField("text", "doc2", FULL)
+                        .withField("int", 2, FULL)
+                        .withPayload("payload2".getBytes()));
 
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
         dbBuilder.buildWritable().writeTo(os);
 
-        return (V1Database) DatabaseFormat.getCurrent()
+        final V1Database db = (V1Database) DatabaseFormat.getCurrent()
                 .getDatabaseReader()
                 .from(Buffer.from(os.toByteArray()));
-    }
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void unsupportedRemove() throws IOException {
-        final V1Database db = buildQueryContext();
         final SortingScoredDocumentIterator iterator =
                 new SortingScoredDocumentIterator(
                         db,
