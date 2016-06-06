@@ -23,9 +23,9 @@ import java.util.Deque;
  * @author incubos
  */
 @ThreadSafe
-public abstract class AbstractCachedArrayBitSetPool implements ArrayBitSetPool {
-    public static final int DEFAULT_SIZE_HINT = 1;
-    public static final float DEFAULT_LOAD_FACTOR = 0.75f;
+abstract class AbstractCachedArrayBitSetPool implements ArrayBitSetPool {
+    static final int DEFAULT_SIZE_HINT = 1;
+    static final float DEFAULT_LOAD_FACTOR = 0.75f;
 
     private final int minSize;
     private final float loadFactor;
@@ -34,7 +34,7 @@ public abstract class AbstractCachedArrayBitSetPool implements ArrayBitSetPool {
         return (int) (LongArrayBitSet.arraySize(bits) / loadFactor);
     }
 
-    protected AbstractCachedArrayBitSetPool(
+    AbstractCachedArrayBitSetPool(
             final int sizeHint,
             final float loadFactor) {
         assert sizeHint > 0;

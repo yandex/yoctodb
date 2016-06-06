@@ -73,7 +73,7 @@ public class DeMorganQueryTest {
         @NotNull
         private final List<Integer> ids;
 
-        public IdCollector(
+        IdCollector(
                 @NotNull
                 final List<Integer> ids) {
             this.ids = ids;
@@ -90,12 +90,12 @@ public class DeMorganQueryTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void illegalOr() throws IOException {
+    public void illegalOr() {
         new SimpleOrCondition(Collections.<Condition>emptyList());
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void illegalAnd() throws IOException {
+    public void illegalAnd() {
         new SimpleAndCondition(Collections.<Condition>emptyList());
     }
 

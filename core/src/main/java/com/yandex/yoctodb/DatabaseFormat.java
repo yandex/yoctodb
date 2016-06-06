@@ -32,12 +32,8 @@ public abstract class DatabaseFormat {
     };
 
     @NotNull
-    private final static DatabaseFormat currentFormat =
-            new V1DatabaseFormat();
-
-    @NotNull
     public static DatabaseFormat getCurrent() {
-        return currentFormat;
+        return V1DatabaseFormat.INSTANCE;
     }
 
     @NotNull

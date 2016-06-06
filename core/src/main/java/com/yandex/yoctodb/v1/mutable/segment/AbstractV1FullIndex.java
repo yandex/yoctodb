@@ -35,7 +35,7 @@ import java.util.Map;
  * @author incubos
  */
 @NotThreadSafe
-public abstract class AbstractV1FullIndex
+abstract class AbstractV1FullIndex
         extends Freezable
         implements IndexSegment {
     @NotNull
@@ -47,7 +47,7 @@ public abstract class AbstractV1FullIndex
     private int currentDocumentId = 0;
     private final V1DatabaseFormat.SegmentType segmentType;
 
-    public AbstractV1FullIndex(
+    AbstractV1FullIndex(
             @NotNull
             final String fieldName,
             final boolean fixedLength,

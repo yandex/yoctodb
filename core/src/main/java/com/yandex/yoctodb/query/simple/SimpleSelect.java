@@ -150,6 +150,7 @@ public final class SimpleSelect implements Select {
         }
     }
 
+    @SuppressWarnings("CloneDoesntCallSuperClone")
     @NotNull
     @Override
     public SimpleSelect clone() {

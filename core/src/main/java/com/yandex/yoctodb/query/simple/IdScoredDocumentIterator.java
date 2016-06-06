@@ -23,7 +23,7 @@ import java.util.NoSuchElementException;
  *
  * @author incubos
  */
-public final class IdScoredDocumentIterator
+final class IdScoredDocumentIterator
         implements Iterator<IdScoredDocument> {
     @NotNull
     private final Database database;
@@ -31,7 +31,7 @@ public final class IdScoredDocumentIterator
     private final BitSet docs;
     private int currentDoc;
 
-    public IdScoredDocumentIterator(
+    IdScoredDocumentIterator(
             @NotNull
             final Database database,
             @NotNull

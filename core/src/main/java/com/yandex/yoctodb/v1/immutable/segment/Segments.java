@@ -18,7 +18,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @author incubos
  */
-public final class Segments {
+final class Segments {
     private Segments() {
         //
     }
@@ -36,7 +36,7 @@ public final class Segments {
      * @return segment slice
      */
     @NotNull
-    public static Buffer extract(
+    static Buffer extract(
             @NotNull
             final Buffer from) {
         final long size = from.getLong();
@@ -53,7 +53,7 @@ public final class Segments {
      * @return extracted string
      */
     @NotNull
-    public static String extractString(
+    static String extractString(
             @NotNull
             final Buffer from) {
         final int size = from.getInt();

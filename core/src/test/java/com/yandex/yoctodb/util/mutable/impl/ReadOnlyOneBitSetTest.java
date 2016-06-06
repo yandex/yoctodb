@@ -10,7 +10,6 @@
 
 package com.yandex.yoctodb.util.mutable.impl;
 
-import com.yandex.yoctodb.util.buf.Buffer;
 import com.yandex.yoctodb.util.mutable.BitSet;
 import org.junit.Test;
 
@@ -72,14 +71,6 @@ public class ReadOnlyOneBitSetTest {
     @Test(expected = UnsupportedOperationException.class)
     public void unsupportedOr() {
         new ReadOnlyOneBitSet(1).or(LongArrayBitSet.zero(1));
-    }
-
-    @Test(expected = UnsupportedOperationException.class)
-    public void unsupportedOrBuffer() {
-        new ReadOnlyOneBitSet(1).or(
-                Buffer.from(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}),
-                0,
-                1);
     }
 
     @Test

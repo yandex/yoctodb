@@ -25,7 +25,7 @@ import java.util.Iterator;
  *
  * @author incubos
  */
-public class FilterResultIterator
+class FilterResultIterator
         implements Iterator<Iterator<? extends ScoredDocument<?>>> {
     @NotNull
     private final Query query;
@@ -34,7 +34,7 @@ public class FilterResultIterator
     @NotNull
     private final ArrayBitSetPool bitSetPool;
 
-    public FilterResultIterator(
+    FilterResultIterator(
             @NotNull
             final Query query,
             @NotNull

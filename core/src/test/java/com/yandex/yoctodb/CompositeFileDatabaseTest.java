@@ -140,7 +140,7 @@ public class CompositeFileDatabaseTest {
     }
 
     @Test
-    public void build() throws IOException {
+    public void build() {
         assertEquals(DOCS, db1.getDocumentCount());
         assertEquals(DOCS, db2.getDocumentCount());
         assertEquals(2 * DOCS, db.getDocumentCount());

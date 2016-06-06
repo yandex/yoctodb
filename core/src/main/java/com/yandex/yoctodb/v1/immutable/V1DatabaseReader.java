@@ -19,7 +19,6 @@ import com.yandex.yoctodb.v1.immutable.segment.SegmentRegistry;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
@@ -70,7 +69,7 @@ public class V1DatabaseReader extends DatabaseReader {
             final Buffer buffer,
             @NotNull
             final ArrayBitSetPool bitSetPool,
-            final boolean checksum) throws IOException {
+            final boolean checksum) {
         // Checking the magic
         for (int i = 0; i < V1DatabaseFormat.MAGIC.length; i++)
             if (buffer.get() != V1DatabaseFormat.MAGIC[i]) {

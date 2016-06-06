@@ -10,7 +10,6 @@
 
 package com.yandex.yoctodb.util.mutable;
 
-import com.yandex.yoctodb.util.buf.Buffer;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -95,21 +94,6 @@ public interface BitSet {
     boolean or(
             @NotNull
             BitSet set);
-
-    /**
-     * Modify current bit set by applying bitwise {@code &} operation
-     *
-     * @param longArrayBitSetInByteBuffer source bit set
-     * @param startPosition               position to start reading from
-     * @param bitSetSizeInLongs           bit set size in {@code long}s
-     *
-     * @return whether there are nonzero bits
-     */
-    boolean or(
-            @NotNull
-            Buffer longArrayBitSetInByteBuffer,
-            long startPosition,
-            int bitSetSizeInLongs);
 
     /**
      * Checks whether there are nonzero bits in current bit set

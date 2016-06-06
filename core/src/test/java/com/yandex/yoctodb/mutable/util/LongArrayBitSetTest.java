@@ -10,14 +10,9 @@
 
 package com.yandex.yoctodb.mutable.util;
 
-import com.google.common.primitives.Longs;
-import com.yandex.yoctodb.util.buf.Buffer;
-import org.junit.Test;
 import com.yandex.yoctodb.util.mutable.BitSet;
 import com.yandex.yoctodb.util.mutable.impl.LongArrayBitSet;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import org.junit.Test;
 
 import static org.junit.Assert.*;
 
@@ -68,24 +63,6 @@ public class LongArrayBitSetTest {
     }
 
     @Test
-    public void simpleOrTestWithByteBufferBitSet() throws IOException {
-        for (int i = 1; i < SIZE; i++) {
-            final BitSet bs1 = LongArrayBitSet.one(i);
-            final LongArrayBitSet bs2 = (LongArrayBitSet) LongArrayBitSet.one(i);
-
-            assertEquals(i, bs1.cardinality());
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
-            for (long word : bs2.toArray()) {
-                os.write(Longs.toByteArray(word));
-            }
-            Buffer bs2BB = Buffer.from(os.toByteArray());
-
-            bs1.or(bs2BB, 0, bs2.toArray().length);
-            assertEquals(i, bs1.cardinality());
-        }
-    }
-
-    @Test
     public void clearTest() {
         for (int size = 1; size <= SIZE; size++) {
             final BitSet bitSet = LongArrayBitSet.one(size);
@@ -114,7 +91,7 @@ public class LongArrayBitSetTest {
     @Test
     public void onesIteratorTest() {
         final BitSet s = LongArrayBitSet.one(SIZE);
-        for (int i = 0; i < s.getSize(); i ++) {
+        for (int i = 0; i < s.getSize(); i++) {
             assertEquals(i, s.nextSetBit(i));
         }
     }

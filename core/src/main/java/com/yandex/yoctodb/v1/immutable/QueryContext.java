@@ -20,7 +20,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @author incubos
  */
-public final class QueryContext {
+final class QueryContext {
     @NotNull
     private final BitSet docs;
     @NotNull
@@ -28,7 +28,7 @@ public final class QueryContext {
     @NotNull
     private final ArrayBitSetPool bitSetPool;
 
-    public QueryContext(
+    QueryContext(
             @NotNull
             final BitSet docs,
             @NotNull

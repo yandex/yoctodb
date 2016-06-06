@@ -17,5 +17,5 @@ import com.yandex.yoctodb.util.OutputStreamWritableBuilder;
  *
  * @author incubos
  */
-public interface PayloadSegment extends OutputStreamWritableBuilder {
+interface PayloadSegment extends OutputStreamWritableBuilder {
 }

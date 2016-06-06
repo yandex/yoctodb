@@ -37,7 +37,8 @@ public class RoaringBitSetIndexToIndexMultiMapTest {
     }
 
     @Test(expected = RuntimeException.class)
-    public void ioException() throws IOException {
+    public void ioException() {
+        @SuppressWarnings("unchecked")
         final Collection<Collection<Integer>> broken = mock(Collection.class);
         when(broken.iterator()).thenThrow(new RuntimeException("Test"));
 
@@ -45,7 +46,7 @@ public class RoaringBitSetIndexToIndexMultiMapTest {
     }
 
     @Test
-    public void string() throws IOException {
+    public void string() {
         final TreeMultimap<Integer, Integer> elements = TreeMultimap.create();
         final int documents = 10;
         for (int i = 0; i < documents; i++)

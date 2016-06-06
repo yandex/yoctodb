@@ -25,9 +25,9 @@ import java.util.*;
 @NotThreadSafe
 abstract class AbstractByteArraySortedSet
         implements ByteArraySortedSet {
-    protected final SortedSet<UnsignedByteArray> elements;
+    final SortedSet<UnsignedByteArray> elements;
 
-    public AbstractByteArraySortedSet(
+    AbstractByteArraySortedSet(
             final SortedSet<UnsignedByteArray> elements) {
         this.elements = elements;
     }

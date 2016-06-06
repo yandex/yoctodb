@@ -31,7 +31,7 @@ abstract class AbstractTermCondition implements TermCondition {
     }
 
     @NotNull
-    protected String getFieldName() {
+    String getFieldName() {
         return fieldName;
     }
 

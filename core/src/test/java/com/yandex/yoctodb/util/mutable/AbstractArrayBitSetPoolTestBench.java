@@ -23,7 +23,7 @@ public abstract class AbstractArrayBitSetPoolTestBench {
     protected abstract ArrayBitSetPool allocate();
 
     @Test
-    public void borrowOne() throws Exception {
+    public void borrowOne() {
         final ArrayBitSetPool pool = allocate();
         final ArrayBitSet set = pool.borrowSet(1);
         assertEquals(1, set.getSize());
@@ -31,7 +31,7 @@ public abstract class AbstractArrayBitSetPoolTestBench {
     }
 
     @Test
-    public void borrowTwo() throws Exception {
+    public void borrowTwo() {
         final ArrayBitSetPool pool = allocate();
 
         final ArrayBitSet set1 = pool.borrowSet(1);
@@ -51,7 +51,7 @@ public abstract class AbstractArrayBitSetPoolTestBench {
     }
 
     @Test
-    public void smallAndBig() throws Exception {
+    public void smallAndBig() {
         final ArrayBitSetPool pool = allocate();
 
         final ArrayBitSet set1 = pool.borrowSet(1);

@@ -10,7 +10,6 @@
 
 package com.yandex.yoctodb.util.mutable.impl;
 
-import com.yandex.yoctodb.util.buf.Buffer;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.NotNull;
 import com.yandex.yoctodb.util.mutable.BitSet;
@@ -74,15 +73,6 @@ public final class ReadOnlyZeroBitSet implements BitSet {
     public boolean or(
             @NotNull
             final BitSet set) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean or(
-            @NotNull
-            final Buffer longArrayBitSetInByteBuffer,
-            final long startPosition,
-            final int bitSetSizeInLongs) {
         throw new UnsupportedOperationException();
     }
 

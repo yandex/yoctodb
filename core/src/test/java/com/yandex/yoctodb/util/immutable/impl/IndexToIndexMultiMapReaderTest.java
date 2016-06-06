@@ -27,11 +27,11 @@ import static org.junit.Assert.assertTrue;
  * @author incubos
  */
 public class IndexToIndexMultiMapReaderTest {
-    private final int DOCS = 128;
 
     @Test
     public void build() throws IOException {
         final TreeMultimap<Integer, Integer> elements = TreeMultimap.create();
+        final int DOCS = 128;
         for (int i = 0; i < DOCS; i++) {
             elements.put(i / 2, i);
         }

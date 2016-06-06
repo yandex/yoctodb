@@ -32,7 +32,7 @@ import java.util.List;
  * @author incubos
  */
 @NotThreadSafe
-public final class SortingScoredDocumentIterator
+final class SortingScoredDocumentIterator
         implements Iterator<SimpleScoredDocument> {
     @NotNull
     private final Database ctx;
@@ -45,7 +45,7 @@ public final class SortingScoredDocumentIterator
     @NotNull
     private Iterator<LocalScoredDocument> chunk;
 
-    public SortingScoredDocumentIterator(
+    SortingScoredDocumentIterator(
             @NotNull
             final IndexedDatabase ctx,
             @NotNull
@@ -176,7 +176,7 @@ public final class SortingScoredDocumentIterator
         }
 
         @NotNull
-        public SimpleDocumentMultiScore toScore() {
+        SimpleDocumentMultiScore toScore() {
             final Buffer[] sortValues =
                     new Buffer[sortValueIndexes.length];
             for (int i = 0; i < sortValueIndexes.length; i++) {
@@ -216,7 +216,7 @@ public final class SortingScoredDocumentIterator
         }
 
         @NotNull
-        public SimpleScoredDocument toScoredDocument() {
+        SimpleScoredDocument toScoredDocument() {
             return new SimpleScoredDocument(ctx, score.toScore(), id);
         }
     }

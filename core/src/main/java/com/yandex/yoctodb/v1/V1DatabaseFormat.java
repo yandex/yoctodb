@@ -36,6 +36,12 @@ public final class V1DatabaseFormat extends DatabaseFormat {
     private final static AtomicReference<String> messageDigestAlgorithm =
             new AtomicReference<>("MD5");
 
+    public final static DatabaseFormat INSTANCE = new V1DatabaseFormat();
+
+    private V1DatabaseFormat() {
+        // Empty
+    }
+
     @NotNull
     public static String getMessageDigestAlgorithm() {
         return messageDigestAlgorithm.get();

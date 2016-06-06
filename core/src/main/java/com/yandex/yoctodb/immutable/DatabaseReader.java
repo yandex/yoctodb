@@ -16,7 +16,6 @@ import com.yandex.yoctodb.util.mutable.impl.AllocatingArrayBitSetPool;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.util.Collection;
 
 /**
@@ -29,7 +28,7 @@ public abstract class DatabaseReader {
     @NotNull
     public IndexedDatabase from(
             @NotNull
-            final Buffer buffer) throws IOException {
+            final Buffer buffer) {
         return from(buffer, AllocatingArrayBitSetPool.INSTANCE, true);
     }
 
@@ -39,7 +38,7 @@ public abstract class DatabaseReader {
             Buffer b,
             @NotNull
             ArrayBitSetPool bitSetPool,
-            boolean checksum) throws IOException;
+            boolean checksum);
 
     @NotNull
     public abstract Database composite(

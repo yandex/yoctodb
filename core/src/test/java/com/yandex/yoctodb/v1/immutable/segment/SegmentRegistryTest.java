@@ -14,7 +14,6 @@ import com.yandex.yoctodb.util.buf.Buffer;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.util.NoSuchElementException;
 
 import static org.junit.Assert.assertEquals;
@@ -41,7 +40,7 @@ public class SegmentRegistryTest {
             };
 
     @Test(expected = NoSuchElementException.class)
-    public void notExisting() throws IOException {
+    public void notExisting() {
         final int ID = -1;
         SegmentRegistry.read(ID, Buffer.from(new byte[]{}));
     }
@@ -53,7 +52,7 @@ public class SegmentRegistryTest {
     }
 
     @Test
-    public void registerAndReturn() throws IOException {
+    public void registerAndReturn() {
         final int ID = -2;
         SegmentRegistry.register(ID, DUMMY);
         assertEquals(

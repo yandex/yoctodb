@@ -28,6 +28,7 @@ public interface DocumentProcessor {
      * @param database database to get document payload from
      * @return whether the processing should continue
      */
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     boolean process(
             int document,
             @NotNull

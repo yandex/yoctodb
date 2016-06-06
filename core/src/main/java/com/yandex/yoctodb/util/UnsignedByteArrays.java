@@ -138,7 +138,7 @@ public class UnsignedByteArrays {
             throw new IllegalArgumentException("Unexpected value");
     }
 
-    public static int compare(
+    private static int compare(
             @NotNull
             final Buffer left,
             long leftFrom,

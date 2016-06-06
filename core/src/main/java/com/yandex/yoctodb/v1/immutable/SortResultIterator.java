@@ -21,14 +21,14 @@ import java.util.Iterator;
  *
  * @author incubos
  */
-public class SortResultIterator
+class SortResultIterator
         implements Iterator<Iterator<? extends ScoredDocument<?>>> {
     @NotNull
     private final Query query;
     @NotNull
     private final Iterator<QueryContext> dbs;
 
-    public SortResultIterator(
+    SortResultIterator(
             @NotNull
             final Query query,
             @NotNull

@@ -21,7 +21,7 @@ import com.yandex.yoctodb.util.immutable.ByteArraySortedSet;
  * @author incubos
  */
 @Immutable
-public abstract class AbstractByteArraySortedSet
+abstract class AbstractByteArraySortedSet
         implements ByteArraySortedSet {
 
     protected abstract int compare(

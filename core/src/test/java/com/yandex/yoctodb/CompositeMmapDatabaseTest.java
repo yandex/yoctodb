@@ -304,7 +304,7 @@ public class CompositeMmapDatabaseTest {
 
 
     @Test
-    public void emptyCompositeDatabaseFieldSearh() {
+    public void emptyCompositeDatabaseFieldSearch() {
         final List<Integer> docs = new ArrayList<>();
 
         db.execute(

@@ -54,6 +54,7 @@ public abstract class Buffer implements Comparable<Buffer> {
     public static Buffer mmap(
             @NotNull
             final File f,
+            @SuppressWarnings("SameParameterValue")
             final boolean forceToMemory) throws IOException {
         assert f.exists() : "File doesn't exist: " + f;
         assert f.length() <= Integer.MAX_VALUE :

@@ -111,6 +111,7 @@ public final class SimpleWhereClause implements Where {
         return select.sortedUnlimited(docs, database, bitSetPool);
     }
 
+    @SuppressWarnings("CloneDoesntCallSuperClone")
     @NotNull
     @Override
     public Where clone() {

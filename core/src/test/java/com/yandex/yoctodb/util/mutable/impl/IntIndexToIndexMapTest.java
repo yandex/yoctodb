@@ -43,14 +43,14 @@ public class IntIndexToIndexMapTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void overwrite() throws IOException {
+    public void overwrite() {
         final IndexToIndexMap idx = new IntIndexToIndexMap();
         idx.put(0, 0);
         idx.put(0, 0);
     }
 
     @Test
-    public void string() throws Exception {
+    public void string() {
         final IndexToIndexMap idx = new IntIndexToIndexMap();
         idx.put(0, 0);
         idx.put(1, 0);

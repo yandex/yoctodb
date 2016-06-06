@@ -10,8 +10,6 @@
 
 package com.yandex.yoctodb.util.mutable.impl;
 
-import com.google.common.primitives.Longs;
-import com.yandex.yoctodb.util.buf.Buffer;
 import com.yandex.yoctodb.util.mutable.ArrayBitSet;
 import com.yandex.yoctodb.util.mutable.BitSet;
 import net.jcip.annotations.NotThreadSafe;
@@ -45,12 +43,12 @@ public final class LongArrayBitSet implements ArrayBitSet {
         this.words = words;
     }
 
-    public static int arraySize(final int size) {
+    static int arraySize(final int size) {
         return (size >>> 6) + 1;
     }
 
     @NotNull
-    public static ArrayBitSet zero(
+    static ArrayBitSet zero(
             final int size,
             @NotNull
             final long[] words) {
@@ -188,32 +186,6 @@ public final class LongArrayBitSet implements ArrayBitSet {
         final long[] from = ((ArrayBitSet) set).toArray();
         for (int i = 0; i < usedWords; i++) {
             final long word = words[i] | from[i];
-            words[i] = word;
-            if (word != 0) {
-                notEmpty = true;
-            }
-        }
-
-        return notEmpty;
-    }
-
-    @Override
-    public boolean or(
-            @NotNull
-            final Buffer longArrayBitSetInByteBuffer,
-            final long startPosition,
-            final int bitSetSizeInLongs) {
-        boolean notEmpty = false;
-        long currentPosition = startPosition;
-
-        assert usedWords == bitSetSizeInLongs;
-
-        for (int i = 0; i < usedWords; i++) {
-            final long currentWord =
-                    longArrayBitSetInByteBuffer.getLong(
-                            currentPosition);
-            currentPosition += Longs.BYTES;
-            final long word = words[i] | currentWord;
             words[i] = word;
             if (word != 0) {
                 notEmpty = true;

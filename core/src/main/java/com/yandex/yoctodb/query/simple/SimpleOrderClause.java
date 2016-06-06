@@ -112,6 +112,7 @@ public final class SimpleOrderClause implements OrderBy {
         return select.sortedUnlimited(docs, database, bitSetPool);
     }
 
+    @SuppressWarnings("CloneDoesntCallSuperClone")
     @NotNull
     @Override
     public OrderBy clone() {

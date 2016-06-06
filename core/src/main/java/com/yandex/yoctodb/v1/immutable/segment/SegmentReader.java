@@ -20,7 +20,7 @@ import org.jetbrains.annotations.NotNull;
  * @author incubos
  */
 @Immutable
-public interface SegmentReader {
+interface SegmentReader {
     @NotNull
     Segment read(
             @NotNull
