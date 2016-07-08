@@ -100,15 +100,6 @@ public class FileChannelBufferTest extends BufferTest {
     }
 
     @Test(expected = RuntimeException.class)
-    public void toByteBuffer() throws IOException {
-        final FileChannel broken = mock(FileChannel.class);
-        when(broken.size()).thenReturn(1024L);
-        when(broken.read(any(ByteBuffer.class), anyLong()))
-                .thenThrow(new IOException("Test"));
-        new FileChannelBuffer(broken).toByteBuffer();
-    }
-
-    @Test(expected = RuntimeException.class)
     public void getSubBuffer() throws IOException {
         final FileChannel broken = mock(FileChannel.class);
         when(broken.size()).thenReturn(1024L);

@@ -11,46 +11,53 @@
 package com.yandex.yoctodb.util.immutable.impl;
 
 import com.yandex.yoctodb.util.buf.Buffer;
-import com.yandex.yoctodb.util.immutable.IndexToIndexMultiMap;
-import com.yandex.yoctodb.util.immutable.IntToIntArray;
-import com.yandex.yoctodb.util.mutable.BitSet;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.roaringbitmap.PeekableIntIterator;
-import org.roaringbitmap.buffer.ImmutableRoaringBitmap;
+import com.yandex.yoctodb.util.immutable.IndexToIndexMultiMap;
+import com.yandex.yoctodb.util.immutable.IntToIntArray;
+import com.yandex.yoctodb.util.mutable.BitSet;
 
-import java.nio.ByteBuffer;
-import java.util.*;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
- * @author incubos
- * @see com.yandex.yoctodb.util.mutable.impl.RoaringBitSetIndexToIndexMultiMap
+ * @author svyatoslav
  */
 @Immutable
-public class RoaringBitSetIndexToIndexMultiMap implements IndexToIndexMultiMap {
+public final class IntIndexToIndexMultiMap implements IndexToIndexMultiMap {
+    private final int keysCount;
     @NotNull
-    private final List<ImmutableRoaringBitmap> bitSets;
+    private final Buffer offsets;
+    @NotNull
+    private final Buffer elements;
 
     @NotNull
-    public static RoaringBitSetIndexToIndexMultiMap from(
+    public static IndexToIndexMultiMap from(
             @NotNull
             final Buffer buf) {
-        final Collection<ImmutableRoaringBitmap> bitSets = new LinkedList<>();
-        while (buf.hasRemaining()) {
-            final int size = buf.getInt();
-            final ByteBuffer data = buf.slice(size).toByteBuffer();
-            bitSets.add(new ImmutableRoaringBitmap(data));
-            buf.advance(size);
-        }
+        final int keysCount = buf.getInt();
+        final Buffer offsets = buf.slice(((long) keysCount) << 3);
+        final Buffer elements =
+                buf.slice().position(offsets.remaining()).slice();
 
-        return new RoaringBitSetIndexToIndexMultiMap(bitSets);
+        return new IntIndexToIndexMultiMap(
+                keysCount,
+                offsets,
+                elements);
     }
 
-    private RoaringBitSetIndexToIndexMultiMap(
+    private IntIndexToIndexMultiMap(
+            final int keysCount,
             @NotNull
-            final Collection<ImmutableRoaringBitmap> bitSets) {
-        this.bitSets = new ArrayList<>(bitSets);
+            final Buffer offsets,
+            @NotNull
+            final Buffer elements) {
+        assert keysCount >= 0 : "Negative keys count";
+
+        this.keysCount = keysCount;
+        this.offsets = offsets;
+        this.elements = elements;
     }
 
     @Override
@@ -58,15 +65,17 @@ public class RoaringBitSetIndexToIndexMultiMap implements IndexToIndexMultiMap {
             @NotNull
             final BitSet dest,
             final int key) {
-        assert 0 <= key && key < bitSets.size();
+        assert 0 <= key && key < keysCount;
 
-        final Iterator<Integer> docs = bitSets.get(key).iterator();
-        final boolean result = docs.hasNext();
-        while (docs.hasNext()) {
-            dest.set(docs.next());
-        }
+        final long start = offsets.getLong(((long) key) << 3);
 
-        return result;
+        final int size = elements.getInt(start);
+        final long from = start + 4L;
+        final long to = from + (((long) size) << 2);
+        for (long i = from; i < to; i += 4L)
+            dest.set(elements.getInt(i));
+
+        return size > 0;
     }
 
     @Override
@@ -74,13 +83,46 @@ public class RoaringBitSetIndexToIndexMultiMap implements IndexToIndexMultiMap {
             @NotNull
             final BitSet dest,
             final int fromInclusive) {
-        assert 0 <= fromInclusive && fromInclusive < bitSets.size();
+        assert 0 <= fromInclusive && fromInclusive < keysCount;
 
         boolean result = false;
 
-        for (int i = fromInclusive; i < bitSets.size(); i++) {
-            final boolean nonEmpty = get(dest, i);
-            result |= nonEmpty;
+        long current = offsets.getLong(((long) fromInclusive) << 3);
+        final long remaining = elements.remaining();
+
+        assert remaining <= Integer.MAX_VALUE;
+
+        while (current < remaining) {
+            int size = elements.getInt(current);
+            current += 4L;
+            result |= size > 0;
+            for (; 0 < size; size--) {
+                dest.set(elements.getInt(current));
+                current += 4L;
+            }
+        }
+
+        return result;
+    }
+
+    private boolean fill(
+            @NotNull
+            final BitSet dest,
+            final long from,
+            final int count) {
+        boolean result = false;
+
+        long current = from;
+        int remaining = count;
+        while (remaining > 0) {
+            int size = elements.getInt(current);
+            current += 4L;
+            result |= size > 0;
+            for (; 0 < size; size--) {
+                dest.set(elements.getInt(current));
+                current += 4L;
+            }
+            remaining--;
         }
 
         return result;
@@ -91,16 +133,9 @@ public class RoaringBitSetIndexToIndexMultiMap implements IndexToIndexMultiMap {
             @NotNull
             final BitSet dest,
             final int toExclusive) {
-        assert 0 < toExclusive && toExclusive <= bitSets.size();
+        assert 0 < toExclusive && toExclusive <= keysCount;
 
-        boolean result = false;
-
-        for (int i = 0; i < toExclusive; i++) {
-            final boolean nonEmpty = get(dest, i);
-            result |= nonEmpty;
-        }
-
-        return result;
+        return fill(dest, 0, toExclusive);
     }
 
     @Override
@@ -111,27 +146,23 @@ public class RoaringBitSetIndexToIndexMultiMap implements IndexToIndexMultiMap {
             final int toExclusive) {
         assert 0 <= fromInclusive &&
                fromInclusive < toExclusive &&
-               toExclusive <= bitSets.size();
+               toExclusive <= keysCount;
 
-        boolean result = false;
+        final long start = offsets.getLong(((long) fromInclusive) << 3);
+        final int count = toExclusive - fromInclusive;
 
-        for (int i = fromInclusive; i < toExclusive; i++) {
-            final boolean nonEmpty = get(dest, i);
-            result |= nonEmpty;
-        }
-
-        return result;
+        return fill(dest, start, count);
     }
 
     @Override
     public int getKeysCount() {
-        return bitSets.size();
+        return keysCount;
     }
 
     @Override
     public String toString() {
-        return "RoaringBitSetIndexToIndexMultiMap{" +
-               "size=" + bitSets.size() +
+        return "IntIndexToIndexMultiMap{" +
+               "keysCount=" + keysCount +
                '}';
     }
 
@@ -140,41 +171,29 @@ public class RoaringBitSetIndexToIndexMultiMap implements IndexToIndexMultiMap {
             final int key,
             @NotNull
             final BitSet valueFilter) {
-        assert 0 <= key && key < bitSets.size();
-        assert !valueFilter.isEmpty();
+        assert 0 <= key && key < keysCount;
+
+        final long start = offsets.getLong(((long) key) << 3);
+
+        final int size = elements.getInt(start);
+
+        assert size > 0;
 
         int[] values = null;
         int count = 0;
 
-        final ImmutableRoaringBitmap bitSet = bitSets.get(key);
-        final PeekableIntIterator ids = bitSet.getIntIterator();
-
-        int nextAllowed = valueFilter.nextSetBit(0);
-        ids.advanceIfNeeded(nextAllowed);
-
-        // Contract: ids is always >= nextAllowed
-        while (ids.hasNext()) {
-            int id = ids.peekNext();
-
-            if (id == nextAllowed) {
+        long valueOffset = start + 4L;
+        for (int i = 0; i < size; i++) {
+            final int value = elements.getInt(valueOffset);
+            if (valueFilter.get(value)) {
                 // Lazy allocation
                 if (values == null) {
-                    values = new int[bitSet.getCardinality()];
+                    values = new int[size - i];
                 }
-
-                // Storing
-                values[count] = id;
+                values[count] = value;
                 count++;
-
-                // Advancing
-                id++;
             }
-
-            nextAllowed = valueFilter.nextSetBit(id);
-            if (nextAllowed < 0)
-                break;
-
-            ids.advanceIfNeeded(nextAllowed);
+            valueOffset += 4L;
         }
 
         if (values == null) {
@@ -194,7 +213,7 @@ public class RoaringBitSetIndexToIndexMultiMap implements IndexToIndexMultiMap {
             private IntToIntArray next = null;
 
             private void advance() {
-                while (next == null && key < bitSets.size()) {
+                while (next == null && key < keysCount) {
                     next = getFilteredValues(key++, valueFilter);
                 }
             }
@@ -234,7 +253,7 @@ public class RoaringBitSetIndexToIndexMultiMap implements IndexToIndexMultiMap {
             @NotNull
             final BitSet valueFilter) {
         return new Iterator<IntToIntArray>() {
-            private int key = bitSets.size() - 1;
+            private int key = keysCount - 1;
             private IntToIntArray next = null;
 
             private void advance() {

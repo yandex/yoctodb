@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 @ThreadSafe
 public final class V1DatabaseFormat extends DatabaseFormat {
-    public final static int FORMAT = 6;
+    public final static int FORMAT = 5;
 
     private final static DatabaseReader DATABASE_READER = new V1DatabaseReader();
 
@@ -91,7 +91,8 @@ public final class V1DatabaseFormat extends DatabaseFormat {
     }
 
     public enum MultiMapType {
-        ROARING_BIT_SET_BASED(3000);
+        LIST_BASED(1000),
+        LONG_ARRAY_BIT_SET_BASED(2000);
 
         private final int code;
 

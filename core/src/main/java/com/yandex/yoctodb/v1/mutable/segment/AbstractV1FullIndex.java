@@ -18,7 +18,10 @@ import com.yandex.yoctodb.util.UnsignedByteArray;
 import com.yandex.yoctodb.util.mutable.ByteArraySortedSet;
 import com.yandex.yoctodb.util.mutable.IndexToIndexMap;
 import com.yandex.yoctodb.util.mutable.IndexToIndexMultiMap;
-import com.yandex.yoctodb.util.mutable.impl.*;
+import com.yandex.yoctodb.util.mutable.impl.FixedLengthByteArraySortedSet;
+import com.yandex.yoctodb.util.mutable.impl.IntIndexToIndexMap;
+import com.yandex.yoctodb.util.mutable.impl.IntIndexToIndexMultiMap;
+import com.yandex.yoctodb.util.mutable.impl.VariableLengthByteArraySortedSet;
 import com.yandex.yoctodb.v1.V1DatabaseFormat;
 import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.NotNull;
@@ -81,6 +84,11 @@ abstract class AbstractV1FullIndex
         return this;
     }
 
+    @Override
+    public void setDatabaseDocumentsCount(final int documentsCount) {
+        // Ignoring the hint
+    }
+
     @NotNull
     @Override
     public OutputStreamWritable buildWritable() {
@@ -91,8 +99,7 @@ abstract class AbstractV1FullIndex
         // Building index
 
         final IndexToIndexMultiMap valueToDocumentsIndex =
-                new RoaringBitSetIndexToIndexMultiMap(
-                        valueToDocuments.asMap().values());
+                new IntIndexToIndexMultiMap(valueToDocuments.asMap().values());
 
         final ByteArraySortedSet values;
         if (fixedLength) {

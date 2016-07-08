@@ -17,32 +17,38 @@ import org.junit.Test;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link RoaringBitSetIndexToIndexMultiMap}
+ * Unit tests for {@link BitSetIndexToIndexMultiMap}
  *
  * @author incubos
  */
-public class RoaringBitSetIndexToIndexMultiMapTest {
+public class BitSetIndexToIndexMultiMapTest {
+    @Test(expected = IllegalArgumentException.class)
+    public void negativeDocuments() {
+        new BitSetIndexToIndexMultiMap(
+                Collections.<Collection<Integer>>emptyList(),
+                -1);
+    }
+
     @Test(expected = AssertionError.class)
-    public void negativeValue() throws IOException {
-        new RoaringBitSetIndexToIndexMultiMap(
-                singletonList(singletonList(-1)))
+    public void wrongDocument() throws IOException {
+        new BitSetIndexToIndexMultiMap(
+                singletonList(singletonList(1)),
+                1)
                 .writeTo(new ByteArrayOutputStream());
     }
 
-    @Test(expected = RuntimeException.class)
-    public void ioException() {
-        @SuppressWarnings("unchecked")
-        final Collection<Collection<Integer>> broken = mock(Collection.class);
-        when(broken.iterator()).thenThrow(new RuntimeException("Test"));
-
-        new RoaringBitSetIndexToIndexMultiMap(broken);
+    @Test(expected = IllegalArgumentException.class)
+    public void negativeValue() throws IOException {
+        new BitSetIndexToIndexMultiMap(
+                singletonList(singletonList(1)),
+                -1)
+                .writeTo(new ByteArrayOutputStream());
     }
 
     @Test
@@ -52,9 +58,14 @@ public class RoaringBitSetIndexToIndexMultiMapTest {
         for (int i = 0; i < documents; i++)
             elements.put(i / 2, i);
         final IndexToIndexMultiMap set =
-                new RoaringBitSetIndexToIndexMultiMap(
-                        elements.asMap().values());
+                new BitSetIndexToIndexMultiMap(
+                        elements.asMap().values(),
+                        documents);
         final String text = set.toString();
         assertTrue(text.contains(Integer.toString(documents / 2)));
+        assertTrue(text.contains(Integer.toString(documents)));
+        set.getSizeInBytes();
+        assertTrue(text.contains(Integer.toString(documents / 2)));
+        assertTrue(text.contains(Integer.toString(documents)));
     }
 }

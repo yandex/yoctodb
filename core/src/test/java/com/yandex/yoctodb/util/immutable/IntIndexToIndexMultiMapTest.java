@@ -12,9 +12,10 @@ package com.yandex.yoctodb.util.immutable;
 
 import com.google.common.collect.TreeMultimap;
 import com.yandex.yoctodb.util.buf.Buffer;
-import com.yandex.yoctodb.util.immutable.impl.RoaringBitSetIndexToIndexMultiMap;
+import com.yandex.yoctodb.util.immutable.impl.IntIndexToIndexMultiMap;
 import com.yandex.yoctodb.util.mutable.BitSet;
 import com.yandex.yoctodb.util.mutable.impl.LongArrayBitSet;
+import com.yandex.yoctodb.v1.V1DatabaseFormat;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -23,20 +24,18 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.yandex.yoctodb.v1.V1DatabaseFormat.MultiMapType.ROARING_BIT_SET_BASED;
-
 /**
- * @author incubos
+ * @author svyatoslav
  */
-public class RoaringBitSetIndexToIndexMultiMapTest {
+public class IntIndexToIndexMultiMapTest {
     @Test
     public void simpleTest() throws IOException {
         final int keys = 128;
         final int values = 128;
         final Buffer buf = prepareData(keys, values);
         final int code = buf.getInt();
-        Assert.assertEquals(ROARING_BIT_SET_BASED.getCode(), code);
-        final IndexToIndexMultiMap map = RoaringBitSetIndexToIndexMultiMap.from(buf);
+        Assert.assertEquals(V1DatabaseFormat.MultiMapType.LIST_BASED.getCode(), code);
+        final IndexToIndexMultiMap map = IntIndexToIndexMultiMap.from(buf);
         Assert.assertEquals(keys, map.getKeysCount());
         for (int i = 0; i < keys; i++) {
             final Set<Integer> expected = new HashSet<>();
@@ -70,7 +69,7 @@ public class RoaringBitSetIndexToIndexMultiMapTest {
             elements.put(i, (3 * keys - i) % values);
         }
         final com.yandex.yoctodb.util.mutable.IndexToIndexMultiMap indexToIndexMultiMap =
-                new com.yandex.yoctodb.util.mutable.impl.RoaringBitSetIndexToIndexMultiMap(
+                new com.yandex.yoctodb.util.mutable.impl.IntIndexToIndexMultiMap(
                         elements.asMap().values());
 
         final ByteArrayOutputStream os = new ByteArrayOutputStream();

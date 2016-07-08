@@ -16,33 +16,31 @@ import com.yandex.yoctodb.util.immutable.IndexToIndexMultiMap;
 import com.yandex.yoctodb.util.immutable.IntToIntArray;
 import com.yandex.yoctodb.util.mutable.BitSet;
 import com.yandex.yoctodb.util.mutable.impl.LongArrayBitSet;
+import com.yandex.yoctodb.v1.V1DatabaseFormat;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import static com.yandex.yoctodb.v1.V1DatabaseFormat.MultiMapType.ROARING_BIT_SET_BASED;
 import static org.junit.Assert.*;
 
 /**
- * Unit tests for {@link RoaringBitSetIndexToIndexMultiMap}
+ * Unit tests for {@link IntIndexToIndexMultiMap}
  *
  * @author incubos
  */
-public class RoaringBitSetIndexToIndexMultiMapTest {
-    private final int DOCS = 128;
+public class IntIndexToIndexMultiMapTest {
+    private final int VALUES = 128;
 
     private IndexToIndexMultiMap build() throws IOException {
         final TreeMultimap<Integer, Integer> elements = TreeMultimap.create();
-        for (int i = 0; i < DOCS; i++) {
+        for (int i = 0; i < VALUES; i++) {
             elements.put(i / 2, i);
         }
         final com.yandex.yoctodb.util.mutable.IndexToIndexMultiMap mutable =
-                new com.yandex.yoctodb.util.mutable.impl.RoaringBitSetIndexToIndexMultiMap(
+                new com.yandex.yoctodb.util.mutable.impl.IntIndexToIndexMultiMap(
                         elements.asMap().values());
 
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -50,82 +48,28 @@ public class RoaringBitSetIndexToIndexMultiMapTest {
 
         final Buffer buf = Buffer.from(baos.toByteArray());
 
-        assertEquals(ROARING_BIT_SET_BASED.getCode(), buf.getInt());
+        assertEquals(
+                V1DatabaseFormat.MultiMapType.LIST_BASED.getCode(),
+                buf.getInt());
 
         final IndexToIndexMultiMap result =
-                RoaringBitSetIndexToIndexMultiMap.from(buf);
+                IntIndexToIndexMultiMap.from(buf);
 
-        assertEquals(DOCS / 2, result.getKeysCount());
+        assertEquals(VALUES / 2, result.getKeysCount());
 
         return result;
     }
 
     @Test
-    public void buildEmpty() throws IOException {
-        final com.yandex.yoctodb.util.mutable.IndexToIndexMultiMap mutable =
-                new com.yandex.yoctodb.util.mutable.impl.RoaringBitSetIndexToIndexMultiMap(
-                        Collections.<Collection<Integer>>emptyList());
-
-        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        mutable.writeTo(baos);
-
-        final Buffer buf = Buffer.from(baos.toByteArray());
-
-        assertEquals(ROARING_BIT_SET_BASED.getCode(), buf.getInt());
-
-        final IndexToIndexMultiMap result =
-                RoaringBitSetIndexToIndexMultiMap.from(buf);
-
-        assertEquals(0, result.getKeysCount());
-    }
-
-    @Test
-    public void getFrom() throws IOException {
-        final IndexToIndexMultiMap index = build();
-
-        final BitSet dest = LongArrayBitSet.zero(DOCS);
-        index.getFrom(dest, DOCS / 4);
-
-        assertEquals(DOCS / 2, dest.cardinality());
-        for (int i = DOCS / 2; i < DOCS; i++)
-            assertTrue(dest.get(i));
-    }
-
-    @Test
-    public void getTo() throws IOException {
-        final IndexToIndexMultiMap index = build();
-
-        final BitSet dest = LongArrayBitSet.zero(DOCS);
-        index.getTo(dest, DOCS / 4);
-
-        assertEquals(DOCS / 2, dest.cardinality());
-        for (int i = 0; i < DOCS / 2; i++)
-            assertTrue(dest.get(i));
-    }
-
-    @Test
-    public void getBetween() throws IOException {
-        final IndexToIndexMultiMap index = build();
-
-        final BitSet dest = LongArrayBitSet.zero(DOCS);
-        index.getBetween(dest, DOCS / 8, DOCS * 3 / 8);
-
-        assertEquals(DOCS / 2, dest.cardinality());
-        for (int i = DOCS / 4; i < DOCS * 3 / 4; i++)
-            assertTrue(dest.get(i));
-    }
-
-    @Test
     public void string() throws IOException {
-        final IndexToIndexMultiMap index = build();
-        assertTrue(index.toString().contains(Integer.toString(DOCS / 2)));
+        assertTrue(build().toString().contains(Integer.toString(VALUES / 2)));
     }
 
     @Test
     public void ascendingIterator() throws IOException {
         final Iterator<IntToIntArray> iter =
-                build().ascending(LongArrayBitSet.one(DOCS));
-        for (int i = 0; i < DOCS / 2; i++) {
+                build().ascending(LongArrayBitSet.one(VALUES));
+        for (int i = 0; i < VALUES / 2; i++) {
             assertTrue(iter.hasNext());
             final IntToIntArray e = iter.next();
             assertEquals(i, e.getKey());
@@ -137,14 +81,14 @@ public class RoaringBitSetIndexToIndexMultiMapTest {
 
     @Test
     public void ascendingSparseIterator() throws IOException {
-        final BitSet filter = LongArrayBitSet.zero(DOCS);
+        final BitSet filter = LongArrayBitSet.zero(VALUES);
         final int step = 4;
-        for (int i = 0; i < DOCS; i += step)
+        for (int i = 0; i < VALUES; i += step)
             filter.set(i);
 
         final Iterator<IntToIntArray> iter = build().ascending(filter);
 
-        for (int i = 0; i < DOCS / 2; i += 2) {
+        for (int i = 0; i < VALUES / 2; i += 2) {
             assertTrue(iter.hasNext());
             final IntToIntArray e = iter.next();
             assertEquals(i, e.getKey());
@@ -156,9 +100,8 @@ public class RoaringBitSetIndexToIndexMultiMapTest {
 
     @Test(expected = NoSuchElementException.class)
     public void ascendingEmptyIterator() throws IOException {
-        final BitSet valueFilter = LongArrayBitSet.zero(DOCS + 1);
-        valueFilter.set(DOCS);
-        final Iterator<IntToIntArray> iter = build().ascending(valueFilter);
+        final Iterator<IntToIntArray> iter =
+                build().ascending(LongArrayBitSet.zero(VALUES));
         assertFalse(iter.hasNext());
         iter.next();
     }
@@ -166,7 +109,7 @@ public class RoaringBitSetIndexToIndexMultiMapTest {
     @Test(expected = UnsupportedOperationException.class)
     public void ascendingRemoveUnsupported() throws IOException {
         final Iterator<IntToIntArray> iter =
-                build().ascending(LongArrayBitSet.one(DOCS));
+                build().ascending(LongArrayBitSet.one(VALUES));
         assertTrue(iter.hasNext());
         iter.remove();
     }
@@ -174,8 +117,8 @@ public class RoaringBitSetIndexToIndexMultiMapTest {
     @Test
     public void descendingIterator() throws IOException {
         final Iterator<IntToIntArray> iter =
-                build().descending(LongArrayBitSet.one(DOCS));
-        for (int i = DOCS / 2 - 1; i >= 0; i--) {
+                build().descending(LongArrayBitSet.one(VALUES));
+        for (int i = VALUES / 2 - 1; i >= 0; i--) {
             assertTrue(iter.hasNext());
             final IntToIntArray e = iter.next();
             assertEquals(i, e.getKey());
@@ -187,14 +130,14 @@ public class RoaringBitSetIndexToIndexMultiMapTest {
 
     @Test
     public void descendingSparseIterator() throws IOException {
-        final BitSet filter = LongArrayBitSet.zero(DOCS);
+        final BitSet filter = LongArrayBitSet.zero(VALUES);
         final int step = 4;
-        for (int i = 0; i < DOCS; i += step)
+        for (int i = 0; i < VALUES; i += step)
             filter.set(i);
 
         final Iterator<IntToIntArray> iter = build().descending(filter);
 
-        for (int i = DOCS / 2 - 2; i >= 0; i -= 2) {
+        for (int i = VALUES / 2 - 2; i >= 0; i -= 2) {
             assertTrue(iter.hasNext());
             final IntToIntArray e = iter.next();
             assertEquals(i, e.getKey());
@@ -206,9 +149,8 @@ public class RoaringBitSetIndexToIndexMultiMapTest {
 
     @Test(expected = NoSuchElementException.class)
     public void descendingEmptyIterator() throws IOException {
-        final BitSet valueFilter = LongArrayBitSet.zero(DOCS + 1);
-        valueFilter.set(DOCS);
-        final Iterator<IntToIntArray> iter = build().descending(valueFilter);
+        final Iterator<IntToIntArray> iter =
+                build().descending(LongArrayBitSet.zero(VALUES));
         assertFalse(iter.hasNext());
         iter.next();
     }
@@ -216,7 +158,7 @@ public class RoaringBitSetIndexToIndexMultiMapTest {
     @Test(expected = UnsupportedOperationException.class)
     public void descendingRemoveUnsupported() throws IOException {
         final Iterator<IntToIntArray> iter =
-                build().descending(LongArrayBitSet.one(DOCS));
+                build().descending(LongArrayBitSet.one(VALUES));
         assertTrue(iter.hasNext());
         iter.remove();
     }

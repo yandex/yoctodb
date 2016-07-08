@@ -56,7 +56,6 @@
         <jmh.version>1.11.3</jmh.version>
         <junit.version>4.12</junit.version>
         <mockito.version>1.10.19</mockito.version>
-        <roaringbitmap.version>0.6.17</roaringbitmap.version>
 
         <!-- Maven -->
         <coveralls-maven-plugin.version>4.1.0</coveralls-maven-plugin.version>
@@ -77,13 +76,6 @@
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>${guava.version}</version>
-            </dependency>
-
-            <!-- Roaring Bitmap -->
-            <dependency>
-                <groupId>org.roaringbitmap</groupId>
-                <artifactId>RoaringBitmap</artifactId>
-                <version>${roaringbitmap.version}</version>
             </dependency>
 
             <!-- Annotations -->

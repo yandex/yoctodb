@@ -139,6 +139,7 @@ public final class V1DatabaseBuilder
                 indexes.values().iterator();
         while (indexSegmentIterator.hasNext()) {
             final IndexSegment segment = indexSegmentIterator.next();
+            segment.setDatabaseDocumentsCount(currentDocumentId);
             writables.add(segment.buildWritable());
             indexSegmentIterator.remove();
         }

@@ -29,4 +29,6 @@ public interface IndexSegment extends OutputStreamWritableBuilder {
             int documentId,
             @NotNull
             Collection<UnsignedByteArray> values);
+
+    void setDatabaseDocumentsCount(int documentsCount);
 }

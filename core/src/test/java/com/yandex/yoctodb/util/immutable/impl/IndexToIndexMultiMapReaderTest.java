@@ -28,15 +28,16 @@ import static org.junit.Assert.assertTrue;
  */
 public class IndexToIndexMultiMapReaderTest {
 
+    private final int DOCS = 128;
+
     @Test
-    public void build() throws IOException {
+    public void buildInt() throws IOException {
         final TreeMultimap<Integer, Integer> elements = TreeMultimap.create();
-        final int DOCS = 128;
         for (int i = 0; i < DOCS; i++) {
             elements.put(i / 2, i);
         }
         final com.yandex.yoctodb.util.mutable.IndexToIndexMultiMap mutable =
-                new com.yandex.yoctodb.util.mutable.impl.RoaringBitSetIndexToIndexMultiMap(
+                new com.yandex.yoctodb.util.mutable.impl.IntIndexToIndexMultiMap(
                         elements.asMap().values());
 
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -47,7 +48,29 @@ public class IndexToIndexMultiMapReaderTest {
         final IndexToIndexMultiMap result =
                 IndexToIndexMultiMapReader.from(buf);
 
-        assertTrue(result instanceof RoaringBitSetIndexToIndexMultiMap);
+        assertTrue(result instanceof IntIndexToIndexMultiMap);
+    }
+
+    @Test
+    public void buildBitSet() throws IOException {
+        final TreeMultimap<Integer, Integer> elements = TreeMultimap.create();
+        for (int i = 0; i < DOCS; i++) {
+            elements.put(i / 2, i);
+        }
+        final com.yandex.yoctodb.util.mutable.IndexToIndexMultiMap mutable =
+                new com.yandex.yoctodb.util.mutable.impl.BitSetIndexToIndexMultiMap(
+                        elements.asMap().values(),
+                        DOCS);
+
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        mutable.writeTo(baos);
+
+        final Buffer buf = Buffer.from(baos.toByteArray());
+
+        final IndexToIndexMultiMap result =
+                IndexToIndexMultiMapReader.from(buf);
+
+        assertTrue(result instanceof BitSetIndexToIndexMultiMap);
     }
 
     @Test(expected = UnsupportedOperationException.class)
