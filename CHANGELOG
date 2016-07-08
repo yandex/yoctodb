@@ -1,3 +1,6 @@
+0.0.18
+  * REVERTED #25: Switched to immutable org.roaringbitmap:RoaringBitmap implementation
+
 0.0.17
   * #7: Cloneable query builders
   * #25: Switched to immutable org.roaringbitmap:RoaringBitmap implementation
