@@ -8,8 +8,7 @@ import com.yandex.yoctodb.util.immutable.impl.VariableLengthByteArraySortedSet;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.infra.Blackhole;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -25,6 +24,29 @@ public class ByteArraySortedSetBenchmarks {
     private static final ByteArraySortedSet variable;
     private static final List<Buffer> elements;
 
+    private static Buffer persist(
+            final com.yandex.yoctodb.util.mutable.ByteArraySortedSet mutable) {
+        final File file;
+        try {
+            file = File.createTempFile("fixed", ".yoctodb");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        file.deleteOnExit();
+
+        try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file))) {
+            mutable.writeTo(os);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        try {
+            return Buffer.mmap(file);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     static {
         // Random
         final Random rnd = new Random();
@@ -38,47 +60,23 @@ public class ByteArraySortedSetBenchmarks {
         }
 
         // Building fixed
-
-        {
-            final com.yandex.yoctodb.util.mutable.ByteArraySortedSet mutable =
-                    new com.yandex.yoctodb.util.mutable.impl.FixedLengthByteArraySortedSet(
-                            set);
-
-            final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            try {
-                mutable.writeTo(baos);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
-            final Buffer buf = Buffer.from(baos.toByteArray());
-
-            fixed = FixedLengthByteArraySortedSet.from(buf);
-        }
+        fixed =
+                FixedLengthByteArraySortedSet.from(
+                        persist(
+                                new com.yandex.yoctodb.util.mutable.impl.FixedLengthByteArraySortedSet(
+                                        set)));
 
         // Building variable
-
-        {
-            final com.yandex.yoctodb.util.mutable.ByteArraySortedSet mutable =
-                    new com.yandex.yoctodb.util.mutable.impl.VariableLengthByteArraySortedSet(
-                            set);
-
-            final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            try {
-                mutable.writeTo(baos);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
-            final Buffer buf = Buffer.from(baos.toByteArray());
-
-            variable = VariableLengthByteArraySortedSet.from(buf);
-        }
+        variable =
+                VariableLengthByteArraySortedSet.from(
+                        persist(
+                                new com.yandex.yoctodb.util.mutable.impl.VariableLengthByteArraySortedSet(
+                                        set)));
 
         // Preparing queries
 
         elements = new ArrayList<>(set.size());
-        for (UnsignedByteArray e: set) {
+        for (UnsignedByteArray e : set) {
             elements.add(e.toByteBuffer());
         }
 
@@ -87,7 +85,7 @@ public class ByteArraySortedSetBenchmarks {
 
     private long measure(final ByteArraySortedSet set) {
         long res = 0;
-        for (Buffer b: elements)
+        for (Buffer b : elements)
             res += set.indexOf(b);
         return res;
     }
