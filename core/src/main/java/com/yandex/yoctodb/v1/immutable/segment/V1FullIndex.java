@@ -143,6 +143,12 @@ public final class V1FullIndex
 
     @NotNull
     @Override
+    public Buffer getStoredValue(final int document) {
+        return sortableDelegate.getStoredValue(document);
+    }
+
+    @NotNull
+    @Override
     public Iterator<IntToIntArray> ascending(
             @NotNull
             final BitSet docs) {

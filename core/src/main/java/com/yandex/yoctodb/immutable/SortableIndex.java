@@ -24,7 +24,7 @@ import java.util.Iterator;
  * @author incubos
  */
 @Immutable
-public interface SortableIndex extends Index {
+public interface SortableIndex extends StoredIndex {
     /**
      * Get {@code document} sort value index
      *

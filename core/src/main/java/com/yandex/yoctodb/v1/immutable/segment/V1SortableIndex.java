@@ -79,6 +79,12 @@ public final class V1SortableIndex
 
     @NotNull
     @Override
+    public Buffer getStoredValue(final int document) {
+        return values.get(documentToValue.get(document));
+    }
+
+    @NotNull
+    @Override
     public Iterator<IntToIntArray> ascending(
             @NotNull
             final BitSet docs) {

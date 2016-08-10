@@ -84,6 +84,12 @@ public class V1DatabaseReader extends DatabaseReader {
                     V1DatabaseFormat.FORMAT + ".");
         }
 
+        // Checking the format version
+        final int documentCount = buffer.getInt();
+        if (documentCount < 0) {
+            throw new IllegalArgumentException("Wrong document count " + format);
+        }
+
         if (buffer.remaining() < V1DatabaseFormat.getDigestSizeInBytes()) {
             throw new IllegalArgumentException("Too small buffer");
         }
@@ -106,9 +112,9 @@ public class V1DatabaseReader extends DatabaseReader {
         }
 
         // Reading the segments
-        Payload payload = null;
         final Map<String, FilterableIndex> filters = new HashMap<>();
         final Map<String, SortableIndex> sorters = new HashMap<>();
+        final Map<String, StoredIndex> storers = new HashMap<>();
         while (body.hasRemaining()) {
             final long size = body.getLong();
             final int type = body.getInt();
@@ -116,12 +122,6 @@ public class V1DatabaseReader extends DatabaseReader {
             final Buffer segmentBuffer = body.slice(size);
 
             final Segment segment = SegmentRegistry.read(type, segmentBuffer);
-
-            if (segment instanceof Payload) {
-                assert payload == null : "Duplicate payload found";
-
-                payload = (Payload) segment;
-            }
 
             if (segment instanceof FilterableIndex) {
                 final FilterableIndex index = (FilterableIndex) segment;
@@ -143,13 +143,21 @@ public class V1DatabaseReader extends DatabaseReader {
                 sorters.put(name, index);
             }
 
+            if (segment instanceof StoredIndex) {
+                final StoredIndex index = (StoredIndex) segment;
+                final String name = index.getFieldName();
+
+                assert !storers.containsKey(name) :
+                        "Duplicate stored index for field <" + name + ">";
+
+                storers.put(name, index);
+            }
+
             // Skipping read index
             body.position(body.position() + size);
         }
 
-        assert payload != null : "No payload found";
-
-        return new V1Database(payload, filters, sorters, bitSetPool);
+        return new V1Database(documentCount, filters, sorters, storers, bitSetPool);
     }
 
     @NotNull

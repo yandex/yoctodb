@@ -21,6 +21,15 @@ import org.jetbrains.annotations.NotNull;
 public interface DocumentProvider {
     int getDocumentCount();
 
+    /**
+     * Get document payload
+     *
+     * @deprecated use stored fields
+     * @see com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption#STORED
+     * @param i document ID
+     * @return payload
+     */
+    @Deprecated
     @NotNull
     Buffer getDocument(int i);
 
@@ -31,6 +40,7 @@ public interface DocumentProvider {
      *
      * @see com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption#SORTABLE
      * @see com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption#FULL
+     * @see com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption#STORED
      * @param document  document index
      * @param fieldName field name
      * @return document field value

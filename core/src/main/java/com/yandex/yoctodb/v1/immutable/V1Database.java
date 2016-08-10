@@ -12,6 +12,7 @@ package com.yandex.yoctodb.v1.immutable;
 
 import com.google.common.collect.Iterators;
 import com.yandex.yoctodb.immutable.*;
+import com.yandex.yoctodb.mutable.DocumentBuilder;
 import com.yandex.yoctodb.query.DocumentProcessor;
 import com.yandex.yoctodb.query.Query;
 import com.yandex.yoctodb.query.ScoredDocument;
@@ -26,6 +27,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import static java.util.Collections.unmodifiableMap;
 
@@ -36,39 +38,50 @@ import static java.util.Collections.unmodifiableMap;
  */
 @Immutable
 public final class V1Database implements IndexedDatabase {
-    @NotNull
-    private final Payload payload;
+    private final int size;
     @NotNull
     private final Map<String, FilterableIndex> filters;
     @NotNull
     private final Map<String, SortableIndex> sorters;
     @NotNull
+    private final Map<String, StoredIndex> storers;
+    @NotNull
     private final ArrayBitSetPool bitSetPool;
 
     public V1Database(
-            @NotNull
-            final Payload payload,
+            final int size,
             @NotNull
             final Map<String, FilterableIndex> filters,
             @NotNull
             final Map<String, SortableIndex> sorters,
             @NotNull
+            final Map<String, StoredIndex> storers,
+            @NotNull
             final ArrayBitSetPool bitSetPool) {
-        this.payload = payload;
+        assert size >= 0;
+
+        this.size = size;
         this.filters = unmodifiableMap(new HashMap<>(filters));
         this.sorters = unmodifiableMap(new HashMap<>(sorters));
+        this.storers = unmodifiableMap(new HashMap<>(storers));
         this.bitSetPool = bitSetPool;
     }
 
     @NotNull
     @Override
     public Buffer getDocument(final int i) {
-        return payload.getPayload(i);
+        final StoredIndex index = storers.get(DocumentBuilder.PAYLOAD);
+
+        if (index == null)
+            throw new NoSuchElementException(
+                    "There is no stored index for <" + DocumentBuilder.PAYLOAD + ">");
+
+        return index.getStoredValue(i);
     }
 
     @Override
     public int getDocumentCount() {
-        return payload.getSize();
+        return size;
     }
 
     @Nullable
@@ -95,9 +108,9 @@ public final class V1Database implements IndexedDatabase {
             final int document,
             @NotNull
             final String fieldName) {
-        final SortableIndex sorter = getSorter(fieldName);
+        assert storers.containsKey(fieldName);
 
-        return sorter.getSortValue(sorter.getSortValueIndex(document));
+        return storers.get(fieldName).getStoredValue(document);
     }
 
     @Override

@@ -203,8 +203,8 @@ public class PartialDocumentTest {
         assertEquals(0, db.getDocument(0).remaining());
     }
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void sparseUnsupported() throws IOException {
+    @Test
+    public void sparseSupported() throws IOException {
         final DatabaseBuilder dbBuilder =
                 DatabaseFormat.getCurrent().newDatabaseBuilder();
 

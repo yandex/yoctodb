@@ -10,9 +10,9 @@
 
 package com.yandex.yoctodb.mutable;
 
+import com.yandex.yoctodb.util.UnsignedByteArray;
 import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.NotNull;
-import com.yandex.yoctodb.util.UnsignedByteArray;
 
 /**
  * Builds a document to be feed to {@link DatabaseBuilder}
@@ -25,6 +25,7 @@ public interface DocumentBuilder {
         FILTERABLE,
         SORTABLE,
         FULL,
+        STORED,
         // For unit tests
         UNSUPPORTED
     }
@@ -34,6 +35,18 @@ public interface DocumentBuilder {
         VARIABLE
     }
 
+    @Deprecated
+    String PAYLOAD = "_payload";
+
+    /**
+     * Add payload
+     *
+     * @deprecated Use stored fields
+     * @see IndexOption#STORED
+     * @param payload payload
+     * @return this
+     */
+    @Deprecated
     @NotNull
     DocumentBuilder withPayload(
             @NotNull
@@ -49,6 +62,15 @@ public interface DocumentBuilder {
             IndexOption index,
             @NotNull
             LengthOption length);
+
+    @NotNull
+    DocumentBuilder withField(
+            @NotNull
+            String name,
+            @NotNull
+            UnsignedByteArray value,
+            @NotNull
+            IndexOption index);
 
     @NotNull
     DocumentBuilder withField(

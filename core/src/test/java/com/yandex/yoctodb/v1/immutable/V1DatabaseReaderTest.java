@@ -10,6 +10,7 @@
 
 package com.yandex.yoctodb.v1.immutable;
 
+import com.google.common.primitives.Ints;
 import com.yandex.yoctodb.DatabaseFormat;
 import com.yandex.yoctodb.mutable.DatabaseBuilder;
 import com.yandex.yoctodb.mutable.DocumentBuilder;
@@ -100,6 +101,14 @@ public class V1DatabaseReaderTest {
     public void wrongFormat() throws IOException {
         final byte[] bytes = buildDatabase();
         bytes[MAGIC.length] = (byte) ~bytes[MAGIC.length];
+        INSTANCE.from(Buffer.from(bytes));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void negativeDocuments() throws IOException {
+        final byte[] bytes = buildDatabase();
+        final byte[] negative = Ints.toByteArray(-1);
+        System.arraycopy(negative, 0, bytes, MAGIC.length + Ints.BYTES, negative.length);
         INSTANCE.from(Buffer.from(bytes));
     }
 

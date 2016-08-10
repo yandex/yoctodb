@@ -11,6 +11,7 @@
 package com.yandex.yoctodb.v1.mutable;
 
 import com.google.common.collect.TreeMultimap;
+import com.yandex.yoctodb.util.UnsignedByteArrays;
 import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.NotNull;
 import com.yandex.yoctodb.mutable.AbstractDocumentBuilder;
@@ -27,8 +28,6 @@ import java.util.Map;
  */
 @NotThreadSafe
 public final class V1DocumentBuilder extends AbstractDocumentBuilder {
-    byte[] payload = null;
-
     final TreeMultimap<String, UnsignedByteArray> fields =
             TreeMultimap.create();
     final Map<String, IndexOption> index = new HashMap<>();
@@ -41,18 +40,32 @@ public final class V1DocumentBuilder extends AbstractDocumentBuilder {
             final byte[] payload) {
         checkNotFrozen();
 
-        if (this.payload != null) {
-            throw new IllegalStateException("The payload is already set");
-        }
-
-        this.payload = payload;
-
-        return this;
+        return doWithField(
+                PAYLOAD,
+                UnsignedByteArrays.from(payload),
+                IndexOption.STORED,
+                LengthOption.VARIABLE);
     }
 
     @NotNull
     @Override
     public DocumentBuilder withField(
+            @NotNull
+            final String name,
+            @NotNull
+            final UnsignedByteArray value,
+            @NotNull
+            final IndexOption index,
+            @NotNull
+            final LengthOption length) {
+        if (name.equals(PAYLOAD))
+            throw new IllegalArgumentException("Reserved field name <" + PAYLOAD + ">");
+
+        return doWithField(name, value, index, length);
+    }
+
+    @NotNull
+    private DocumentBuilder doWithField(
             @NotNull
             final String name,
             @NotNull

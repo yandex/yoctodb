@@ -10,6 +10,7 @@
 
 package com.yandex.yoctodb.mutable;
 
+import com.yandex.yoctodb.util.UnsignedByteArray;
 import com.yandex.yoctodb.util.UnsignedByteArrays;
 import com.yandex.yoctodb.v1.mutable.segment.Freezable;
 import net.jcip.annotations.NotThreadSafe;
@@ -24,6 +25,18 @@ import org.jetbrains.annotations.NotNull;
 public abstract class AbstractDocumentBuilder
         extends Freezable
         implements DocumentBuilder {
+    @NotNull
+    @Override
+    public DocumentBuilder withField(
+            @NotNull
+            final String name,
+            @NotNull
+            final UnsignedByteArray value,
+            @NotNull
+            final IndexOption index) {
+        return withField(name, value, index, LengthOption.VARIABLE);
+    }
+
     @NotNull
     @Override
     public DocumentBuilder withField(

@@ -19,13 +19,6 @@ import org.junit.Test;
  * @author incubos
  */
 public class V1DocumentBuilderTest {
-    @Test(expected = IllegalStateException.class)
-    public void payloadOverwrite() {
-        new V1DocumentBuilder()
-                .withPayload(new byte[]{})
-                .withPayload(new byte[]{});
-    }
-
     @Test(expected = IllegalArgumentException.class)
     public void differentIndexOptions() {
         new V1DocumentBuilder()
@@ -38,5 +31,14 @@ public class V1DocumentBuilderTest {
         new V1DocumentBuilder()
                 .withField("k", "0", DocumentBuilder.IndexOption.FULL)
                 .withField("k", 0, DocumentBuilder.IndexOption.FULL);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void payloadStoredField() {
+        new V1DocumentBuilder()
+                .withField(
+                        DocumentBuilder.PAYLOAD,
+                        "0",
+                        DocumentBuilder.IndexOption.STORED);
     }
 }

@@ -14,17 +14,19 @@ import com.yandex.yoctodb.util.buf.Buffer;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.NoSuchElementException;
-
 /**
- * Payload segment interface
+ * Index storing field values
  *
  * @author incubos
  */
 @Immutable
-public interface Payload {
-    int getSize();
-
+public interface StoredIndex extends Index {
+    /**
+     * Get stored value by document ID
+     *
+     * @param document document ID
+     * @return stored value
+     */
     @NotNull
-    Buffer getPayload(int i) throws NoSuchElementException;
+    Buffer getStoredValue(int document);
 }

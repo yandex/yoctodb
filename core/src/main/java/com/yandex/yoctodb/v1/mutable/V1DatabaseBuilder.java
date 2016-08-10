@@ -17,7 +17,6 @@ import com.yandex.yoctodb.mutable.DocumentBuilder;
 import com.yandex.yoctodb.util.MessageDigestOutputStreamWrapper;
 import com.yandex.yoctodb.util.OutputStreamWritable;
 import com.yandex.yoctodb.util.UnsignedByteArray;
-import com.yandex.yoctodb.util.UnsignedByteArrays;
 import com.yandex.yoctodb.v1.V1DatabaseFormat;
 import com.yandex.yoctodb.v1.mutable.segment.*;
 import net.jcip.annotations.NotThreadSafe;
@@ -39,9 +38,6 @@ public final class V1DatabaseBuilder
         extends Freezable
         implements DatabaseBuilder {
     private int currentDocumentId = 0;
-
-    private final SortedMap<Integer, UnsignedByteArray> payloads =
-            new TreeMap<>();
 
     private final Map<String, IndexSegment> indexes =
             new HashMap<>();
@@ -99,6 +95,9 @@ public final class V1DatabaseBuilder
                                 lengthOption == DocumentBuilder.LengthOption.FIXED
                         );
                         break;
+                    case STORED:
+                        index = new V1StoredIndex(fieldName);
+                        break;
                     default:
                         throw new UnsupportedOperationException(
                                 "Unsupported index option: " + indexOption);
@@ -109,14 +108,6 @@ public final class V1DatabaseBuilder
             } else {
                 existingIndex.addDocument(currentDocumentId, values);
             }
-        }
-
-        // Adding payload and moving on
-        if (builder.payload != null) {
-            payloads.put(
-                    currentDocumentId,
-                    UnsignedByteArrays.from(
-                            builder.payload));
         }
 
         currentDocumentId++;
@@ -144,25 +135,13 @@ public final class V1DatabaseBuilder
             indexSegmentIterator.remove();
         }
 
-        if (payloads.isEmpty()) {
-            writables.add(
-                    new V1NonePayloadSegment(currentDocumentId)
-                            .buildWritable());
-        } else if (payloads.size() == currentDocumentId) {
-            writables.add(
-                    new V1FullPayloadSegment(payloads.values())
-                            .buildWritable());
-        } else {
-            throw new UnsupportedOperationException(
-                    "Sparse payloads not supported yet");
-        }
-
         return new OutputStreamWritable() {
             @Override
             public long getSizeInBytes() {
                 long size =
                         V1DatabaseFormat.MAGIC.length +
                         Ints.BYTES + // Format length
+                        Ints.BYTES + // Document count
                         V1DatabaseFormat.getDigestSizeInBytes();
 
                 for (OutputStreamWritable writable : writables) {
@@ -179,6 +158,7 @@ public final class V1DatabaseBuilder
                 // Header
                 os.write(DatabaseFormat.MAGIC);
                 os.write(Ints.toByteArray(V1DatabaseFormat.FORMAT));
+                os.write(Ints.toByteArray(currentDocumentId));
 
                 final MessageDigest md;
                 try {

@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 @ThreadSafe
 public final class V1DatabaseFormat extends DatabaseFormat {
-    public final static int FORMAT = 5;
+    public final static int FORMAT = 6;
 
     private final static DatabaseReader DATABASE_READER = new V1DatabaseReader();
 
@@ -70,14 +70,13 @@ public final class V1DatabaseFormat extends DatabaseFormat {
     // Segment types
     public enum SegmentType {
         // External segments should start from 10E6
-        PAYLOAD_FULL(1), // All documents have payload
-        PAYLOAD_NONE(2), // No documents have any payload
         FIXED_LENGTH_FILTER(1000),
         VARIABLE_LENGTH_FILTER(2000),
         FIXED_LENGTH_SORTABLE_INDEX(3000),
         VARIABLE_LENGTH_SORTABLE_INDEX(4000),
         FIXED_LENGTH_FULL_INDEX(5000),
-        VARIABLE_LENGTH_FULL_INDEX(6000);
+        VARIABLE_LENGTH_FULL_INDEX(6000),
+        VARIABLE_LENGTH_STORED_INDEX(8000);
 
         private final int code;
 
