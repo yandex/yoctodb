@@ -1,3 +1,8 @@
+0.0.19
+  * ATTENTION! Incompatible format changes -- rebuild your databases
+  * #33: Support for stored field values
+  * Payloads are deprecated in favor of stored fields, but still supported
+
 0.0.18
   * REVERTED #25: Switched to immutable org.roaringbitmap:RoaringBitmap implementation
 
