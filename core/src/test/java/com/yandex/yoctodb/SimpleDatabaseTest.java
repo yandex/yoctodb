@@ -10,13 +10,14 @@
 
 package com.yandex.yoctodb;
 
+import com.google.common.primitives.Ints;
 import com.yandex.yoctodb.immutable.Database;
 import com.yandex.yoctodb.mutable.DatabaseBuilder;
-import com.yandex.yoctodb.mutable.DocumentBuilder;
 import com.yandex.yoctodb.query.DocumentProcessor;
 import com.yandex.yoctodb.query.Query;
 import com.yandex.yoctodb.query.simple.SimpleDescendingOrder;
 import com.yandex.yoctodb.query.simple.SimpleRangeCondition;
+import com.yandex.yoctodb.util.UnsignedByteArrays;
 import com.yandex.yoctodb.util.buf.Buffer;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
@@ -30,6 +31,7 @@ import static com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption.*;
 import static com.yandex.yoctodb.query.QueryBuilder.*;
 import static com.yandex.yoctodb.util.UnsignedByteArrays.from;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -418,6 +420,59 @@ public class SimpleDatabaseTest {
             assertEquals("payload" + i, result);
             i--;
         }
+    }
+
+    @Test
+    public void stored() throws IOException {
+        final DatabaseBuilder dbBuilder =
+                DatabaseFormat.getCurrent().newDatabaseBuilder();
+
+        dbBuilder.merge(
+                DatabaseFormat
+                        .getCurrent()
+                        .newDocumentBuilder()
+                        .withField("full", 11, FULL)
+                        .withField("sorted", 12, SORTABLE)
+                        .withField("stored", 13, STORED)
+                        .withField("first", 14, STORED)
+                        .withPayload(("payload1").getBytes())
+        );
+
+        dbBuilder.merge(
+                DatabaseFormat
+                        .getCurrent()
+                        .newDocumentBuilder()
+                        .withField("full", 21, FULL)
+                        .withField("sorted", 22, SORTABLE)
+                        .withField("stored", 23, STORED)
+                        .withField("second", 24, STORED)
+                        .withPayload(("payload2").getBytes())
+        );
+
+        final ByteArrayOutputStream os = new ByteArrayOutputStream();
+        dbBuilder.buildWritable().writeTo(os);
+        final Database db =
+                DatabaseFormat.getCurrent()
+                        .getDatabaseReader()
+                        .from(Buffer.from(os.toByteArray()));
+
+        // Document 1
+
+        assertEquals(from(11).toByteBuffer(), db.getFieldValue(0, "full"));
+        assertEquals(from(12).toByteBuffer(), db.getFieldValue(0, "sorted"));
+        assertEquals(from(13).toByteBuffer(), db.getFieldValue(0, "stored"));
+        assertEquals(from(14).toByteBuffer(), db.getFieldValue(0, "first"));
+        assertEquals(from("payload1").toByteBuffer(), db.getDocument(0));
+        assertFalse(db.getFieldValue(0, "second").hasRemaining());
+
+        // Document 2
+
+        assertEquals(from(21).toByteBuffer(), db.getFieldValue(1, "full"));
+        assertEquals(from(22).toByteBuffer(), db.getFieldValue(1, "sorted"));
+        assertEquals(from(23).toByteBuffer(), db.getFieldValue(1, "stored"));
+        assertEquals(from(24).toByteBuffer(), db.getFieldValue(1, "second"));
+        assertEquals(from("payload2").toByteBuffer(), db.getDocument(1));
+        assertFalse(db.getFieldValue(1, "first").hasRemaining());
     }
 
     @Test
