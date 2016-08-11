@@ -26,8 +26,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption.FULL;
-import static com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption.STORED;
+import static com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption.*;
 import static com.yandex.yoctodb.query.QueryBuilder.*;
 import static com.yandex.yoctodb.util.UnsignedByteArrays.from;
 import static org.junit.Assert.assertEquals;
@@ -62,14 +61,8 @@ public class SimpleDatabaseTest {
                 DatabaseFormat
                         .getCurrent()
                         .newDocumentBuilder()
-                        .withField(
-                                "text",
-                                "doc2",
-                                FULL)
-                        .withField(
-                                "int",
-                                2,
-                                FULL)
+                        .withField("text", "doc2", FULL)
+                        .withField("int", 2, FULL)
                         .withPayload("payload2".getBytes())
         );
 
@@ -100,14 +93,8 @@ public class SimpleDatabaseTest {
                 DatabaseFormat
                         .getCurrent()
                         .newDocumentBuilder()
-                        .withField(
-                                "text",
-                                "doc1234",
-                                FULL)
-                        .withField(
-                                "int",
-                                1,
-                                FULL)
+                        .withField("text", "doc1234", FULL)
+                        .withField("int", 1, FULL)
                         .withPayload("payload1".getBytes())
         );
 
@@ -116,14 +103,8 @@ public class SimpleDatabaseTest {
                 DatabaseFormat
                         .getCurrent()
                         .newDocumentBuilder()
-                        .withField(
-                                "text",
-                                "doc2",
-                                FULL)
-                        .withField(
-                                "int",
-                                2,
-                                FULL)
+                        .withField("text", "doc2", FULL)
+                        .withField("int", 2, FULL)
                         .withPayload("payload2".getBytes())
         );
 
@@ -148,83 +129,29 @@ public class SimpleDatabaseTest {
                         .getCurrent()
                         .newDocumentBuilder()
                                 //string
-                        .withField(
-                                "string_field_full",
-                                "string_1",
-                                FULL)
-                        .withField(
-                                "string_field_filterable",
-                                "string_1",
-                                DocumentBuilder.IndexOption.FILTERABLE)
-                        .withField(
-                                "string_field_sortable",
-                                "string_1",
-                                DocumentBuilder.IndexOption.SORTABLE)
+                        .withField("string_field_full", "string_1", FULL)
+                        .withField("string_field_filterable", "string_1", FILTERABLE)
+                        .withField("string_field_sortable", "string_1", SORTABLE)
                                 //byte
-                        .withField(
-                                "byte_field_full",
-                                (byte) 1,
-                                FULL)
-                        .withField(
-                                "byte_field_filterable",
-                                (byte) 1,
-                                DocumentBuilder.IndexOption.FILTERABLE)
-                        .withField(
-                                "byte_field_sortable",
-                                (byte) 1,
-                                DocumentBuilder.IndexOption.SORTABLE)
+                        .withField("byte_field_full", (byte) 1, FULL)
+                        .withField("byte_field_filterable", (byte) 1, FILTERABLE)
+                        .withField("byte_field_sortable", (byte) 1, SORTABLE)
                                 //short
-                        .withField(
-                                "short_field_full",
-                                (short) 1,
-                                FULL)
-                        .withField(
-                                "short_field_filterable",
-                                (short) 1,
-                                DocumentBuilder.IndexOption.FILTERABLE)
-                        .withField(
-                                "short_field_sortable",
-                                (short) 1,
-                                DocumentBuilder.IndexOption.SORTABLE)
+                        .withField("short_field_full", (short) 1, FULL)
+                        .withField("short_field_filterable", (short) 1, FILTERABLE)
+                        .withField("short_field_sortable", (short) 1, SORTABLE)
                                 //integer
-                        .withField(
-                                "int_field_full",
-                                1,
-                                FULL)
-                        .withField(
-                                "int_field_filterable",
-                                1,
-                                DocumentBuilder.IndexOption.FILTERABLE)
-                        .withField(
-                                "int_field_sortable",
-                                1,
-                                DocumentBuilder.IndexOption.SORTABLE)
+                        .withField("int_field_full", 1, FULL)
+                        .withField("int_field_filterable", 1, FILTERABLE)
+                        .withField("int_field_sortable", 1, SORTABLE)
                                 //long
-                        .withField(
-                                "long_field_full",
-                                1L,
-                                FULL)
-                        .withField(
-                                "long_field_filterable",
-                                1L,
-                                DocumentBuilder.IndexOption.FILTERABLE)
-                        .withField(
-                                "long_field_sortable",
-                                1L,
-                                DocumentBuilder.IndexOption.SORTABLE)
+                        .withField("long_field_full", 1L, FULL)
+                        .withField("long_field_filterable", 1L, FILTERABLE)
+                        .withField("long_field_sortable", 1L, SORTABLE)
                                 //boolean
-                        .withField(
-                                "boolean_field_full",
-                                false,
-                                FULL)
-                        .withField(
-                                "boolean_field_filterable",
-                                false,
-                                DocumentBuilder.IndexOption.FILTERABLE)
-                        .withField(
-                                "boolean_field_sortable",
-                                false,
-                                DocumentBuilder.IndexOption.SORTABLE)
+                        .withField("boolean_field_full", false, FULL)
+                        .withField("boolean_field_filterable", false, FILTERABLE)
+                        .withField("boolean_field_sortable", false, SORTABLE)
                                 //
                         .withPayload("payload1".getBytes())
         );
@@ -234,14 +161,8 @@ public class SimpleDatabaseTest {
                 DatabaseFormat
                         .getCurrent()
                         .newDocumentBuilder()
-                        .withField(
-                                "string_field_full",
-                                "doc2",
-                                FULL)
-                        .withField(
-                                "int_field_full",
-                                2,
-                                FULL)
+                        .withField("string_field_full", "doc2", FULL)
+                        .withField("int_field_full", 2, FULL)
                         .withPayload("payload2".getBytes())
         );
 
@@ -302,22 +223,10 @@ public class SimpleDatabaseTest {
                 DatabaseFormat
                         .getCurrent()
                         .newDocumentBuilder()
-                        .withField(
-                                "text",
-                                "doc1234",
-                                DocumentBuilder.IndexOption.FILTERABLE)
-                        .withField(
-                                "text",
-                                "doc1",
-                                DocumentBuilder.IndexOption.FILTERABLE)
-                        .withField(
-                                "doc2_not_contain_this_field",
-                                "doc2",
-                                DocumentBuilder.IndexOption.FILTERABLE)
-                        .withField(
-                                "doc2_not_contain_this_field2",
-                                1,
-                                DocumentBuilder.IndexOption.FILTERABLE)
+                        .withField("text", "doc1234", FILTERABLE)
+                        .withField("text", "doc1", FILTERABLE)
+                        .withField("doc2_not_contain_this_field", "doc2", FILTERABLE)
+                        .withField("doc2_not_contain_this_field2", 1, FILTERABLE)
                         .withPayload("payload1".getBytes())
         );
 
@@ -326,14 +235,8 @@ public class SimpleDatabaseTest {
                 DatabaseFormat
                         .getCurrent()
                         .newDocumentBuilder()
-                        .withField(
-                                "text",
-                                "doc2",
-                                DocumentBuilder.IndexOption.FILTERABLE)
-                        .withField(
-                                "int",
-                                2,
-                                DocumentBuilder.IndexOption.FILTERABLE)
+                        .withField("text", "doc2", FILTERABLE)
+                        .withField("int", 2, FILTERABLE)
                         .withPayload("payload2".getBytes())
         );
 
@@ -397,10 +300,7 @@ public class SimpleDatabaseTest {
                     DatabaseFormat
                             .getCurrent()
                             .newDocumentBuilder()
-                            .withField(
-                                    "id",
-                                    i,
-                                    FULL)
+                            .withField( "id", i, FULL)
                             .withPayload(("payload" + i).getBytes())
             );
         }
@@ -465,7 +365,7 @@ public class SimpleDatabaseTest {
                                     "f",
                                     String.format("%07d", i) +
                                     "veryLongFilterableFieldValue",
-                                    DocumentBuilder.IndexOption.FILTERABLE)
+                                    FILTERABLE)
                             .withPayload(("payload" + i).getBytes())
             );
         }
@@ -479,11 +379,7 @@ public class SimpleDatabaseTest {
 
         final Query q =
                 select().where(
-                        eq(
-                                "f",
-                                from(
-                                        String.format("%07d", DOCS / 2) +
-                                        "veryLongFilterableFieldValue")));
+                        eq("f", from(String.format("%07d", DOCS / 2) + "veryLongFilterableFieldValue")));
         assertEquals(1, db.count(q));
     }
 
@@ -497,10 +393,7 @@ public class SimpleDatabaseTest {
                     DatabaseFormat
                             .getCurrent()
                             .newDocumentBuilder()
-                            .withField(
-                                    "id",
-                                    i,
-                                    FULL)
+                            .withField("id", i, FULL)
                             .withPayload(("payload" + i).getBytes())
             );
         }
@@ -537,10 +430,7 @@ public class SimpleDatabaseTest {
                     DatabaseFormat
                             .getCurrent()
                             .newDocumentBuilder()
-                            .withField(
-                                    "f",
-                                    0,
-                                    FULL)
+                            .withField("f", 0, FULL)
                             .withPayload(("payload" + i).getBytes())
             );
         }
@@ -576,14 +466,8 @@ public class SimpleDatabaseTest {
                     DatabaseFormat
                             .getCurrent()
                             .newDocumentBuilder()
-                            .withField(
-                                    "f1",
-                                    i / 2,
-                                    DocumentBuilder.IndexOption.SORTABLE)
-                            .withField(
-                                    "f2",
-                                    i,
-                                    DocumentBuilder.IndexOption.SORTABLE)
+                            .withField("f1", i / 2, SORTABLE)
+                            .withField("f2", i, SORTABLE)
                             .withPayload(("payload" + i).getBytes())
             );
         }
@@ -621,10 +505,7 @@ public class SimpleDatabaseTest {
                     DatabaseFormat
                             .getCurrent()
                             .newDocumentBuilder()
-                            .withField(
-                                    "id",
-                                    i,
-                                    FULL)
+                            .withField("id", i, FULL)
                             .withPayload(("payload" + i).getBytes())
             );
         }
@@ -638,12 +519,7 @@ public class SimpleDatabaseTest {
 
         final Query q1 =
                 select().where(
-                        new SimpleRangeCondition(
-                                "id",
-                                from(10),
-                                true,
-                                from(20),
-                                true))
+                        new SimpleRangeCondition("id", from(10), true, from(20), true))
                         .orderBy(new SimpleDescendingOrder("id"));
         final List<String> results = new ArrayList<>(DOCS);
         db.execute(q1, new StringProcessor(results));
@@ -656,10 +532,9 @@ public class SimpleDatabaseTest {
         }
 
         final Query q2 =
-                select().where(new SimpleRangeCondition("id",
-                        from(1000),
-                        true, from(2000),
-                        true)).orderBy(new SimpleDescendingOrder("id"));
+                select().where(
+                        new SimpleRangeCondition("id", from(1000), true, from(2000), true))
+                        .orderBy(new SimpleDescendingOrder("id"));
         final List<String> results2 = new ArrayList<>(DOCS);
         db.execute(q2, new StringProcessor(results2));
         assertTrue(results2.isEmpty());
@@ -675,15 +550,9 @@ public class SimpleDatabaseTest {
                 DatabaseFormat
                         .getCurrent()
                         .newDocumentBuilder()
-                        .withField(
-                                "text",
-                                "doc1234",
-                                DocumentBuilder.IndexOption.FILTERABLE)
-                        .withField("text", "doc123456", DocumentBuilder.IndexOption.FILTERABLE)
-                        .withField(
-                                "int",
-                                1,
-                                DocumentBuilder.IndexOption.FILTERABLE)
+                        .withField("text", "doc1234", FILTERABLE)
+                        .withField("text", "doc123456", FILTERABLE)
+                        .withField("int", 1, FILTERABLE)
                         .withPayload("payload1".getBytes())
         );
 
@@ -692,14 +561,8 @@ public class SimpleDatabaseTest {
                 DatabaseFormat
                         .getCurrent()
                         .newDocumentBuilder()
-                        .withField(
-                                "text",
-                                "doc2",
-                                DocumentBuilder.IndexOption.FILTERABLE)
-                        .withField(
-                                "int",
-                                2,
-                                DocumentBuilder.IndexOption.FILTERABLE)
+                        .withField("text", "doc2", FILTERABLE)
+                        .withField("int", 2, FILTERABLE)
                         .withPayload("payload2".getBytes())
         );
 
@@ -730,14 +593,8 @@ public class SimpleDatabaseTest {
                 DatabaseFormat
                         .getCurrent()
                         .newDocumentBuilder()
-                        .withField(
-                                "text",
-                                "doc1234",
-                                FULL)
-                        .withField(
-                                "int",
-                                1,
-                                FULL)
+                        .withField("text", "doc1234", FULL)
+                        .withField("int", 1, FULL)
                         .withPayload("payload1".getBytes())
         );
 
@@ -746,14 +603,8 @@ public class SimpleDatabaseTest {
                 DatabaseFormat
                         .getCurrent()
                         .newDocumentBuilder()
-                        .withField(
-                                "text",
-                                "doc2",
-                                FULL)
-                        .withField(
-                                "int",
-                                2,
-                                FULL)
+                        .withField("text", "doc2", FULL)
+                        .withField("int", 2, FULL)
                         .withPayload("payload2".getBytes())
         );
 
@@ -811,14 +662,8 @@ public class SimpleDatabaseTest {
                 DatabaseFormat
                         .getCurrent()
                         .newDocumentBuilder()
-                        .withField(
-                                "text",
-                                "doc1234",
-                                FULL)
-                        .withField(
-                                "int",
-                                1,
-                                FULL)
+                        .withField("text", "doc1234", FULL)
+                        .withField("int", 1, FULL)
                         .withPayload("payload1".getBytes())
         );
 
@@ -827,14 +672,8 @@ public class SimpleDatabaseTest {
                 DatabaseFormat
                         .getCurrent()
                         .newDocumentBuilder()
-                        .withField(
-                                "text",
-                                "doc2",
-                                FULL)
-                        .withField(
-                                "int",
-                                2,
-                                FULL)
+                        .withField("text", "doc2", FULL)
+                        .withField("int", 2, FULL)
                         .withPayload("payload2".getBytes())
         );
 
@@ -862,10 +701,7 @@ public class SimpleDatabaseTest {
                 DatabaseFormat
                         .getCurrent()
                         .newDocumentBuilder()
-                        .withField(
-                                "id",
-                                0,
-                                FULL)
+                        .withField("id", 0, FULL)
                         .withPayload("payload".getBytes())
         );
 
@@ -908,10 +744,7 @@ public class SimpleDatabaseTest {
                     DatabaseFormat
                             .getCurrent()
                             .newDocumentBuilder()
-                            .withField(
-                                    "id",
-                                    i,
-                                    FULL)
+                            .withField("id", i, FULL)
                             .withPayload(("payload" + i).getBytes())
             );
         }
@@ -992,10 +825,7 @@ public class SimpleDatabaseTest {
                     DatabaseFormat
                             .getCurrent()
                             .newDocumentBuilder()
-                            .withField(
-                                    "id",
-                                    i,
-                                    FULL)
+                            .withField("id", i, FULL)
                             .withPayload(("payload" + i).getBytes())
             );
         }
