@@ -11,6 +11,7 @@ public class AscendingBitSetIndexToIndexMultiMapTest {
         new AscendingBitSetIndexToIndexMultiMap(singletonList(singletonList(1)), -1);
     }
 
+    @Test
     public void tostring() {
         assertNotNull(
                 new AscendingBitSetIndexToIndexMultiMap(

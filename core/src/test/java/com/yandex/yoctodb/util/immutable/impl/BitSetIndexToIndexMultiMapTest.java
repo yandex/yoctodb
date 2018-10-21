@@ -84,6 +84,16 @@ public class BitSetIndexToIndexMultiMapTest {
     }
 
     @Test
+    public void get() throws IOException {
+        final IndexToIndexMultiMap index = build();
+
+        final BitSet dest = LongArrayBitSet.zero(DOCS);
+        index.get(dest, 0);
+
+        assertTrue(dest.get(0));
+    }
+
+    @Test
     public void getFrom() throws IOException {
         final IndexToIndexMultiMap index = build();
 
