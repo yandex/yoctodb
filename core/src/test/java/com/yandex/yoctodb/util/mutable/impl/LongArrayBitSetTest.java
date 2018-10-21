@@ -46,13 +46,24 @@ public class LongArrayBitSetTest {
     }
 
     @Test
-    public void and() {
+    public void andEmpty() {
         for (int i = 1; i < SIZE; i++) {
             final BitSet bs1 = LongArrayBitSet.one(i);
             final BitSet bs2 = LongArrayBitSet.zero(i);
             assertEquals(i, bs1.cardinality());
             assertEquals(0, bs2.cardinality());
             assertFalse(bs2.and(bs1));
+        }
+    }
+
+    @Test
+    public void andNonEmpty() {
+        for (int i = 1; i < SIZE; i++) {
+            final BitSet bs1 = LongArrayBitSet.one(i);
+            final BitSet bs2 = LongArrayBitSet.one(i);
+            assertEquals(i, bs1.cardinality());
+            assertEquals(i, bs2.cardinality());
+            assertTrue(bs2.and(bs1));
         }
     }
 
