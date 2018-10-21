@@ -50,7 +50,7 @@ public class AscendingBitSetIndexToIndexMultiMap implements IndexToIndexMultiMap
     public void writeTo(
             @NotNull final OutputStream os) throws IOException {
         // Type
-        os.write(Ints.toByteArray(V1DatabaseFormat.MultiMapType.LONG_ARRAY_BIT_SET_BASED.getCode()));
+        os.write(Ints.toByteArray(V1DatabaseFormat.MultiMapType.ASCENDING_BIT_SET_BASED.getCode()));
 
         // Keys count
         os.write(Ints.toByteArray(map.size()));

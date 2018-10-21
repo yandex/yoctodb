@@ -33,7 +33,7 @@ public final class IntIndexToIndexMultiMap implements IndexToIndexMultiMap {
     private final Buffer elements;
 
     @NotNull
-    public static IndexToIndexMultiMap from(
+    public static IntIndexToIndexMultiMap from(
             @NotNull
             final Buffer buf) {
         final int keysCount = buf.getInt();

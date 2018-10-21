@@ -6,6 +6,7 @@ import com.yandex.yoctodb.util.immutable.IntToIntArray;
 import com.yandex.yoctodb.util.mutable.ArrayBitSet;
 import com.yandex.yoctodb.util.mutable.BitSet;
 import com.yandex.yoctodb.util.mutable.impl.LongArrayBitSet;
+import com.yandex.yoctodb.util.mutable.impl.ThreadLocalCachedArrayBitSetPool;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,12 +28,14 @@ public class AscendingBitSetIndexToIndexMultiMap implements IndexToIndexMultiMap
     private final int keysCount;
     @NotNull
     private final Buffer elements;
-    private BitSet nonNullBitSet; // lazy-evaluated
     private final int bitSetSizeInLongs;
     private final long bitSetSizeInBytes;
 
+    private BitSet nonNullBitSet; // lazy-evaluated
+    private ThreadLocalCachedArrayBitSetPool bitSetPool; // lazy-evaluated
+
     @NotNull
-    public static IndexToIndexMultiMap from(
+    public static AscendingBitSetIndexToIndexMultiMap from(
             @NotNull
             final Buffer buf) {
         final int keysCount = buf.getInt();
@@ -55,6 +58,22 @@ public class AscendingBitSetIndexToIndexMultiMap implements IndexToIndexMultiMap
         this.bitSetSizeInLongs = bitSetSizeInLongs;
         this.bitSetSizeInBytes = ((long) bitSetSizeInLongs) << 3;
         this.elements = elements;
+    }
+
+    private ArrayBitSet borrowBitSet(int size) {
+        if (bitSetPool == null) {
+            bitSetPool = new ThreadLocalCachedArrayBitSetPool(bitSetSizeInLongs * 64, 1.0f);
+        }
+
+        return bitSetPool.borrowSet(size);
+    }
+
+    private void release(@NotNull ArrayBitSet bitset) {
+        if (bitSetPool == null) {
+            bitSetPool = new ThreadLocalCachedArrayBitSetPool(bitSetSizeInLongs * 64, 1.0f);
+        }
+
+        bitSetPool.returnSet(bitset);
     }
 
     /**
@@ -80,7 +99,7 @@ public class AscendingBitSetIndexToIndexMultiMap implements IndexToIndexMultiMap
      *
      * @param dest destination {@link BitSet}
      * @param key key index
-     * @return true if destination have non-zero bits, false otherwise
+     * @return true if destination have non-zero bits afterwards, false otherwise
      */
     @Override
     public boolean get(
@@ -99,8 +118,8 @@ public class AscendingBitSetIndexToIndexMultiMap implements IndexToIndexMultiMap
      * Additional space: O(1)
      *
      * @param dest destination {@link BitSet}
-     * @param fromInclusive lowest key index
-     * @return true if destination have non-zero bits, false otherwise
+     * @param fromInclusive lowest key index (inclusive)
+     * @return true if destination have non-zero bits afterwards, false otherwise
      */
     @Override
     public boolean getFrom(
@@ -121,8 +140,8 @@ public class AscendingBitSetIndexToIndexMultiMap implements IndexToIndexMultiMap
      * Additional space: -
      *
      * @param dest destination {@link BitSet}
-     * @param toExclusive highest key index
-     * @return true if destination have non-zero bits, false otherwise
+     * @param toExclusive highest key index (exclusive)
+     * @return true if destination have non-zero bits afterwards, false otherwise
      */
     @Override
     public boolean getTo(
@@ -146,9 +165,9 @@ public class AscendingBitSetIndexToIndexMultiMap implements IndexToIndexMultiMap
      * Additional space: O(1)
      *
      * @param dest destination {@link BitSet}
-     * @param fromInclusive
-     * @param toExclusive
-     * @return
+     * @param fromInclusive lowest key index (inclusive)
+     * @param toExclusive highest key index (exclusive)
+     * @return true if destination have non-zero bits afterwards, false otherwise
      */
     @Override
     public boolean getBetween(
@@ -160,12 +179,20 @@ public class AscendingBitSetIndexToIndexMultiMap implements IndexToIndexMultiMap
                 fromInclusive < toExclusive &&
                 toExclusive <= keysCount;
 
-        ArrayBitSet target = LongArrayBitSet.zero(dest.getSize());
-        
-        getTo(target, toExclusive);
-        target.xor(elements, fromInclusive * bitSetSizeInBytes, bitSetSizeInLongs);
+        ArrayBitSet target = borrowBitSet(dest.getSize());
 
-        return dest.or(target);
+        try {
+            getTo(target, toExclusive);
+
+            // edge case optimization
+            if (fromInclusive != 0) {
+                target.xor(elements, fromInclusive * bitSetSizeInBytes, bitSetSizeInLongs);
+            }
+
+            return dest.or(target);
+        } finally {
+            release(target);
+        }
     }
 
     @Override
@@ -175,7 +202,7 @@ public class AscendingBitSetIndexToIndexMultiMap implements IndexToIndexMultiMap
 
     @Override
     public String toString() {
-        return "BitSetBasedIndexToIndexMultiMap{" +
+        return "AscendingBitSetIndexToIndexMultiMap{" +
                 "keysCount=" + keysCount +
                 '}';
     }

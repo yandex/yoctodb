@@ -31,7 +31,7 @@ public class BitSetIndexToIndexMultiMap implements IndexToIndexMultiMap {
     private final long bitSetSizeInBytes;
 
     @NotNull
-    public static IndexToIndexMultiMap from(
+    public static BitSetIndexToIndexMultiMap from(
             @NotNull
             final Buffer buf) {
         final int keysCount = buf.getInt();
