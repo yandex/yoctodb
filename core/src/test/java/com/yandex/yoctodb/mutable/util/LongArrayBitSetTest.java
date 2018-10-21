@@ -10,6 +10,7 @@
 
 package com.yandex.yoctodb.mutable.util;
 
+import com.yandex.yoctodb.util.buf.Buffer;
 import com.yandex.yoctodb.util.mutable.BitSet;
 import com.yandex.yoctodb.util.mutable.impl.LongArrayBitSet;
 import org.junit.Test;
@@ -53,6 +54,15 @@ public class LongArrayBitSetTest {
         assertEquals(2, bs2.cardinality());
         bs2.xor(bs1);
         assertEquals(1, bs2.cardinality());
+    }
+
+    @Test
+    public void andBuffer() {
+        final BitSet bs = LongArrayBitSet.one(2);
+
+        assertEquals(2, bs.cardinality());
+        bs.and(Buffer.from(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}), 0, 1);
+        assertEquals(0, bs.cardinality());
     }
 
     @Test

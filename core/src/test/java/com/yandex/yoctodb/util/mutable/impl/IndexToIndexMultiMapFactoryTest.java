@@ -12,6 +12,7 @@ package com.yandex.yoctodb.util.mutable.impl;
 
 import com.google.common.collect.TreeMultimap;
 import com.yandex.yoctodb.util.mutable.IndexToIndexMultiMap;
+import com.yandex.yoctodb.v1.V1DatabaseFormat;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -37,6 +38,21 @@ public class IndexToIndexMultiMapFactoryTest {
     @Test(expected = IllegalArgumentException.class)
     public void zeroDocuments() {
         IndexToIndexMultiMapFactory.buildIndexToIndexMultiMap(
+                singletonList(singletonList(0)),
+                0);
+    }
+    @Test(expected = IllegalArgumentException.class)
+    public void zeroValuesTyped() {
+        IndexToIndexMultiMapFactory.buildIndexToIndexMultiMap(
+                V1DatabaseFormat.MultiMapType.LIST_BASED,
+                Collections.<Collection<Integer>>emptyList(),
+                1);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void zeroDocumentsTyped() {
+        IndexToIndexMultiMapFactory.buildIndexToIndexMultiMap(
+                V1DatabaseFormat.MultiMapType.LIST_BASED,
                 singletonList(singletonList(0)),
                 0);
     }

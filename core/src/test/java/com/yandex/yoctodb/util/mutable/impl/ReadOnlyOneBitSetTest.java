@@ -75,6 +75,27 @@ public class ReadOnlyOneBitSetTest {
     }
 
     @Test(expected = UnsupportedOperationException.class)
+    public void unsupportedXor() {
+        new ReadOnlyOneBitSet(1).xor(LongArrayBitSet.zero(1));
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void unsupportedAndBuffer() {
+        new ReadOnlyOneBitSet(1).and(
+                Buffer.from(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}),
+                0,
+                1);
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void unsupportedXorBuffer() {
+        new ReadOnlyOneBitSet(1).xor(
+                Buffer.from(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}),
+                0,
+                1);
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
     public void unsupportedOrBuffer() {
         new ReadOnlyOneBitSet(1).or(
                 Buffer.from(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}),

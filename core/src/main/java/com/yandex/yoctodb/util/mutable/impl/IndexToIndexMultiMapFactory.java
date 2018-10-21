@@ -99,8 +99,8 @@ public final class IndexToIndexMultiMapFactory {
                 return new BitSetIndexToIndexMultiMap(valueToDocuments, documentsCount);
             case ASCENDING_BIT_SET_BASED:
                 return buildIndexToIndexMultiMap(valueToDocuments, documentsCount);
+            default:
+                return buildIndexToIndexMultiMap(valueToDocuments, documentsCount);
         }
-
-        throw new IllegalArgumentException("Unknown index type");
     }
 }
