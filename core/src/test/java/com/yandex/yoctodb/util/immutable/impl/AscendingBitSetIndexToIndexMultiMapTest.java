@@ -113,6 +113,23 @@ public class AscendingBitSetIndexToIndexMultiMapTest {
         assertTrue("Documents (4, 5, 6, 7) are set", dest.cardinality() == 0);
     }
 
+    @Test
+    public void releaseToNullPool() {
+        AscendingBitSetIndexToIndexMultiMap index = build();
+
+        final BitSet dest = LongArrayBitSet.zero(DOCS);
+        final BitSet expected = LongArrayBitSet.zero(DOCS);
+        expected.set(4);
+        expected.set(5);
+        expected.set(6);
+        expected.set(7);
+
+
+        assertTrue("Destination non-zero", index.getBetween(dest, 2, 4));
+        dest.xor(expected);
+        assertTrue("Documents (4, 5, 6, 7) are set", dest.cardinality() == 0);
+    }
+
     @Test(expected = UnsupportedOperationException.class)
     @NotNull
     public void ascending() {
@@ -122,12 +139,17 @@ public class AscendingBitSetIndexToIndexMultiMapTest {
     @Test(expected = UnsupportedOperationException.class)
     @NotNull
     public void descending() {
-        build().ascending(LongArrayBitSet.one(DOCS));
+        build().descending(LongArrayBitSet.one(DOCS));
     }
 
     @Test
     public void getKeysCount() {
         int keysCount = build().getKeysCount();
         assertEquals(DOCS / 2, keysCount);
+    }
+
+    @Test
+    public void tostring() {
+        assertNotNull(build().toString());
     }
 }

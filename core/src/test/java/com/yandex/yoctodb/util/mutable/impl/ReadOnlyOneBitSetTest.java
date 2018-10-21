@@ -111,4 +111,10 @@ public class ReadOnlyOneBitSetTest {
         }
         assertEquals(-1, bs.nextSetBit(SIZE));
     }
+
+    @Test(expected = AssertionError.class)
+    public void invalidNextSetBit() {
+        final BitSet bs = new ReadOnlyOneBitSet(SIZE);
+        bs.nextSetBit(-1);
+    }
 }

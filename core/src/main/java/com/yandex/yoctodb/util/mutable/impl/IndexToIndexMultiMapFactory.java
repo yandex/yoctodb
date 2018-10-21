@@ -13,6 +13,7 @@ package com.yandex.yoctodb.util.mutable.impl;
 import com.yandex.yoctodb.util.mutable.IndexToIndexMultiMap;
 import com.yandex.yoctodb.v1.V1DatabaseFormat;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 
@@ -83,7 +84,7 @@ public final class IndexToIndexMultiMapFactory {
     }
 
     public static IndexToIndexMultiMap buildIndexToIndexMultiMap(
-            @NotNull final V1DatabaseFormat.MultiMapType type,
+            @Nullable final V1DatabaseFormat.MultiMapType type,
             @NotNull final Collection<? extends Collection<Integer>> valueToDocuments,
             final int documentsCount) {
         final int uniqueValuesCount = valueToDocuments.size();
@@ -92,15 +93,17 @@ public final class IndexToIndexMultiMapFactory {
         if (documentsCount <= 0)
             throw new IllegalArgumentException("Nonpositive documents count");
 
-        switch (type) {
-            case LIST_BASED:
-                return new IntIndexToIndexMultiMap(valueToDocuments);
-            case LONG_ARRAY_BIT_SET_BASED:
-                return new BitSetIndexToIndexMultiMap(valueToDocuments, documentsCount);
-            case ASCENDING_BIT_SET_BASED:
-                return buildIndexToIndexMultiMap(valueToDocuments, documentsCount);
-            default:
-                return buildIndexToIndexMultiMap(valueToDocuments, documentsCount);
+        if (type != null) {
+            switch (type) {
+                case LIST_BASED:
+                    return new IntIndexToIndexMultiMap(valueToDocuments);
+                case LONG_ARRAY_BIT_SET_BASED:
+                    return new BitSetIndexToIndexMultiMap(valueToDocuments, documentsCount);
+                case ASCENDING_BIT_SET_BASED:
+                    return buildIndexToIndexMultiMap(valueToDocuments, documentsCount);
+            }
         }
+
+        return buildIndexToIndexMultiMap(valueToDocuments, documentsCount);
     }
 }

@@ -69,10 +69,6 @@ public class AscendingBitSetIndexToIndexMultiMap implements IndexToIndexMultiMap
     }
 
     private void release(@NotNull ArrayBitSet bitset) {
-        if (bitSetPool == null) {
-            bitSetPool = new ThreadLocalCachedArrayBitSetPool(bitSetSizeInLongs * 64, 1.0f);
-        }
-
         bitSetPool.returnSet(bitset);
     }
 

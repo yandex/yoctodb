@@ -41,6 +41,7 @@ public class IndexToIndexMultiMapFactoryTest {
                 singletonList(singletonList(0)),
                 0);
     }
+
     @Test(expected = IllegalArgumentException.class)
     public void zeroValuesTyped() {
         IndexToIndexMultiMapFactory.buildIndexToIndexMultiMap(
@@ -86,6 +87,28 @@ public class IndexToIndexMultiMapFactoryTest {
         @SuppressWarnings("unchecked")
         final IndexToIndexMultiMap map =
                 IndexToIndexMultiMapFactory.buildIndexToIndexMultiMap(
+                        Arrays.asList(singletonList(0), singletonList(1), singletonList(2)),
+                        128);
+        assertTrue(map instanceof AscendingBitSetIndexToIndexMultiMap);
+    }
+
+    @Test
+    public void ascendingTyped() {
+        @SuppressWarnings("unchecked")
+        final IndexToIndexMultiMap map =
+                IndexToIndexMultiMapFactory.buildIndexToIndexMultiMap(
+                        V1DatabaseFormat.MultiMapType.ASCENDING_BIT_SET_BASED,
+                        Arrays.asList(singletonList(0), singletonList(1), singletonList(2)),
+                        128);
+        assertTrue(map instanceof AscendingBitSetIndexToIndexMultiMap);
+    }
+
+    @Test
+    public void nullTypedShouldBeDefault() {
+        @SuppressWarnings("unchecked")
+        final IndexToIndexMultiMap map =
+                IndexToIndexMultiMapFactory.buildIndexToIndexMultiMap(
+                        null,
                         Arrays.asList(singletonList(0), singletonList(1), singletonList(2)),
                         128);
         assertTrue(map instanceof AscendingBitSetIndexToIndexMultiMap);
