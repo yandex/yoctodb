@@ -78,7 +78,17 @@ public final class ReadOnlyOneBitSet implements BitSet {
     }
 
     @Override
-    public boolean and(@NotNull Buffer longArrayBitSetInByteBuffer, long startPosition, int bitSetSizeInLongs) {
+    public boolean xor(
+            @NotNull BitSet set) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean and(
+            @NotNull
+            Buffer longArrayBitSetInByteBuffer,
+            long startPosition,
+            int bitSetSizeInLongs) {
         throw new UnsupportedOperationException();
     }
 
@@ -92,7 +102,11 @@ public final class ReadOnlyOneBitSet implements BitSet {
     }
 
     @Override
-    public boolean xor(@NotNull Buffer longArrayBitSetInByteBuffer, long startPosition, int bitSetSizeInLongs) {
+    public boolean xor(
+            @NotNull
+            Buffer longArrayBitSetInByteBuffer,
+            long startPosition,
+            int bitSetSizeInLongs) {
         throw new UnsupportedOperationException();
     }
 

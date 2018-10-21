@@ -97,6 +97,17 @@ public interface BitSet {
             BitSet set);
 
     /**
+     * Modify current bit set by applying bitwise {@code ^}
+     *
+     * @param set source bit set
+     *
+     * @return whether there are nonzero bits
+     */
+    boolean xor(
+            @NotNull
+            BitSet set);
+
+    /**
      * Modify current bit set by applying bitwise {@code &} operation
      *
      * @param longArrayBitSetInByteBuffer source bit set
