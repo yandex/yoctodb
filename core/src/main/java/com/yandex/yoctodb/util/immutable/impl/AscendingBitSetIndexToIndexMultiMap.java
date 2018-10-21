@@ -89,14 +89,7 @@ public class AscendingBitSetIndexToIndexMultiMap implements IndexToIndexMultiMap
             final int key) {
         assert 0 <= key && key < keysCount;
 
-        final long start = key * bitSetSizeInBytes;
-
-        ArrayBitSet target = LongArrayBitSet.zero(dest.getSize());
-
-        target.or(elements, start + bitSetSizeInBytes, bitSetSizeInLongs);
-        target.xor(elements, start, bitSetSizeInLongs);
-
-        return dest.or(target);
+        return getBetween(dest, key, key + 1);
     }
 
     /**
@@ -116,11 +109,7 @@ public class AscendingBitSetIndexToIndexMultiMap implements IndexToIndexMultiMap
             final int fromInclusive) {
         assert 0 <= fromInclusive && fromInclusive < keysCount;
 
-        ArrayBitSet target = LongArrayBitSet.zero(dest.getSize());
-        target.or(getNonNull(dest.getSize()));
-        target.xor(elements, fromInclusive * bitSetSizeInBytes, bitSetSizeInLongs);
-
-        return dest.or(target);
+        return getBetween(dest, fromInclusive, keysCount);
     }
 
 
@@ -172,14 +161,8 @@ public class AscendingBitSetIndexToIndexMultiMap implements IndexToIndexMultiMap
                 toExclusive <= keysCount;
 
         ArrayBitSet target = LongArrayBitSet.zero(dest.getSize());
-
-        // edge case optimization
-        if (toExclusive == keysCount) {
-            target.or(getNonNull(dest.getSize()));
-        } else {
-            target.or(elements, toExclusive * bitSetSizeInBytes, bitSetSizeInLongs);
-        }
-
+        
+        getTo(target, toExclusive);
         target.xor(elements, fromInclusive * bitSetSizeInBytes, bitSetSizeInLongs);
 
         return dest.or(target);
