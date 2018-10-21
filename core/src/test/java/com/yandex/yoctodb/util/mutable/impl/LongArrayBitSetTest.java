@@ -8,7 +8,7 @@
  * A copy of the License is also available at http://mozilla.org/MPL/2.0/.
  */
 
-package com.yandex.yoctodb.mutable.util;
+package com.yandex.yoctodb.util.mutable.impl;
 
 import com.yandex.yoctodb.util.buf.Buffer;
 import com.yandex.yoctodb.util.mutable.BitSet;
@@ -42,6 +42,18 @@ public class LongArrayBitSetTest {
             assertEquals(0, bs2.cardinality());
             bs2.or(bs1);
             assertEquals(i, bs2.cardinality());
+        }
+    }
+
+    @Test
+    public void and() {
+        for (int i = 1; i < SIZE; i++) {
+            final BitSet bs1 = LongArrayBitSet.one(i);
+            final BitSet bs2 = LongArrayBitSet.zero(i);
+            assertEquals(i, bs1.cardinality());
+            assertEquals(0, bs2.cardinality());
+            bs2.and(bs1);
+            assertEquals(0, bs2.cardinality());
         }
     }
 
