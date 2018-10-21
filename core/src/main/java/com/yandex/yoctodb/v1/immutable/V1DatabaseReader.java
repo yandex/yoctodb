@@ -21,9 +21,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Builds immutable {@link Database}s from bytes in V1 format
@@ -33,6 +31,24 @@ import java.util.Map;
 @ThreadSafe
 public class V1DatabaseReader extends DatabaseReader {
     private static final int DIGEST_BUF_SIZE = 4096;
+    private static final Set<Integer> SUPPORTED_FORMATS;
+
+    static {
+        Set<Integer> supported = new HashSet<>();
+        supported.add(6);
+        supported.add(V1DatabaseFormat.FORMAT);
+
+        SUPPORTED_FORMATS = Collections.unmodifiableSet(supported);
+    }
+
+    public static String supportedFormatsString() {
+        StringBuilder sb = new StringBuilder();
+        for (Integer format : SUPPORTED_FORMATS) {
+            sb.append("<").append(format).append("> ");
+        }
+
+        return sb.toString();
+    }
 
     private static Buffer calculateDigest(
             @NotNull
@@ -78,10 +94,10 @@ public class V1DatabaseReader extends DatabaseReader {
 
         // Checking the format version
         final int format = buffer.getInt();
-        if (format != V1DatabaseFormat.FORMAT) {
+        if (!SUPPORTED_FORMATS.contains(format)) {
             throw new IllegalArgumentException(
-                    "Wrong format " + format + ". Supported format is " +
-                    V1DatabaseFormat.FORMAT + ".");
+                    "Wrong format <" + format + ">. Supported formats: "
+                            + supportedFormatsString());
         }
 
         // Checking the format version

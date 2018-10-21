@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 @ThreadSafe
 public final class V1DatabaseFormat extends DatabaseFormat {
-    public final static int FORMAT = 6;
+    public final static int FORMAT = 7;
 
     private final static DatabaseReader DATABASE_READER = new V1DatabaseReader();
 
