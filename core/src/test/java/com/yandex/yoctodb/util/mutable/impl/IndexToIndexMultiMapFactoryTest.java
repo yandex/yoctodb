@@ -42,10 +42,11 @@ public class IndexToIndexMultiMapFactoryTest {
     }
 
     @Test
-    public void selective() {
+    public void list() {
         final TreeMultimap<Integer, Integer> elements = TreeMultimap.create();
         for (int i = 0; i < 1024; i++) {
             elements.put(i, i);
+            elements.put(i, i + 1);
         }
         final IndexToIndexMultiMap map =
                 IndexToIndexMultiMapFactory.buildIndexToIndexMultiMap(
@@ -55,12 +56,22 @@ public class IndexToIndexMultiMapFactoryTest {
     }
 
     @Test
-    public void nonSelective() {
+    public void bitset() {
         @SuppressWarnings("unchecked")
         final IndexToIndexMultiMap map =
                 IndexToIndexMultiMapFactory.buildIndexToIndexMultiMap(
-                        Arrays.asList(singletonList(0), singletonList(1)),
+                        Arrays.asList(singletonList(0), singletonList(1), singletonList(1)),
                         128);
         assertTrue(map instanceof BitSetIndexToIndexMultiMap);
+    }
+
+    @Test
+    public void ascending() {
+        @SuppressWarnings("unchecked")
+        final IndexToIndexMultiMap map =
+                IndexToIndexMultiMapFactory.buildIndexToIndexMultiMap(
+                        Arrays.asList(singletonList(0), singletonList(1), singletonList(2)),
+                        128);
+        assertTrue(map instanceof AscendingBitSetIndexToIndexMultiMap);
     }
 }
