@@ -52,8 +52,7 @@ public class LongArrayBitSetTest {
             final BitSet bs2 = LongArrayBitSet.zero(i);
             assertEquals(i, bs1.cardinality());
             assertEquals(0, bs2.cardinality());
-            bs2.and(bs1);
-            assertEquals(0, bs2.cardinality());
+            assertFalse(bs2.and(bs1));
         }
     }
 
