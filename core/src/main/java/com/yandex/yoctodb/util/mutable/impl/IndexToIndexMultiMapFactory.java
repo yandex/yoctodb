@@ -31,6 +31,24 @@ public final class IndexToIndexMultiMapFactory {
         new IndexToIndexMultiMapFactory();
     }
 
+    private static boolean hasDocumentsWithMultipleKeys(
+            final Collection<? extends Collection<Integer>> valueToDocuments,
+            final int documentsCount) {
+        int[] counters = new int[documentsCount];
+
+        for (Collection<Integer> documents : valueToDocuments) {
+            for (Integer document : documents) {
+                int current = counters[document];
+                if (current > 0) {
+                    return false;
+                }
+                counters[document]++;
+            }
+        }
+
+        return true;
+    }
+
     public static IndexToIndexMultiMap buildIndexToIndexMultiMap(
             final Collection<? extends Collection<Integer>> valueToDocuments,
             final int documentsCount) {
@@ -40,14 +58,21 @@ public final class IndexToIndexMultiMapFactory {
         if (documentsCount <= 0)
             throw new IllegalArgumentException("Nonpositive documents count");
 
-        if (((long) uniqueValuesCount) * documentsCount / 64L <
-            documentsCount * 4L) {
-            // BitSet might be more effective
-            return new BitSetIndexToIndexMultiMap(
-                    valueToDocuments,
-                    documentsCount);
+        /**
+         * If all of the documents have exactly one value we can use {@link AscendingBitSetIndexToIndexMultiMap}
+         */
+        if (hasDocumentsWithMultipleKeys(valueToDocuments, documentsCount)) {
+            if (((long) uniqueValuesCount) * documentsCount / 64L <
+                    documentsCount * 4L) {
+                // BitSet might be more effective
+                return new BitSetIndexToIndexMultiMap(
+                        valueToDocuments,
+                        documentsCount);
+            } else {
+                return new IntIndexToIndexMultiMap(valueToDocuments);
+            }
         } else {
-            return new IntIndexToIndexMultiMap(valueToDocuments);
+            return new AscendingBitSetIndexToIndexMultiMap(valueToDocuments, documentsCount);
         }
     }
 }

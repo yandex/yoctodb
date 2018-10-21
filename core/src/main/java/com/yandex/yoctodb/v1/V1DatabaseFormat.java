@@ -91,7 +91,8 @@ public final class V1DatabaseFormat extends DatabaseFormat {
 
     public enum MultiMapType {
         LIST_BASED(1000),
-        LONG_ARRAY_BIT_SET_BASED(2000);
+        LONG_ARRAY_BIT_SET_BASED(2000),
+        ASCENDING_BIT_SET_BASED(3000);
 
         private final int code;
 
