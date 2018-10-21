@@ -45,6 +45,17 @@ public class LongArrayBitSetTest {
     }
 
     @Test
+    public void xor() {
+        final BitSet bs1 = LongArrayBitSet.zero(2);
+        final BitSet bs2 = LongArrayBitSet.one(2);
+
+        bs1.set(0);
+        assertEquals(2, bs2.cardinality());
+        bs2.xor(bs1);
+        assertEquals(1, bs2.cardinality());
+    }
+
+    @Test
     public void empty() {
         for (int i = 1; i < SIZE; i++) {
             assertTrue(LongArrayBitSet.zero(i).isEmpty());
