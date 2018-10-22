@@ -12,7 +12,6 @@ package com.yandex.yoctodb.util.mutable.impl;
 
 import com.yandex.yoctodb.util.buf.Buffer;
 import com.yandex.yoctodb.util.mutable.BitSet;
-import com.yandex.yoctodb.util.mutable.impl.LongArrayBitSet;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -80,11 +79,16 @@ public class LongArrayBitSetTest {
 
     @Test
     public void andBuffer() {
-        final BitSet bs = LongArrayBitSet.one(2);
+        final BitSet bs1 = LongArrayBitSet.one(2);
 
-        assertEquals(2, bs.cardinality());
-        bs.and(Buffer.from(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}), 0, 1);
-        assertEquals(0, bs.cardinality());
+        assertEquals(2, bs1.cardinality());
+        bs1.and(Buffer.from(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}), 0, 1);
+        assertEquals(0, bs1.cardinality());
+
+        final BitSet bs2 = LongArrayBitSet.one(2);
+        assertEquals(2, bs2.cardinality());
+        assertTrue(bs2.and(Buffer.from(new byte[]{0, 0, 0, 0, 0, 0, 0, 1}), 0, 1));
+        assertEquals(1, bs2.cardinality());
     }
 
     @Test
