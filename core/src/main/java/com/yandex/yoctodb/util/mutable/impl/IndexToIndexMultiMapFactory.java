@@ -37,7 +37,7 @@ public final class IndexToIndexMultiMapFactory {
     public static boolean hasDocumentsWithMultipleKeys(
             @NotNull final Collection<? extends Collection<Integer>> valueToDocuments,
             final int documentsCount) {
-        int[] counters = new int[documentsCount];
+        byte[] counters = new byte[documentsCount];
 
         for (Collection<Integer> documents : valueToDocuments) {
             for (Integer document : documents) {
