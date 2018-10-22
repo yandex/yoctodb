@@ -79,16 +79,22 @@ public class LongArrayBitSetTest {
 
     @Test
     public void andBuffer() {
-        final BitSet bs1 = LongArrayBitSet.one(2);
+        for (int docs = 1; docs < SIZE; docs++) {
+            final int arraySize = LongArrayBitSet.arraySize(docs);
+            final BitSet bs1 = LongArrayBitSet.one(docs);
 
-        assertEquals(2, bs1.cardinality());
-        bs1.and(Buffer.from(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}), 0, 1);
-        assertEquals(0, bs1.cardinality());
+            assertEquals(docs, bs1.cardinality());
+            byte[] buf1 = new byte[arraySize * 8];
+            bs1.and(Buffer.from(buf1), 0, arraySize);
+            assertEquals(0, bs1.cardinality());
 
-        final BitSet bs2 = LongArrayBitSet.one(2);
-        assertEquals(2, bs2.cardinality());
-        assertTrue(bs2.and(Buffer.from(new byte[]{0, 0, 0, 0, 0, 0, 0, 1}), 0, 1));
-        assertEquals(1, bs2.cardinality());
+            final BitSet bs2 = LongArrayBitSet.one(docs);
+            assertEquals(docs, bs2.cardinality());
+            byte[] buf2 = new byte[arraySize * 8];
+            buf2[7] = 1;
+            assertTrue(bs2.and(Buffer.from(buf2), 0, arraySize));
+            assertEquals(1, bs2.cardinality());
+        }
     }
 
     @Test
