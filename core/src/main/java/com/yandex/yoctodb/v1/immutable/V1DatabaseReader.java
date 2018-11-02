@@ -14,8 +14,10 @@ import com.yandex.yoctodb.immutable.*;
 import com.yandex.yoctodb.util.buf.Buffer;
 import com.yandex.yoctodb.util.mutable.ArrayBitSetPool;
 import com.yandex.yoctodb.v1.V1DatabaseFormat;
+import com.yandex.yoctodb.v1.V1DatabaseFormat.Feature;
 import com.yandex.yoctodb.v1.immutable.segment.Segment;
 import com.yandex.yoctodb.v1.immutable.segment.SegmentRegistry;
+import java.util.stream.Collectors;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,23 +33,16 @@ import java.util.*;
 @ThreadSafe
 public class V1DatabaseReader extends DatabaseReader {
     private static final int DIGEST_BUF_SIZE = 4096;
-    private static final Set<Integer> SUPPORTED_FORMATS;
+    public static final V1DatabaseFormat.Feature[] SUPPORTED_FEATURES = {
+        Feature.LEGACY,
+        Feature.ASCENDING_BIT_SET_INDEX
+    };
 
-    static {
-        Set<Integer> supported = new HashSet<>();
-        supported.add(6);
-        supported.add(V1DatabaseFormat.FORMAT);
 
-        SUPPORTED_FORMATS = Collections.unmodifiableSet(supported);
-    }
-
-    public static String supportedFormatsString() {
-        StringBuilder sb = new StringBuilder();
-        for (Integer format : SUPPORTED_FORMATS) {
-            sb.append("<").append(format).append("> ");
-        }
-
-        return sb.toString();
+    private  static String supportedFormatsString() {
+        return Arrays.stream(SUPPORTED_FEATURES)
+            .map(Enum::name)
+            .collect(Collectors.joining(", "));
     }
 
     private static Buffer calculateDigest(
@@ -93,17 +88,19 @@ public class V1DatabaseReader extends DatabaseReader {
             }
 
         // Checking the format version
-        final int format = buffer.getInt();
-        if (!SUPPORTED_FORMATS.contains(format)) {
+        final int dbFeatures = buffer.getInt();
+        final int unknownFeatures =
+            V1DatabaseFormat.Feature.clearSupported(dbFeatures, SUPPORTED_FEATURES);
+        if (unknownFeatures != 0) {
             throw new IllegalArgumentException(
-                    "Wrong format <" + format + ">. Supported formats: "
-                            + supportedFormatsString());
+                    "Encountered unknown features: <" + Integer.toBinaryString(unknownFeatures) +
+                        ">. Supported features: <" + supportedFormatsString() + ">.");
         }
 
         // Checking the format version
         final int documentCount = buffer.getInt();
         if (documentCount < 0) {
-            throw new IllegalArgumentException("Wrong document count " + format);
+            throw new IllegalArgumentException("Wrong document count " + documentCount);
         }
 
         if (buffer.remaining() < V1DatabaseFormat.getDigestSizeInBytes()) {

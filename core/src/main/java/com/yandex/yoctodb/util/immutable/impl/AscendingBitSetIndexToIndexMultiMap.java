@@ -19,20 +19,18 @@ import java.util.Iterator;
  *
  * Restriction: document with this index type must not provide more than one value.
  *
- * @author Andrey Korzinev (goodfella@yandex-team.ru)
+ * @author Andrey Korzinev (ya-goodfella@yandex.com)
  */
-
 @Immutable
 public class AscendingBitSetIndexToIndexMultiMap implements IndexToIndexMultiMap {
-
     private final int keysCount;
     @NotNull
     private final Buffer elements;
     private final int bitSetSizeInLongs;
     private final long bitSetSizeInBytes;
 
-    private BitSet nonNullBitSet; // lazy-evaluated
-    private ThreadLocalCachedArrayBitSetPool bitSetPool; // lazy-evaluated
+    private volatile BitSet nonNullBitSet; // lazy-evaluated
+    private volatile ThreadLocalCachedArrayBitSetPool bitSetPool; // lazy-evaluated
 
     @NotNull
     public static AscendingBitSetIndexToIndexMultiMap from(
@@ -61,11 +59,18 @@ public class AscendingBitSetIndexToIndexMultiMap implements IndexToIndexMultiMap
     }
 
     private ArrayBitSet borrowBitSet(int size) {
-        if (bitSetPool == null) {
-            bitSetPool = new ThreadLocalCachedArrayBitSetPool(bitSetSizeInLongs * 64, 1.0f);
+        ThreadLocalCachedArrayBitSetPool pool = bitSetPool;
+        if (pool == null) {
+            synchronized (this) {
+                if (bitSetPool == null) {
+                    bitSetPool = new ThreadLocalCachedArrayBitSetPool(bitSetSizeInLongs * Long.SIZE, 1.0f);
+                }
+            }
+
+            return bitSetPool.borrowSet(size);
         }
 
-        return bitSetPool.borrowSet(size);
+        return pool.borrowSet(size);
     }
 
     private void release(@NotNull ArrayBitSet bitset) {
@@ -77,14 +82,20 @@ public class AscendingBitSetIndexToIndexMultiMap implements IndexToIndexMultiMap
      * @return {@link BitSet} that contains every document that was associated with key (e.g. not null)
      */
     private BitSet getNonNull(int sizeHint) {
-        if (nonNullBitSet == null) {
-            nonNullBitSet = LongArrayBitSet.zero(sizeHint);
-            nonNullBitSet.or(elements, keysCount * bitSetSizeInBytes, bitSetSizeInLongs);
+        BitSet result = nonNullBitSet;
+        if (result == null) {
+            synchronized (this) {
+                if (nonNullBitSet == null) {
+                    result = LongArrayBitSet.zero(sizeHint);
+                    result.or(elements, keysCount * bitSetSizeInBytes, bitSetSizeInLongs);
+                    nonNullBitSet = result;
+                }
+            }
         }
 
-        assert nonNullBitSet.getSize() == sizeHint;
+        assert result.getSize() == sizeHint;
 
-        return nonNullBitSet;
+        return result;
     }
 
     /**
@@ -155,7 +166,7 @@ public class AscendingBitSetIndexToIndexMultiMap implements IndexToIndexMultiMap
     }
 
     /**
-     * Sets document bits for documents for keys which is less than key index
+     * Sets document bits for documents for keys which is between selected keys
      *
      * Complexity: O(1)
      * Additional space: O(1)
@@ -175,7 +186,7 @@ public class AscendingBitSetIndexToIndexMultiMap implements IndexToIndexMultiMap
                 fromInclusive < toExclusive &&
                 toExclusive <= keysCount;
 
-        ArrayBitSet target = borrowBitSet(dest.getSize());
+        final ArrayBitSet target = borrowBitSet(dest.getSize());
 
         try {
             getTo(target, toExclusive);

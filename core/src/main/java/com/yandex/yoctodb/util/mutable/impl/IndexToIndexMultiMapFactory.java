@@ -65,8 +65,8 @@ public final class IndexToIndexMultiMapFactory {
          * If all of the documents have exactly one value we can use {@link AscendingBitSetIndexToIndexMultiMap}
          */
         if (hasDocumentsWithMultipleKeys(valueToDocuments, documentsCount)) {
-            if (((long) uniqueValuesCount) * documentsCount / 64L <
-                    documentsCount * 4L) {
+            if (((long) uniqueValuesCount) * documentsCount / Long.SIZE <
+                    documentsCount * Integer.BYTES) {
                 // BitSet might be more effective
                 return buildIndexToIndexMultiMap(
                         V1DatabaseFormat.MultiMapType.LONG_ARRAY_BIT_SET_BASED,

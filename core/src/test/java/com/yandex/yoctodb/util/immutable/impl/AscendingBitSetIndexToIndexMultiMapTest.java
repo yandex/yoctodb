@@ -56,7 +56,6 @@ public class AscendingBitSetIndexToIndexMultiMapTest {
         expected.set(4);
         expected.set(5);
 
-
         assertTrue("Destination non-zero", index.get(dest, 2));
         dest.xor(expected);
         assertTrue("Documents 4 and 5 are set", dest.cardinality() == 0);
@@ -72,7 +71,6 @@ public class AscendingBitSetIndexToIndexMultiMapTest {
         expected.set(125);
         expected.set(126);
         expected.set(127);
-
 
         assertTrue("Destination non-zero", index.getFrom(dest, 62));
         dest.xor(expected);
@@ -90,7 +88,6 @@ public class AscendingBitSetIndexToIndexMultiMapTest {
         expected.set(2);
         expected.set(3);
 
-
         assertTrue("Destination non-zero", index.getTo(dest, 2));
         dest.xor(expected);
         assertTrue("Documents (0, 1, 2, 3) are set", dest.cardinality() == 0);
@@ -107,7 +104,6 @@ public class AscendingBitSetIndexToIndexMultiMapTest {
         expected.set(6);
         expected.set(7);
 
-
         assertTrue("Destination non-zero", index.getBetween(dest, 2, 4));
         dest.xor(expected);
         assertTrue("Documents (4, 5, 6, 7) are set", dest.cardinality() == 0);
@@ -123,7 +119,6 @@ public class AscendingBitSetIndexToIndexMultiMapTest {
         expected.set(5);
         expected.set(6);
         expected.set(7);
-
 
         assertTrue("Destination non-zero", index.getBetween(dest, 2, 4));
         dest.xor(expected);

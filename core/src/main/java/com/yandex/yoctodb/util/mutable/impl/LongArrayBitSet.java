@@ -213,7 +213,8 @@ public final class LongArrayBitSet implements ArrayBitSet {
             }
         }
 
-        return notEmpty;    }
+        return notEmpty;
+    }
 
     @Override
     public boolean and(

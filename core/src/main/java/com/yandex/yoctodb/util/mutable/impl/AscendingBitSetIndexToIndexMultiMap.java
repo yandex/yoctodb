@@ -18,9 +18,8 @@ import java.util.Collection;
  * {@link IndexToIndexMultiMap} implementation based on grouped {@link LongArrayBitSet}s
  * For more information see {@link com.yandex.yoctodb.util.immutable.impl.AscendingBitSetIndexToIndexMultiMap}
  *
- * @author Andrey Korzinev (goodfella@yandex-team.ru)
+ * @author Andrey Korzinev (ya-goodfella@yandex.com)
  */
-
 @Immutable
 @NotThreadSafe
 public class AscendingBitSetIndexToIndexMultiMap implements IndexToIndexMultiMap, OutputStreamWritable {
@@ -40,10 +39,18 @@ public class AscendingBitSetIndexToIndexMultiMap implements IndexToIndexMultiMap
 
     @Override
     public long getSizeInBytes() {
-        return 4L + // Type
-                4L + // Keys count
-                4L + // Bit set size in longs
-                8L * (map.size() + 1) * LongArrayBitSet.arraySize(documentsCount);
+        /*
+         * This index contains:
+         * + 4 bytes for index type
+         * + 4 bytes for keys count
+         * + 4 bytes for bitset size (in terms of {@code long[]} size)
+         * + bitsets (as long[]) for each associated key and one extra bitset for storing
+         *   all non-null values
+         */
+        return Integer.BYTES + // Type
+               Integer.BYTES + // Keys count
+               Integer.BYTES + // Bit set size in longs
+               (map.size() + 1) * Long.BYTES * LongArrayBitSet.arraySize(documentsCount); // Docs
     }
 
     @Override
@@ -78,7 +85,7 @@ public class AscendingBitSetIndexToIndexMultiMap implements IndexToIndexMultiMap
 
     @Override
     public String toString() {
-        return "BitSetIndexToIndexMultiMap{" +
+        return "AscendingBitSetIndexToIndexMultiMap{" +
                 "values=" + map.size() +
                 ", documentsCount=" + documentsCount +
                 '}';

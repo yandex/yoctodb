@@ -14,7 +14,6 @@ import java.util.*;
 import static com.yandex.yoctodb.v1.V1DatabaseFormat.MultiMapType.*;
 import static com.yandex.yoctodb.util.mutable.impl.IndexToIndexMultiMapFactory.buildIndexToIndexMultiMap;
 
-
 public class IndexToIndexMultiMapBenchmark {
     private static int KEYS_COUNT = 8192;
     private static int MIN_DOCS_COUNT = 1;
@@ -23,7 +22,7 @@ public class IndexToIndexMultiMapBenchmark {
     private static final BitSetIndexToIndexMultiMap bitSetIndex;
     private static final IntIndexToIndexMultiMap listIndex;
     private static final AscendingBitSetIndexToIndexMultiMap ascendingIndex;
-    private static final ArrayList<ArrayList<Integer>> valueToDocuments;
+    private static final Collection<Collection<Integer>> valueToDocuments;
     private static final int documentsCount;
     private static final ArrayBitSetPool bitSetPool;
 
@@ -37,7 +36,6 @@ public class IndexToIndexMultiMapBenchmark {
         }
         file.deleteOnExit();
 
-
         try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file))) {
             writable.writeTo(os);
         } catch (IOException e) {
@@ -45,7 +43,7 @@ public class IndexToIndexMultiMapBenchmark {
         }
 
         try {
-            return Buffer.mmap(file).advance(4).slice();
+            return Buffer.mmap(file).advance(Integer.BYTES).slice();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -123,7 +121,7 @@ public class IndexToIndexMultiMapBenchmark {
         try {
             index.getFrom(dest, 0);
             long result = dest.cardinality();
-            result = result << 32;
+            result = result << Integer.SIZE;
 
             dest.clear();
 
@@ -140,7 +138,7 @@ public class IndexToIndexMultiMapBenchmark {
         try {
             index.getTo(dest, 1);
             long result = dest.cardinality();
-            result = result << 32;
+            result = result << Integer.SIZE;
 
             dest.clear();
 
