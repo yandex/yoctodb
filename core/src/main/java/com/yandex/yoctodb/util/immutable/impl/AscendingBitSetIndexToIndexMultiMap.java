@@ -138,8 +138,6 @@ public class AscendingBitSetIndexToIndexMultiMap implements IndexToIndexMultiMap
         return getBetween(dest, fromInclusive, keysCount);
     }
 
-
-
     /**
      * Sets document bits for documents for keys which is less than key index
      *
