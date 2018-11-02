@@ -3,19 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>yoctodb-core</artifactId>
     <version>0.1-SNAPSHOT</version>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>8</source>
-          <target>8</target>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-  <packaging>jar</packaging>
+    <packaging>jar</packaging>
 
     <name>YoctoDB core</name>
     <description>Embedded immutable database core module</description>
