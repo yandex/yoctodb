@@ -52,7 +52,7 @@ public class IndexToIndexMultiMapBenchmark {
     static {
         Random rand = new Random();
 
-        Iterator<Integer> documentsIterator = new Iterator<Integer>() {
+        final Iterator<Integer> documentsIterator = new Iterator<Integer>() {
             private int current = 0;
 
             @Override
