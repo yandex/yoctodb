@@ -77,7 +77,7 @@ public class IndexToIndexMultiMapBenchmark {
         valueToDocuments = new ArrayList<>(KEYS_COUNT);
 
         for (int i = 0; i < KEYS_COUNT; i++) {
-            ArrayList<Integer> documents = new ArrayList<>();
+            final List<Integer> documents = new ArrayList<>();
             for (int j = rand.nextInt(MIN_DOCS_COUNT + MAX_DOCS_COUNT) - MIN_DOCS_COUNT; j >= 0; j--) {
                 documents.add(documentsIterator.next());
             }
@@ -103,7 +103,7 @@ public class IndexToIndexMultiMapBenchmark {
     }
 
     private static long measureGet(final IndexToIndexMultiMap index) {
-        ArrayBitSet dest = bitSetPool.borrowSet(documentsCount);
+        final ArrayBitSet dest = bitSetPool.borrowSet(documentsCount);
         try {
             index.get(dest, 0);
             index.get(dest, KEYS_COUNT - 1);
@@ -116,7 +116,7 @@ public class IndexToIndexMultiMapBenchmark {
     }
 
     private static long measureFrom(final IndexToIndexMultiMap index) {
-        ArrayBitSet dest = bitSetPool.borrowSet(documentsCount);
+        final ArrayBitSet dest = bitSetPool.borrowSet(documentsCount);
 
         try {
             index.getFrom(dest, 0);
@@ -134,7 +134,7 @@ public class IndexToIndexMultiMapBenchmark {
     }
 
     private static long measureUntil(final IndexToIndexMultiMap index) {
-        ArrayBitSet dest = bitSetPool.borrowSet(documentsCount);
+        final ArrayBitSet dest = bitSetPool.borrowSet(documentsCount);
         try {
             index.getTo(dest, 1);
             long result = dest.cardinality();
