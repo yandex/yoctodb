@@ -20,6 +20,7 @@ import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 
 import static org.junit.Assert.*;
 
@@ -135,16 +136,20 @@ public class AscendingBitSetIndexToIndexMultiMapTest {
         assertTrue("Documents (4, 5, 6, 7) are set", dest.cardinality() == 0);
     }
 
-    @Test(expected = UnsupportedOperationException.class)
-    @NotNull
+    @Test
     public void ascending() {
-        build().ascending(LongArrayBitSet.one(DOCS));
+        build().ascending(LongArrayBitSet.one(DOCS)).forEachRemaining(itia -> {
+            final int key = itia.getKey();
+            assertTrue(Arrays.stream(itia.getValues()).allMatch(v -> key == v / 2));
+        });
     }
 
-    @Test(expected = UnsupportedOperationException.class)
-    @NotNull
+    @Test
     public void descending() {
-        build().descending(LongArrayBitSet.one(DOCS));
+        build().descending(LongArrayBitSet.one(DOCS)).forEachRemaining(itia -> {
+            final int key = itia.getKey();
+            assertTrue(Arrays.stream(itia.getValues()).allMatch(v -> key == v / 2));
+        });
     }
 
     @Test

@@ -21,6 +21,9 @@ import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  * {@link IndexToIndexMultiMap} implementation based on accumulated {@link BitSet}s.
@@ -227,7 +230,10 @@ public class AscendingBitSetIndexToIndexMultiMap implements IndexToIndexMultiMap
     public Iterator<IntToIntArray> ascending(
             @NotNull
             final BitSet valueFilter) {
-        throw new UnsupportedOperationException();
+        final ArrayBitSet bs = LongArrayBitSet.zero(valueFilter.getSize());
+        return Stream.iterate(0, i -> i + 1)
+                .map(i -> getIntToIntArray(valueFilter, bs, i))
+                .limit(keysCount).iterator();
     }
 
     @NotNull
@@ -235,6 +241,30 @@ public class AscendingBitSetIndexToIndexMultiMap implements IndexToIndexMultiMap
     public Iterator<IntToIntArray> descending(
             @NotNull
             final BitSet valueFilter) {
-        throw new UnsupportedOperationException();
+
+        final ArrayBitSet bs = LongArrayBitSet.zero(valueFilter.getSize());
+        return Stream.iterate(keysCount - 1, i -> i - 1)
+                .map(i -> getIntToIntArray(valueFilter, bs, i))
+                .limit(keysCount).iterator();
+    }
+
+    @NotNull
+    private IntToIntArray getIntToIntArray(
+            @NotNull
+            final BitSet valueFilter,
+            final ArrayBitSet dest,
+            Integer i) {
+        dest.clear();
+        get(dest, i);
+        dest.and(valueFilter);
+        final int count = dest.cardinality();
+
+        return new IntToIntArray(
+                i,
+                IntStream.iterate(dest.nextSetBit(0), b -> dest.nextSetBit(b + 1))
+                        .limit(count)
+                        .toArray(),
+                count
+        );
     }
 }
