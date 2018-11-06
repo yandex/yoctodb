@@ -188,9 +188,7 @@ public class UnsignedByteArrays {
             }
         }
 
-        return (leftLength < rightLength) ?
-                -1 :
-                ((leftLength == rightLength) ? 0 : 1);
+        return Long.compare(leftLength, rightLength);
     }
 
     public static int compare(

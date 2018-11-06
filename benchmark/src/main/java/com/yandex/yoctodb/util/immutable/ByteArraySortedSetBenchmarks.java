@@ -4,6 +4,7 @@ import com.yandex.yoctodb.util.UnsignedByteArray;
 import com.yandex.yoctodb.util.UnsignedByteArrays;
 import com.yandex.yoctodb.util.buf.Buffer;
 import com.yandex.yoctodb.util.immutable.impl.FixedLengthByteArraySortedSet;
+import com.yandex.yoctodb.util.immutable.impl.TrieByteArraySortedSet;
 import com.yandex.yoctodb.util.immutable.impl.VariableLengthByteArraySortedSet;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.infra.Blackhole;
@@ -22,6 +23,7 @@ public class ByteArraySortedSetBenchmarks {
 
     private static final ByteArraySortedSet fixed;
     private static final ByteArraySortedSet variable;
+    private static final ByteArraySortedSet trie;
     private static final List<Buffer> elements;
 
     private static Buffer persist(
@@ -33,6 +35,8 @@ public class ByteArraySortedSetBenchmarks {
             throw new RuntimeException(e);
         }
         file.deleteOnExit();
+
+        System.out.println("Size " + mutable.getSizeInBytes() + " bytes");
 
         try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file))) {
             mutable.writeTo(os);
@@ -53,8 +57,8 @@ public class ByteArraySortedSetBenchmarks {
 
         // Building elements
         final SortedSet<UnsignedByteArray> set = new TreeSet<>();
+        final byte[] element = new byte[SIZE];
         for (int i = 0; i < ELEMENTS; i++) {
-            final byte[] element = new byte[SIZE];
             rnd.nextBytes(element);
             set.add(UnsignedByteArrays.from(element));
         }
@@ -73,14 +77,27 @@ public class ByteArraySortedSetBenchmarks {
                                 new com.yandex.yoctodb.util.mutable.impl.VariableLengthByteArraySortedSet(
                                         set)));
 
+        // Building trie
+        trie =
+                TrieByteArraySortedSet.from(
+                        persist(
+                                new com.yandex.yoctodb.util.mutable.impl.TrieByteArraySortedSet(set)
+                        )
+                );
+
         // Preparing queries
 
-        elements = new ArrayList<>(set.size());
+        elements = new ArrayList<>(set.size() * 2);
         for (UnsignedByteArray e : set) {
             elements.add(e.toByteBuffer());
         }
+        // (maybe?) false queries
+        for (int i = 0; i < set.size(); i++) {
+            rnd.nextBytes(element);
+            elements.add(UnsignedByteArrays.from(element).toByteBuffer());
+        }
 
-        Collections.shuffle(new ArrayList<>(elements), rnd);
+        Collections.shuffle(elements, rnd);
     }
 
     private long measure(final ByteArraySortedSet set) {
@@ -98,5 +115,10 @@ public class ByteArraySortedSetBenchmarks {
     @Benchmark
     public void variable(final Blackhole bh) {
         bh.consume(measure(variable));
+    }
+
+    @Benchmark
+    public void trie(final Blackhole bh) {
+        bh.consume(measure(trie));
     }
 }

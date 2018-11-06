@@ -233,6 +233,11 @@ public final class LongArrayBitSet implements ArrayBitSet {
         return true;
     }
 
+    @Override
+    public int indexOf(int i) {
+        return 0;
+    }
+
     /**
      * See {@link java.util.BitSet#nextSetBit(int)}
      */

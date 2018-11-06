@@ -91,6 +91,11 @@ public final class ReadOnlyOneBitSet implements BitSet {
         return false;
     }
 
+    @Override
+    public int indexOf(int i) {
+        return 0;
+    }
+
     /**
      * See {@link java.util.BitSet#nextSetBit(int)}
      */
