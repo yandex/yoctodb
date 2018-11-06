@@ -160,7 +160,6 @@ public final class V1DatabaseBuilder
                 os.write(DatabaseFormat.MAGIC);
                 os.write(Ints.toByteArray(
                     Feature.intValue(
-                        Feature.LEGACY,
                         Feature.ASCENDING_BIT_SET_INDEX
                     )
                 ));

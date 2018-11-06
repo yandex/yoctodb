@@ -39,7 +39,7 @@ public class V1DatabaseReader extends DatabaseReader {
     };
 
 
-    private  static String supportedFormatsString() {
+    private static String supportedFormatsString() {
         return Arrays.stream(SUPPORTED_FEATURES)
             .map(Enum::name)
             .collect(Collectors.joining(", "));
