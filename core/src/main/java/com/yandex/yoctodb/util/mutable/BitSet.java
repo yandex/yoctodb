@@ -117,11 +117,4 @@ public interface BitSet {
      * @return whether there are nonzero bits in current bit set
      */
     boolean isEmpty();
-
-    /**
-     * Counts count of set bits to this bit index (inclusive)
-     * @param i bit index
-     * @return count of set bits to given bit index or -1 if given bit is unset
-     */
-    int indexOf(int i);
 }

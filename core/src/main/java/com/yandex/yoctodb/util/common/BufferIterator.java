@@ -39,14 +39,14 @@ public class BufferIterator implements Iterator<Byte> {
         }
     }
 
-    public static int compareMutableIterators(@NotNull Iterator<Byte> left, @NotNull Iterator<Byte> right) {
-        while (left.hasNext() && right.hasNext()) {
-            int result = UnsignedBytes.compare(left.next(), right.next());
+    public static int strip(@NotNull Iterator<Byte> from, @NotNull Iterator<Byte> elements) {
+        while (from.hasNext() && elements.hasNext()) {
+            int result = UnsignedBytes.compare(from.next(), elements.next());
             if (result != 0) {
                 return result;
             }
         }
 
-        return Boolean.compare(left.hasNext(), right.hasNext());
+        return elements.hasNext() ? -1 : 0;
     }
 }

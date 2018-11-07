@@ -69,6 +69,6 @@ public class BufferBitSet {
     }
 
     public static int arraySize(final int bitCount) {
-        return (bitCount >>> 6) + 1;
+        return (bitCount >>> 6) + ((bitCount & 0x3f) != 0 ? 1 : 0);
     }
 }

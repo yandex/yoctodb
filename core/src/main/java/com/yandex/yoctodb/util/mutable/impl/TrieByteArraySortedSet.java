@@ -4,7 +4,7 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.yandex.yoctodb.util.OutputStreamWritable;
 import com.yandex.yoctodb.util.UnsignedByteArray;
-import com.yandex.yoctodb.util.UnsignedByteArrays;
+import com.yandex.yoctodb.util.common.TrieNodeMetadata;
 import com.yandex.yoctodb.util.mutable.ArrayBitSet;
 import com.yandex.yoctodb.util.mutable.ByteArraySortedSet;
 import net.jcip.annotations.NotThreadSafe;
@@ -13,9 +13,8 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.*;
-import java.util.stream.Collectors;
 
-import static com.yandex.yoctodb.util.common.BufferIterator.compareMutableIterators;
+import static com.yandex.yoctodb.util.common.BufferIterator.strip;
 
 @NotThreadSafe
 public class TrieByteArraySortedSet implements ByteArraySortedSet {
@@ -59,12 +58,12 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
         int valueOf(@NotNull Iterator<Byte> bytes) {
             Trie node = this;
             while (node != null) {
-                if (compareMutableIterators(bytes, node.infix.iterator()) < 0) {
+                if (strip(bytes, node.infix.iterator()) < 0) {
                     throw new NoSuchElementException();
                 }
 
                 if (bytes.hasNext()) {
-                    node = node.edges.get(bytes.next());
+                    node = node.edges.get(Byte.toUnsignedInt(bytes.next()));
                 } else {
                     if (node.value == null) {
                         throw new NoSuchElementException();
@@ -151,19 +150,19 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
             int result = 0;
 
             if (!infix.isEmpty()) {
-                result |= 0b0001; // infix exists
+                result |= TrieNodeMetadata.INFIX_FLAG; // infix exists
             }
 
             if (value != null) {
-                result |= 0b0010; // value exists
+                result |= TrieNodeMetadata.VALUE_FLAG; // value exists
             }
 
             if (edges.size() == 1) {
-                result |= 0b0100; // only one edge
+                result |= TrieNodeMetadata.EDGES_SINGLE; // only one edge
             } else if (isCondensed()) {
-                result |= 0b1100; // many condensed edges
+                result |= TrieNodeMetadata.EDGES_CONDENSED; // many condensed edges
             } else if (!edges.isEmpty()) {
-                result |= 0b1000; // many thin edges
+                result |= TrieNodeMetadata.EDGES_BITSET; // many thin edges
             }
 
             os.write(result);
@@ -224,19 +223,6 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
                 node.writeNodeTo(os);
                 queue.addAll(node.edges.values());
             }
-        }
-
-        @Override
-        public String toString() {
-            return String.format("<value=%d, infix=%s, edges=(%s)>",
-                        value,
-                        infix.stream()
-                                .map(b -> Byte.toString(b))
-                                .collect(Collectors.joining(", ")),
-                        edges.entrySet().stream()
-                                .map(e -> e.getKey().toString() + "=" + e.getValue().toString())
-                                .collect(Collectors.joining(", "))
-                    );
         }
     }
 

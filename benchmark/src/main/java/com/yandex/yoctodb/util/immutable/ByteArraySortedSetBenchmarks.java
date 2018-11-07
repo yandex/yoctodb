@@ -57,8 +57,8 @@ public class ByteArraySortedSetBenchmarks {
 
         // Building elements
         final SortedSet<UnsignedByteArray> set = new TreeSet<>();
-        final byte[] element = new byte[SIZE];
         for (int i = 0; i < ELEMENTS; i++) {
+            final byte[] element = new byte[SIZE];
             rnd.nextBytes(element);
             set.add(UnsignedByteArrays.from(element));
         }
@@ -67,15 +67,17 @@ public class ByteArraySortedSetBenchmarks {
         fixed =
                 FixedLengthByteArraySortedSet.from(
                         persist(
-                                new com.yandex.yoctodb.util.mutable.impl.FixedLengthByteArraySortedSet(
-                                        set)));
+                                new com.yandex.yoctodb.util.mutable.impl.FixedLengthByteArraySortedSet(set)
+                        )
+                );
 
         // Building variable
         variable =
                 VariableLengthByteArraySortedSet.from(
                         persist(
-                                new com.yandex.yoctodb.util.mutable.impl.VariableLengthByteArraySortedSet(
-                                        set)));
+                                new com.yandex.yoctodb.util.mutable.impl.VariableLengthByteArraySortedSet(set)
+                        )
+                );
 
         // Building trie
         trie =
@@ -93,6 +95,7 @@ public class ByteArraySortedSetBenchmarks {
         }
         // (maybe?) false queries
         for (int i = 0; i < set.size(); i++) {
+            final byte[] element = new byte[SIZE];
             rnd.nextBytes(element);
             elements.add(UnsignedByteArrays.from(element).toByteBuffer());
         }
