@@ -231,9 +231,10 @@ public class AscendingBitSetIndexToIndexMultiMap implements IndexToIndexMultiMap
             @NotNull
             final BitSet valueFilter) {
         final ArrayBitSet bs = LongArrayBitSet.zero(valueFilter.getSize());
-        return Stream.iterate(0, i -> i + 1)
-                .map(i -> getIntToIntArray(valueFilter, bs, i))
-                .limit(keysCount).iterator();
+        return IntStream.iterate(0, i -> i + 1)
+                .mapToObj(i -> getIntToIntArray(valueFilter, bs, i))
+                .limit(keysCount)
+                .iterator();
     }
 
     @NotNull
@@ -241,11 +242,11 @@ public class AscendingBitSetIndexToIndexMultiMap implements IndexToIndexMultiMap
     public Iterator<IntToIntArray> descending(
             @NotNull
             final BitSet valueFilter) {
-
         final ArrayBitSet bs = LongArrayBitSet.zero(valueFilter.getSize());
-        return Stream.iterate(keysCount - 1, i -> i - 1)
-                .map(i -> getIntToIntArray(valueFilter, bs, i))
-                .limit(keysCount).iterator();
+        return IntStream.iterate(keysCount - 1, i -> i - 1)
+                .mapToObj(i -> getIntToIntArray(valueFilter, bs, i))
+                .limit(keysCount)
+                .iterator();
     }
 
     @NotNull
@@ -253,7 +254,7 @@ public class AscendingBitSetIndexToIndexMultiMap implements IndexToIndexMultiMap
             @NotNull
             final BitSet valueFilter,
             final ArrayBitSet dest,
-            Integer i) {
+            final int i) {
         dest.clear();
         get(dest, i);
         dest.and(valueFilter);
