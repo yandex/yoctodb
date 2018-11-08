@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 @ThreadSafe
 public final class V1DatabaseFormat extends DatabaseFormat {
-    public final static int FORMAT = 6;
+    public final static int FORMAT = 7;
 
     private final static DatabaseReader DATABASE_READER = new V1DatabaseReader();
 
@@ -67,6 +67,32 @@ public final class V1DatabaseFormat extends DatabaseFormat {
         digestSize.set(size);
     }
 
+    public enum Feature {
+        LEGACY(6), // 0b110
+        ASCENDING_BIT_SET_INDEX(1 << 3);
+
+        private final int code;
+
+        Feature(final int code) {
+            this.code = code;
+        }
+
+        public static int clearSupported(int value, final Feature ... features) {
+            final int supported = intValue(features);
+
+            return (value & ~supported);
+        }
+
+        public static int intValue(final Feature ... features) {
+            int result = 0;
+            for (Feature feature : features) {
+                result |= feature.code;
+            }
+
+            return result;
+        }
+    }
+
     // Segment types
     public enum SegmentType {
         // External segments should start from 10E6
@@ -92,7 +118,8 @@ public final class V1DatabaseFormat extends DatabaseFormat {
 
     public enum MultiMapType {
         LIST_BASED(1000),
-        LONG_ARRAY_BIT_SET_BASED(2000);
+        LONG_ARRAY_BIT_SET_BASED(2000),
+        ASCENDING_BIT_SET_BASED(3000);
 
         private final int code;
 

@@ -206,6 +206,51 @@ public final class LongArrayBitSet implements ArrayBitSet {
     }
 
     @Override
+    public boolean xor(
+            @NotNull
+            BitSet set) {
+        assert size == set.getSize();
+
+        boolean notEmpty = false;
+        final long[] from = ((ArrayBitSet) set).toArray();
+        for (int i = 0; i < usedWords; i++) {
+            final long word = words[i] ^ from[i];
+            words[i] = word;
+            if (word != 0) {
+                notEmpty = true;
+            }
+        }
+
+        return notEmpty;
+    }
+
+    @Override
+    public boolean and(
+            @NotNull
+            Buffer longArrayBitSetInByteBuffer,
+            long startPosition,
+            int bitSetSizeInLongs) {
+        boolean notEmpty = false;
+        long currentPosition = startPosition;
+
+        assert usedWords == bitSetSizeInLongs;
+
+        for (int i = 0; i < usedWords; i++) {
+            final long currentWord =
+                    longArrayBitSetInByteBuffer.getLong(
+                            currentPosition);
+            currentPosition += Longs.BYTES;
+            final long word = words[i] & currentWord;
+            words[i] = word;
+            if (word != 0) {
+                notEmpty = true;
+            }
+        }
+
+        return notEmpty;
+    }
+
+    @Override
     public boolean or(
             @NotNull
             final Buffer longArrayBitSetInByteBuffer,
@@ -222,6 +267,32 @@ public final class LongArrayBitSet implements ArrayBitSet {
                             currentPosition);
             currentPosition += Longs.BYTES;
             final long word = words[i] | currentWord;
+            words[i] = word;
+            if (word != 0) {
+                notEmpty = true;
+            }
+        }
+
+        return notEmpty;
+    }
+
+    @Override
+    public boolean xor(
+            @NotNull
+            Buffer longArrayBitSetInByteBuffer,
+            long startPosition,
+            int bitSetSizeInLongs) {
+        boolean notEmpty = false;
+        long currentPosition = startPosition;
+
+        assert usedWords == bitSetSizeInLongs;
+
+        for (int i = 0; i < usedWords; i++) {
+            final long currentWord =
+                    longArrayBitSetInByteBuffer.getLong(
+                            currentPosition);
+            currentPosition += Longs.BYTES;
+            final long word = words[i] ^ currentWord;
             words[i] = word;
             if (word != 0) {
                 notEmpty = true;

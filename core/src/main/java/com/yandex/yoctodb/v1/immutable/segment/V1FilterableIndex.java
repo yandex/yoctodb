@@ -103,12 +103,12 @@ public final class V1FilterableIndex implements FilterableIndex, Segment {
             @NotNull
             final Buffer value,
             final boolean orEquals) {
-        final int greatestValueIndex = values.indexOfGreaterThan(
+        final int leastValueIndex = values.indexOfGreaterThan(
                 value,
                 orEquals,
                 values.size() - 1);
-        return greatestValueIndex != -1 &&
-                valueToDocuments.getFrom(dest, greatestValueIndex);
+        return leastValueIndex != -1 &&
+                valueToDocuments.getFrom(dest, leastValueIndex);
     }
 
     @Override

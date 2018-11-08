@@ -52,6 +52,18 @@ public class ReadOnlyZeroBitSetTest {
         }
     }
 
+    @Test(expected = AssertionError.class)
+    public void invalidGet() {
+        final BitSet bs = new ReadOnlyZeroBitSet(1);
+        bs.get(1);
+    }
+
+    @Test(expected = AssertionError.class)
+    public void invalidNegativeGet() {
+        final BitSet bs = new ReadOnlyZeroBitSet(1);
+        bs.get(-1);
+    }
+
     @Test(expected = UnsupportedOperationException.class)
     public void unsupportedPointSet() {
         new ReadOnlyZeroBitSet(1).set(0);
@@ -83,6 +95,27 @@ public class ReadOnlyZeroBitSetTest {
     }
 
     @Test(expected = UnsupportedOperationException.class)
+    public void unsupportedXor() {
+        new ReadOnlyZeroBitSet(1).xor(LongArrayBitSet.zero(1));
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void unsupportedAndBuffer() {
+        new ReadOnlyZeroBitSet(1).and(
+                Buffer.from(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}),
+                0,
+                1);
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void unsupportedXorBuffer() {
+        new ReadOnlyZeroBitSet(1).xor(
+                Buffer.from(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}),
+                0,
+                1);
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
     public void unsupportedOrBuffer() {
         new ReadOnlyZeroBitSet(1).or(
                 Buffer.from(new byte[]{0, 0, 0, 0, 0, 0, 0, 0}),
@@ -97,5 +130,11 @@ public class ReadOnlyZeroBitSetTest {
             assertEquals(-1, bs.nextSetBit(i));
         }
         assertEquals(-1, bs.nextSetBit(SIZE));
+    }
+
+    @Test(expected = AssertionError.class)
+    public void invalidNextSetBit() {
+        final BitSet bs = new ReadOnlyZeroBitSet(SIZE);
+        bs.nextSetBit(-1);
     }
 }

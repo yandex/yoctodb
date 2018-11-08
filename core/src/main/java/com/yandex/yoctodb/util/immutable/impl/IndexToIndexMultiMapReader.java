@@ -35,6 +35,8 @@ public final class IndexToIndexMultiMapReader {
             return IntIndexToIndexMultiMap.from(byteBuffer.slice());
         } else if (type == V1DatabaseFormat.MultiMapType.LONG_ARRAY_BIT_SET_BASED.getCode()) {
             return BitSetIndexToIndexMultiMap.from(byteBuffer.slice());
+        } else if (type == V1DatabaseFormat.MultiMapType.ASCENDING_BIT_SET_BASED.getCode()) {
+            return AscendingBitSetIndexToIndexMultiMap.from(byteBuffer.slice());
         } else {
             throw new UnsupportedOperationException(
                     "Unsupported IndexToIndexMultiMap type: " + type);
