@@ -30,7 +30,7 @@ public final class FixedLengthByteArraySortedSet
     private final Buffer elements;
 
     @NotNull
-    public static ByteArraySortedSet from(
+    public static FixedLengthByteArraySortedSet from(
             @NotNull
             final Buffer buf) {
         final int elementSize = buf.getInt();

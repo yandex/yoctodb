@@ -27,6 +27,8 @@ import static com.yandex.yoctodb.util.common.TrieNodeMetadata.*;
  * @author Andrey Korzinev (ya-goodfella@yandex.com)
  */
 public class TrieByteArraySortedSet implements ByteArraySortedSet {
+    private static final int NOT_FOUND = -1;
+
     private final int keysCount;
     private final Buffer nodes;
 
@@ -81,7 +83,7 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
             return indexOf(new BufferIterator(e));
         }
 
-        return -1;
+        return NOT_FOUND;
     }
 
     /**
@@ -98,10 +100,10 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
     public int indexOfGreaterThan(@NotNull Buffer e, boolean orEquals, int upToIndexInclusive) {
         if (size() > 0) {
             int result = indexOfGreaterThan(new BufferIterator(e), orEquals);
-            return result == keysCount ? -1 : Math.min(result, upToIndexInclusive);
+            return result == keysCount ? NOT_FOUND : Math.min(result, upToIndexInclusive);
         }
 
-        return -1;
+        return NOT_FOUND;
     }
 
     /**
@@ -120,7 +122,7 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
             return indexOfLessThan(new BufferIterator(e), orEquals);
         }
 
-        return -1;
+        return NOT_FOUND;
     }
 
     private int indexOf(@NotNull final Iterator<Byte> query) {
@@ -137,12 +139,12 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
                 movingOffset += Integer.BYTES;
                 Iterator<Byte> infix = new BufferIterator(nodes, movingOffset, infixSize);
                 if (BufferIterator.strip(query, infix) != 0) {
-                    return -1;
+                    return NOT_FOUND;
                 }
                 movingOffset += infixSize * Byte.BYTES;
             }
 
-            int maybeValue = -1;
+            int maybeValue = NOT_FOUND;
             if (hasValue(metadata)) { // there is a value
                 maybeValue = nodes.getInt(movingOffset);
                 movingOffset += Integer.BYTES;
@@ -156,7 +158,7 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
             switch (edgeType(metadata)) {
                 case EDGES_SINGLE:
                     if (next != Byte.toUnsignedInt(nodes.get(movingOffset++))) {
-                        return -1;
+                        return NOT_FOUND;
                     }
                     movingOffset = nodes.getLong(movingOffset);
                     break;
@@ -164,7 +166,7 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
                     int min = Byte.toUnsignedInt(nodes.get(movingOffset++));
                     int max = Byte.toUnsignedInt(nodes.get(movingOffset++));
                     if (min > next || max < next || !BufferBitSet.get(nodes, movingOffset, next - min)) {
-                        return -1;
+                        return NOT_FOUND;
                     }
                     int index = BufferBitSet.cardinalityTo(nodes, movingOffset, next - min);
                     movingOffset += BufferBitSet.arraySize(max - min + 1) * Long.BYTES;
@@ -175,14 +177,14 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
                     int min = Byte.toUnsignedInt(nodes.get(movingOffset++));
                     int max = Byte.toUnsignedInt(nodes.get(movingOffset++));
                     if (min > next || max < next) {
-                        return -1;
+                        return NOT_FOUND;
                     }
                     int index = next - min;
                     movingOffset = nodes.getLong(movingOffset + index * Long.BYTES);
                     break;
                 }
                 case EDGES_NONE:
-                    return -1;
+                    return NOT_FOUND;
             }
         }
     }
@@ -230,7 +232,7 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
                 movingOffset += infixSize * Byte.BYTES;
             }
 
-            int value = -1;
+            int value = NOT_FOUND;
             if (hasValue(metadata)) { // there is a value
                 value = nodes.getInt(movingOffset);
                 movingOffset += Integer.BYTES;
@@ -287,14 +289,14 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
                 movingOffset += infixSize * Byte.BYTES;
             }
 
-            int maybeValue = -1;
+            int maybeValue = NOT_FOUND;
             if (hasValue(metadata)) { // there is a value
                 maybeValue = nodes.getInt(movingOffset);
                 movingOffset += Integer.BYTES;
             }
 
             if (!query.hasNext()) {
-                if (maybeValue != -1) {
+                if (maybeValue != NOT_FOUND) {
                     return orEquals ? maybeValue : maybeValue + 1;
                 }
                 return takeFirstValueOnLeft(nodeOffset);
@@ -376,14 +378,14 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
                 movingOffset += infixSize * Byte.BYTES;
             }
 
-            int maybeValue = -1;
+            int maybeValue = NOT_FOUND;
             if (hasValue(metadata)) { // there is a value
                 maybeValue = nodes.getInt(movingOffset);
                 movingOffset += Integer.BYTES;
             }
 
             if (!query.hasNext()) {
-                if (maybeValue != -1) {
+                if (maybeValue != NOT_FOUND) {
                     return orEquals ? maybeValue : maybeValue - 1;
                 }
                 return takeFirstValueOnLeft(nodeOffset) - 1;
