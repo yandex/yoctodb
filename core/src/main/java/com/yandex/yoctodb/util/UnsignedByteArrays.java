@@ -147,8 +147,9 @@ public class UnsignedByteArrays {
             final Buffer right,
             long rightFrom,
             final long rightLength) {
-        assert leftLength > 0;
-        assert rightLength > 0;
+        if (leftLength == 0 || rightLength == 0) { // one of arrays is empty
+            return Long.compare(leftLength, rightLength);
+        }
 
         // Adapted from Guava UnsignedBytes
 

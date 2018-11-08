@@ -1,3 +1,13 @@
+/*
+ * (C) YANDEX LLC, 2014-2018
+ *
+ * The Source Code called "YoctoDB" available at
+ * https://github.com/yandex/yoctodb is subject to the terms of the
+ * Mozilla Public License, v. 2.0 (hereinafter referred to as the "License").
+ *
+ * A copy of the License is also available at http://mozilla.org/MPL/2.0/.
+ */
+
 package com.yandex.yoctodb.util.immutable.impl;
 
 import com.yandex.yoctodb.util.buf.Buffer;
@@ -9,6 +19,13 @@ import java.util.Iterator;
 
 import static com.yandex.yoctodb.util.common.TrieNodeMetadata.*;
 
+/**
+ * Trie-based implementation for keys storage.
+ * Provides an average complexity O(|key|) for all operations with
+ * worst-case performance proportional to the depth of compressed trie.
+ *
+ * @author Andrey Korzinev (ya-goodfella@yandex.com)
+ */
 public class TrieByteArraySortedSet implements ByteArraySortedSet {
     private final int keysCount;
     private final Buffer nodes;
@@ -29,17 +46,35 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
         this.nodes = nodes;
     }
 
+    /**
+     * @return keys count in this index.
+     */
     @Override
     public int size() {
         return keysCount;
     }
 
+    /**
+     * We unable to provide get() implementation since
+     * there is no continuous buffer with key value.
+     *
+     * @param i index of key
+     * @throws UnsupportedOperationException
+     */
     @NotNull
     @Override
     public Buffer get(int i) {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * Look up for key in trie.
+     * Complexity: O(|key|)
+     *
+     * @param e the element to lookup
+     *
+     * @return index of key matching the query or -1 if there is no match
+     */
     @Override
     public int indexOf(@NotNull Buffer e) {
         if (size() > 0) {
@@ -49,26 +84,48 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
         return -1;
     }
 
+    /**
+     * Looks up for index of key, that would be greater than element with respect to orEquals
+     * Complexity: O(|key|)
+     *
+     * @param e                  element to compare to
+     * @param orEquals           inclusive flag
+     * @param upToIndexInclusive right bound (inclusive)
+     *
+     * @return index of key matching the query or -1 if there is no match
+     */
     @Override
     public int indexOfGreaterThan(@NotNull Buffer e, boolean orEquals, int upToIndexInclusive) {
         if (size() > 0) {
             int result = indexOfGreaterThan(new BufferIterator(e), orEquals);
-            return result == keysCount ? -1 : result;
+            return result == keysCount ? -1 : Math.min(result, upToIndexInclusive);
         }
 
         return -1;
     }
 
+    /**
+     * Looks up for index of key, that would be less than element with respect to orEquals
+     * Complexity: O(|key|)
+     *
+     * @param e                  element to compare to
+     * @param orEquals           inclusive flag
+     * @param fromIndexInclusive left bound (inclusive)
+     *
+     * @return index of key matching the query or -1 if there is no match
+     */
     @Override
     public int indexOfLessThan(@NotNull Buffer e, boolean orEquals, int fromIndexInclusive) {
         if (size() > 0) {
-            return Math.max(-1, indexOfLessThan(new BufferIterator(e), orEquals));
+            return indexOfLessThan(new BufferIterator(e), orEquals);
         }
 
         return -1;
     }
 
     private int indexOf(@NotNull final Iterator<Byte> query) {
+        assert keysCount > 0;
+
         long movingOffset = 0L;
 
         while (true) {
@@ -207,6 +264,8 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
     }
 
     private int indexOfGreaterThan(@NotNull final Iterator<Byte> query, final boolean orEquals) {
+        assert keysCount > 0;
+
         long movingOffset = 0L;
         long nodeOffset;
 
@@ -221,7 +280,7 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
                 Iterator<Byte> infix = new BufferIterator(nodes, movingOffset, infixSize);
                 int infixCompare = BufferIterator.strip(query, infix);
                 if (infixCompare > 0) { // query > node
-                    return takeLastValueOnRight(nodeOffset);
+                    return takeLastValueOnRight(nodeOffset) + 1;
                 } else if (infixCompare < 0) { // infix > query
                     return takeFirstValueOnLeft(nodeOffset);
                 }
@@ -235,7 +294,10 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
             }
 
             if (!query.hasNext()) {
-                return orEquals && maybeValue != -1 ? maybeValue : maybeValue + 1;
+                if (maybeValue != -1) {
+                    return orEquals ? maybeValue : maybeValue + 1;
+                }
+                return takeFirstValueOnLeft(nodeOffset);
             }
 
             int next = Byte.toUnsignedInt(query.next());
@@ -291,6 +353,8 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
     }
 
     private int indexOfLessThan(@NotNull final Iterator<Byte> query, final boolean orEquals) {
+        assert keysCount > 0;
+
         long movingOffset = 0L;
         long nodeOffset;
 

@@ -1,20 +1,33 @@
+/*
+ * (C) YANDEX LLC, 2014-2018
+ *
+ * The Source Code called "YoctoDB" available at
+ * https://github.com/yandex/yoctodb is subject to the terms of the
+ * Mozilla Public License, v. 2.0 (hereinafter referred to as the "License").
+ *
+ * A copy of the License is also available at http://mozilla.org/MPL/2.0/.
+ */
+
 package com.yandex.yoctodb.util.immutable.impl;
 
 import com.yandex.yoctodb.util.UnsignedByteArray;
-import com.yandex.yoctodb.util.UnsignedByteArrays;
 import com.yandex.yoctodb.util.buf.Buffer;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
-import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 
+import static com.yandex.yoctodb.util.UnsignedByteArrays.from;
 import static org.junit.Assert.assertEquals;
 
+/**
+ * Unit tests for {@code TrieByteArraySortedSet}
+ *
+ * @author Andrey Korzinev (ya-goodfella@yandex.com)
+ */
 public class TrieByteArraySortedSetTest {
     private static final List<String> keys = Arrays.asList(
             "a",
@@ -57,119 +70,194 @@ public class TrieByteArraySortedSetTest {
             "yb",
             "ybeeex"
     );
-    private static final com.yandex.yoctodb.util.mutable.impl.TrieByteArraySortedSet tbs;
-    private static final com.yandex.yoctodb.util.immutable.impl.TrieByteArraySortedSet keysSet;
-    private static final com.yandex.yoctodb.util.immutable.impl.TrieByteArraySortedSet emptySet;
+    private static final int lastIndex = keys.size() - 1;
+
+    private static final Collection<String> falseQueries = Arrays.asList(
+            "",
+            "z",
+            "a",
+            "a",
+            "asb",
+            "ascending",
+            "ascendin",
+            "ascendiz",
+            "ascendia",
+            "ascendingz",
+            "ascending",
+            "asg",
+            "asz",
+            "assz",
+            "b",
+            "be",
+            "be",
+            "bee",
+            "bec",
+            "cab",
+            "caz",
+            "catz",
+            "doorbel",
+            "doorbela",
+            "xenm",
+            "ybd",
+            "zzz"
+    );
+
+    private static com.yandex.yoctodb.util.mutable.impl.VariableLengthByteArraySortedSet mutableVariable;
+    private static com.yandex.yoctodb.util.mutable.impl.TrieByteArraySortedSet mutableTrie;
+
+    private static final com.yandex.yoctodb.util.immutable.impl.TrieByteArraySortedSet emptyTrieSet;
+    private static final com.yandex.yoctodb.util.immutable.impl.TrieByteArraySortedSet trieSet;
+    private static final com.yandex.yoctodb.util.immutable.impl.VariableLengthByteArraySortedSet variableSet;
+    private static final Collection<String> queries = new ArrayList<>(keys);
 
     static {
-        SortedSet<UnsignedByteArray> set = new TreeSet<>();
+        final SortedSet<UnsignedByteArray> set = new TreeSet<>();
         for (String str : keys) {
-            set.add(UnsignedByteArrays.from(str));
+            set.add(from(str));
+            queries.add(str);
         }
 
-        tbs = new com.yandex.yoctodb.util.mutable.impl.TrieByteArraySortedSet(set);
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        mutableTrie = new com.yandex.yoctodb.util.mutable.impl.TrieByteArraySortedSet(set);
+        final ByteArrayOutputStream trieOutput = new ByteArrayOutputStream();
         try {
-            tbs.writeTo(os);
+            mutableTrie.writeTo(trieOutput);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        ByteBuffer buffer = ByteBuffer.allocateDirect((int) tbs.getSizeInBytes());
-        buffer.put(os.toByteArray());
-        buffer.rewind();
-        keysSet = com.yandex.yoctodb.util.immutable.impl.TrieByteArraySortedSet.from(Buffer.from(buffer));
-        emptySet = com.yandex.yoctodb.util.immutable.impl.TrieByteArraySortedSet.from(Buffer.from(ByteBuffer.allocate(4)));
+        mutableVariable = new com.yandex.yoctodb.util.mutable.impl.VariableLengthByteArraySortedSet(set);
+        final ByteArrayOutputStream variableOutput = new ByteArrayOutputStream();
+        try {
+            mutableVariable.writeTo(variableOutput);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        emptyTrieSet = com.yandex.yoctodb.util.immutable.impl.TrieByteArraySortedSet.from(
+                Buffer.from(ByteBuffer.allocate(4))
+        );
+        trieSet = com.yandex.yoctodb.util.immutable.impl.TrieByteArraySortedSet.from(
+                Buffer.from(trieOutput.toByteArray())
+        );
+        variableSet = com.yandex.yoctodb.util.immutable.impl.VariableLengthByteArraySortedSet.from(
+                Buffer.from(variableOutput.toByteArray())
+        );
+
+        queries.addAll(falseQueries);
     }
 
 
     @Test
     public void size() {
-        assertEquals(keys.size(), keysSet.size());
+        assertEquals(keys.size(), trieSet.size());
     }
 
     @Test(expected = UnsupportedOperationException.class)
     public void get() {
-        keysSet.get(0);
+        trieSet.get(0);
+    }
+
+    @Test
+    public void indexOfMutable() {
+        for (String q : keys) {
+            assertEquals(
+                    String.format("for query <%s>",  q),
+                    mutableVariable.indexOf(from(q)),
+                    mutableTrie.indexOf(from(q))
+            );
+        }
     }
 
     @Test
     public void indexOf() {
-        for (int i = 0; i < keys.size(); i++) {
-            assertEquals(i, keysSet.indexOf(UnsignedByteArrays.from(keys.get(i)).toByteBuffer()));
+        for (String q : queries) {
+            assertEquals(
+                    String.format("for query <%s>", q),
+                    variableSet.indexOf(query(q)),
+                    trieSet.indexOf(query(q))
+            );
         }
+    }
 
-        assertEquals(-1, keysSet.indexOf(UnsignedByteArrays.from("").toByteBuffer()));
-        assertEquals(-1, keysSet.indexOf(UnsignedByteArrays.from("carder").toByteBuffer()));
-        assertEquals(-1, keysSet.indexOf(UnsignedByteArrays.from("asa").toByteBuffer()));
-        assertEquals(-1, keysSet.indexOf(UnsignedByteArrays.from("asf").toByteBuffer()));
-        assertEquals(-1, keysSet.indexOf(UnsignedByteArrays.from("assignm").toByteBuffer()));
-        assertEquals(-1, keysSet.indexOf(UnsignedByteArrays.from("asz").toByteBuffer()));
-        assertEquals(-1, keysSet.indexOf(UnsignedByteArrays.from("beg").toByteBuffer()));
-        assertEquals(-1, keysSet.indexOf(UnsignedByteArrays.from("cal").toByteBuffer()));
-        assertEquals(-1, keysSet.indexOf(UnsignedByteArrays.from("z").toByteBuffer()));
+    @Test
+    public void indexOfEmpty() {
+        for (String q : queries) {
+            assertEquals(
+                    String.format("for query <%s>", q),
+                    -1,
+                    emptyTrieSet.indexOf(query(q))
+            );
+        }
+    }
 
-        assertEquals(-1, emptySet.indexOf(UnsignedByteArrays.from("z").toByteBuffer()));
+    @Test
+    public void indexOfGreaterThanEmpty() {
+        for (String q : queries) {
+            assertEquals(
+                    String.format("for query <%s>", q),
+                    -1,
+                    emptyTrieSet.indexOfGreaterThan(query(q), true, lastIndex)
+            );
+        }
+    }
+
+    @Test
+    public void indexOfLessThanEmpty() {
+        for (String q : queries) {
+            assertEquals(
+                    String.format("for query <%s>", q),
+                    -1,
+                    emptyTrieSet.indexOfLessThan(query(q), true, 0)
+            );
+        }
+    }
+
+    @NotNull
+    private static Buffer query(String z) {
+        return from(z).toByteBuffer();
     }
 
     @Test
     public void indexOfGreaterThan() {
-        assertEquals(-1, emptySet.indexOfGreaterThan(UnsignedByteArrays.from("").toByteBuffer(), true, -1));
+        for (String q : queries) {
+            assertEquals(
+                    String.format("for query <%s>", q),
+                    variableSet.indexOfGreaterThan(query(q), false, lastIndex),
+                    trieSet.indexOfGreaterThan(query(q), false, lastIndex)
+            );
+        }
+    }
 
-        assertEquals(0, keysSet.indexOfGreaterThan(UnsignedByteArrays.from("").toByteBuffer(), true, -1));
-        assertEquals(-1, keysSet.indexOfGreaterThan(UnsignedByteArrays.from("z").toByteBuffer(), false, -1));
-        assertEquals(0, keysSet.indexOfGreaterThan(UnsignedByteArrays.from("a").toByteBuffer(), true, -1));
-        assertEquals(1, keysSet.indexOfGreaterThan(UnsignedByteArrays.from("a").toByteBuffer(), false, -1));
-        assertEquals(2, keysSet.indexOfGreaterThan(UnsignedByteArrays.from("asb").toByteBuffer(), true, -1));
-        assertEquals(2, keysSet.indexOfGreaterThan(UnsignedByteArrays.from("ascending").toByteBuffer(), true, -1));
-        assertEquals(2, keysSet.indexOfGreaterThan(UnsignedByteArrays.from("ascendin").toByteBuffer(), true, -1));
-        assertEquals(2, keysSet.indexOfGreaterThan(UnsignedByteArrays.from("ascendiz").toByteBuffer(), true, -1));
-        assertEquals(2, keysSet.indexOfGreaterThan(UnsignedByteArrays.from("ascendia").toByteBuffer(), true, -1));
-        assertEquals(3, keysSet.indexOfGreaterThan(UnsignedByteArrays.from("ascendingz").toByteBuffer(), true, -1));
-        assertEquals(3, keysSet.indexOfGreaterThan(UnsignedByteArrays.from("ascending").toByteBuffer(), false, -1));
-        assertEquals(3, keysSet.indexOfGreaterThan(UnsignedByteArrays.from("asg").toByteBuffer(), false, -1));
-        assertEquals(7, keysSet.indexOfGreaterThan(UnsignedByteArrays.from("asz").toByteBuffer(), false, -1));
-        assertEquals(7, keysSet.indexOfGreaterThan(UnsignedByteArrays.from("assz").toByteBuffer(), false, -1));
-        assertEquals(7, keysSet.indexOfGreaterThan(UnsignedByteArrays.from("b").toByteBuffer(), false, -1));
-        assertEquals(7, keysSet.indexOfGreaterThan(UnsignedByteArrays.from("be").toByteBuffer(), true, -1));
-        assertEquals(8, keysSet.indexOfGreaterThan(UnsignedByteArrays.from("be").toByteBuffer(), false, -1));
-        assertEquals(8, keysSet.indexOfGreaterThan(UnsignedByteArrays.from("bee").toByteBuffer(), false, -1));
-        assertEquals(8, keysSet.indexOfGreaterThan(UnsignedByteArrays.from("bec").toByteBuffer(), false, -1));
-        assertEquals(9, keysSet.indexOfGreaterThan(UnsignedByteArrays.from("cab").toByteBuffer(), false, -1));
-        assertEquals(16, keysSet.indexOfGreaterThan(UnsignedByteArrays.from("caz").toByteBuffer(), false, -1));
-        assertEquals(16, keysSet.indexOfGreaterThan(UnsignedByteArrays.from("catz").toByteBuffer(), false, -1));
+    @Test
+    public void indexOfGreaterThanOrEquals() {
+        for (String q : queries) {
+            assertEquals(
+                    String.format("for query <%s>", q),
+                    variableSet.indexOfGreaterThan(query(q), true, lastIndex),
+                    trieSet.indexOfGreaterThan(query(q), true, lastIndex)
+            );
+        }
     }
 
     @Test
     public void indexOfLessThan() {
-        assertEquals(-1, emptySet.indexOfLessThan(UnsignedByteArrays.from("").toByteBuffer(), true, -1));
+        for (String q : queries) {
+            assertEquals(
+                    String.format("for query <%s>", q),
+                    variableSet.indexOfLessThan(query(q), false, 0),
+                    trieSet.indexOfLessThan(query(q), false, 0)
+            );
+        }
+    }
 
-        assertEquals(-1, keysSet.indexOfLessThan(UnsignedByteArrays.from("").toByteBuffer(), true, -1));
-        assertEquals(-1, keysSet.indexOfLessThan(UnsignedByteArrays.from("").toByteBuffer(), false, -1));
-        assertEquals(keys.size() - 1, keysSet.indexOfLessThan(UnsignedByteArrays.from("z").toByteBuffer(), false, -1));
-        assertEquals(0, keysSet.indexOfLessThan(UnsignedByteArrays.from("a").toByteBuffer(), true, -1));
-        assertEquals(-1, keysSet.indexOfLessThan(UnsignedByteArrays.from("a").toByteBuffer(), false, -1));
-        assertEquals(1, keysSet.indexOfLessThan(UnsignedByteArrays.from("asb").toByteBuffer(), true, -1));
-        assertEquals(2, keysSet.indexOfLessThan(UnsignedByteArrays.from("ascending").toByteBuffer(), true, -1));
-        assertEquals(1, keysSet.indexOfLessThan(UnsignedByteArrays.from("ascendin").toByteBuffer(), true, -1));
-        assertEquals(2, keysSet.indexOfLessThan(UnsignedByteArrays.from("ascendiz").toByteBuffer(), true, -1));
-        assertEquals(1, keysSet.indexOfLessThan(UnsignedByteArrays.from("ascendia").toByteBuffer(), true, -1));
-        assertEquals(2, keysSet.indexOfLessThan(UnsignedByteArrays.from("ascendingz").toByteBuffer(), true, -1));
-        assertEquals(1, keysSet.indexOfLessThan(UnsignedByteArrays.from("ascending").toByteBuffer(), false, -1));
-        assertEquals(2, keysSet.indexOfLessThan(UnsignedByteArrays.from("asg").toByteBuffer(), false, -1));
-        assertEquals(6, keysSet.indexOfLessThan(UnsignedByteArrays.from("asz").toByteBuffer(), false, -1));
-        assertEquals(6, keysSet.indexOfLessThan(UnsignedByteArrays.from("assz").toByteBuffer(), false, -1));
-        assertEquals(6, keysSet.indexOfLessThan(UnsignedByteArrays.from("b").toByteBuffer(), false, -1));
-        assertEquals(7, keysSet.indexOfLessThan(UnsignedByteArrays.from("be").toByteBuffer(), true, -1));
-        assertEquals(6, keysSet.indexOfLessThan(UnsignedByteArrays.from("be").toByteBuffer(), false, -1));
-        assertEquals(7, keysSet.indexOfLessThan(UnsignedByteArrays.from("bee").toByteBuffer(), false, -1));
-        assertEquals(7, keysSet.indexOfLessThan(UnsignedByteArrays.from("bec").toByteBuffer(), false, -1));
-        assertEquals(8, keysSet.indexOfLessThan(UnsignedByteArrays.from("cab").toByteBuffer(), false, -1));
-        assertEquals(15, keysSet.indexOfLessThan(UnsignedByteArrays.from("caz").toByteBuffer(), false, -1));
-        assertEquals(15, keysSet.indexOfLessThan(UnsignedByteArrays.from("catz").toByteBuffer(), false, -1));
-        assertEquals(16, keysSet.indexOfLessThan(UnsignedByteArrays.from("doorbel").toByteBuffer(), false, -1));
-        assertEquals(16, keysSet.indexOfLessThan(UnsignedByteArrays.from("doorbela").toByteBuffer(), false, -1));
-        assertEquals(31, keysSet.indexOfLessThan(UnsignedByteArrays.from("xenm").toByteBuffer(), false, -1));
-        assertEquals(37, keysSet.indexOfLessThan(UnsignedByteArrays.from("ybd").toByteBuffer(), false, -1));
+    @Test
+    public void indexOfLessThanOrEquals() {
+        for (String q : queries) {
+            assertEquals(
+                    String.format("for query <%s>", q),
+                    variableSet.indexOfLessThan(query(q), true, 0),
+                    trieSet.indexOfLessThan(query(q), true, 0)
+            );
+        }
     }
 }

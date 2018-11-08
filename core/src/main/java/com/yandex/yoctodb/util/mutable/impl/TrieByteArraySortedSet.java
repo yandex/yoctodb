@@ -1,3 +1,13 @@
+/*
+ * (C) YANDEX LLC, 2014-2018
+ *
+ * The Source Code called "YoctoDB" available at
+ * https://github.com/yandex/yoctodb is subject to the terms of the
+ * Mozilla Public License, v. 2.0 (hereinafter referred to as the "License").
+ *
+ * A copy of the License is also available at http://mozilla.org/MPL/2.0/.
+ */
+
 package com.yandex.yoctodb.util.mutable.impl;
 
 import com.google.common.primitives.Ints;
@@ -7,6 +17,7 @@ import com.yandex.yoctodb.util.UnsignedByteArray;
 import com.yandex.yoctodb.util.common.TrieNodeMetadata;
 import com.yandex.yoctodb.util.mutable.ArrayBitSet;
 import com.yandex.yoctodb.util.mutable.ByteArraySortedSet;
+import com.yandex.yoctodb.v1.mutable.segment.Freezable;
 import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,19 +27,27 @@ import java.util.*;
 
 import static com.yandex.yoctodb.util.common.BufferIterator.strip;
 
+/**
+ * Trie-based implementation for keys storage.
+ * Provides an average complexity O(|key|) for all operations with
+ * worst-case performance proportional to the depth of compressed trie.
+ *
+ * @author Andrey Korzinev (ya-goodfella@yandex.com)
+ */
 @NotThreadSafe
 public class TrieByteArraySortedSet implements ByteArraySortedSet {
-    private static class Trie implements OutputStreamWritable {
+    private static class Trie extends Freezable implements OutputStreamWritable {
         private final List<Byte> infix = new LinkedList<>();
         private SortedMap<Integer, Trie> edges = new TreeMap<>();
         private Integer value = null;
         private long offset;
 
         void append(UnsignedByteArray key, int value) {
+            checkNotFrozen();
             append(key.iterator(), value);
         }
 
-        void compress() {
+        private void compress() {
             while (edges.size() == 1 && value == null) {
                 int key = edges.firstKey();
                 infix.add((byte) key);
@@ -43,7 +62,10 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
             }
         }
 
-        void processOffsets() {
+        void markDone() {
+            freeze();
+            compress();
+
             final Queue<Trie> queue = new LinkedList<>();
             queue.add(this);
             long offset = 0;
@@ -236,8 +258,7 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
             this.root.append(key, i++);
         }
 
-        this.root.compress();
-        this.root.processOffsets();
+        this.root.markDone();
     }
 
     @Override
