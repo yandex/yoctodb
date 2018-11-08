@@ -11,6 +11,9 @@
 package com.yandex.yoctodb.util.mutable.impl;
 
 import com.yandex.yoctodb.util.mutable.IndexToIndexMultiMap;
+import com.yandex.yoctodb.v1.V1DatabaseFormat;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 
@@ -31,8 +34,26 @@ public final class IndexToIndexMultiMapFactory {
         new IndexToIndexMultiMapFactory();
     }
 
+    public static boolean hasDocumentsWithMultipleKeys(
+            @NotNull final Collection<? extends Collection<Integer>> valueToDocuments,
+            final int documentsCount) {
+        byte[] counters = new byte[documentsCount];
+
+        for (Collection<Integer> documents : valueToDocuments) {
+            for (Integer document : documents) {
+                int current = counters[document];
+                if (current > 0) {
+                    return true;
+                }
+                counters[document]++;
+            }
+        }
+
+        return false;
+    }
+
     public static IndexToIndexMultiMap buildIndexToIndexMultiMap(
-            final Collection<? extends Collection<Integer>> valueToDocuments,
+            @NotNull final Collection<? extends Collection<Integer>> valueToDocuments,
             final int documentsCount) {
         final int uniqueValuesCount = valueToDocuments.size();
         if (uniqueValuesCount == 0)
@@ -40,14 +61,49 @@ public final class IndexToIndexMultiMapFactory {
         if (documentsCount <= 0)
             throw new IllegalArgumentException("Nonpositive documents count");
 
-        if (((long) uniqueValuesCount) * documentsCount / 64L <
-            documentsCount * 4L) {
-            // BitSet might be more effective
-            return new BitSetIndexToIndexMultiMap(
-                    valueToDocuments,
-                    documentsCount);
+        /**
+         * If all of the documents have exactly one value we can use {@link AscendingBitSetIndexToIndexMultiMap}
+         */
+        if (hasDocumentsWithMultipleKeys(valueToDocuments, documentsCount)) {
+            if (((long) uniqueValuesCount) * documentsCount / Long.SIZE <
+                    documentsCount * Integer.BYTES) {
+                // BitSet might be more effective
+                return buildIndexToIndexMultiMap(
+                        V1DatabaseFormat.MultiMapType.LONG_ARRAY_BIT_SET_BASED,
+                        valueToDocuments,
+                        documentsCount);
+            } else {
+                return buildIndexToIndexMultiMap(
+                        V1DatabaseFormat.MultiMapType.LIST_BASED,
+                        valueToDocuments,
+                        documentsCount);
+            }
         } else {
-            return new IntIndexToIndexMultiMap(valueToDocuments);
+            return new AscendingBitSetIndexToIndexMultiMap(valueToDocuments, documentsCount);
         }
+    }
+
+    public static IndexToIndexMultiMap buildIndexToIndexMultiMap(
+            @Nullable final V1DatabaseFormat.MultiMapType type,
+            @NotNull final Collection<? extends Collection<Integer>> valueToDocuments,
+            final int documentsCount) {
+        final int uniqueValuesCount = valueToDocuments.size();
+        if (uniqueValuesCount == 0)
+            throw new IllegalArgumentException("Nonpositive values count");
+        if (documentsCount <= 0)
+            throw new IllegalArgumentException("Nonpositive documents count");
+
+        if (type != null) {
+            switch (type) {
+                case LIST_BASED:
+                    return new IntIndexToIndexMultiMap(valueToDocuments);
+                case LONG_ARRAY_BIT_SET_BASED:
+                    return new BitSetIndexToIndexMultiMap(valueToDocuments, documentsCount);
+                case ASCENDING_BIT_SET_BASED:
+                    return buildIndexToIndexMultiMap(valueToDocuments, documentsCount);
+            }
+        }
+
+        return buildIndexToIndexMultiMap(valueToDocuments, documentsCount);
     }
 }

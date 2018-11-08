@@ -12,6 +12,7 @@ package com.yandex.yoctodb.util.mutable.impl;
 
 import com.google.common.collect.TreeMultimap;
 import com.yandex.yoctodb.util.mutable.IndexToIndexMultiMap;
+import com.yandex.yoctodb.v1.V1DatabaseFormat;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -41,11 +42,28 @@ public class IndexToIndexMultiMapFactoryTest {
                 0);
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void zeroValuesTyped() {
+        IndexToIndexMultiMapFactory.buildIndexToIndexMultiMap(
+                V1DatabaseFormat.MultiMapType.LIST_BASED,
+                Collections.<Collection<Integer>>emptyList(),
+                1);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void zeroDocumentsTyped() {
+        IndexToIndexMultiMapFactory.buildIndexToIndexMultiMap(
+                V1DatabaseFormat.MultiMapType.LIST_BASED,
+                singletonList(singletonList(0)),
+                0);
+    }
+
     @Test
-    public void selective() {
+    public void list() {
         final TreeMultimap<Integer, Integer> elements = TreeMultimap.create();
         for (int i = 0; i < 1024; i++) {
             elements.put(i, i);
+            elements.put(i, i + 1);
         }
         final IndexToIndexMultiMap map =
                 IndexToIndexMultiMapFactory.buildIndexToIndexMultiMap(
@@ -55,12 +73,44 @@ public class IndexToIndexMultiMapFactoryTest {
     }
 
     @Test
-    public void nonSelective() {
+    public void bitset() {
         @SuppressWarnings("unchecked")
         final IndexToIndexMultiMap map =
                 IndexToIndexMultiMapFactory.buildIndexToIndexMultiMap(
-                        Arrays.asList(singletonList(0), singletonList(1)),
+                        Arrays.asList(singletonList(0), singletonList(1), singletonList(1)),
                         128);
         assertTrue(map instanceof BitSetIndexToIndexMultiMap);
+    }
+
+    @Test
+    public void ascending() {
+        @SuppressWarnings("unchecked")
+        final IndexToIndexMultiMap map =
+                IndexToIndexMultiMapFactory.buildIndexToIndexMultiMap(
+                        Arrays.asList(singletonList(0), singletonList(1), singletonList(2)),
+                        128);
+        assertTrue(map instanceof AscendingBitSetIndexToIndexMultiMap);
+    }
+
+    @Test
+    public void ascendingTyped() {
+        @SuppressWarnings("unchecked")
+        final IndexToIndexMultiMap map =
+                IndexToIndexMultiMapFactory.buildIndexToIndexMultiMap(
+                        V1DatabaseFormat.MultiMapType.ASCENDING_BIT_SET_BASED,
+                        Arrays.asList(singletonList(0), singletonList(1), singletonList(2)),
+                        128);
+        assertTrue(map instanceof AscendingBitSetIndexToIndexMultiMap);
+    }
+
+    @Test
+    public void nullTypedShouldBeDefault() {
+        @SuppressWarnings("unchecked")
+        final IndexToIndexMultiMap map =
+                IndexToIndexMultiMapFactory.buildIndexToIndexMultiMap(
+                        null,
+                        Arrays.asList(singletonList(0), singletonList(1), singletonList(2)),
+                        128);
+        assertTrue(map instanceof AscendingBitSetIndexToIndexMultiMap);
     }
 }
