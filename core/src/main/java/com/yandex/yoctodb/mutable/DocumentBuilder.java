@@ -32,7 +32,8 @@ public interface DocumentBuilder {
 
     enum LengthOption {
         FIXED,
-        VARIABLE
+        VARIABLE,
+        TRIE
     }
 
     @Deprecated

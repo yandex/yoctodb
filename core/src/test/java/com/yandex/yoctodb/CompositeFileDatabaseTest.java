@@ -14,6 +14,7 @@ import com.yandex.yoctodb.immutable.Database;
 import com.yandex.yoctodb.immutable.DatabaseReader;
 import com.yandex.yoctodb.immutable.IndexedDatabase;
 import com.yandex.yoctodb.mutable.DatabaseBuilder;
+import com.yandex.yoctodb.mutable.DocumentBuilder;
 import com.yandex.yoctodb.query.DocumentProcessor;
 import com.yandex.yoctodb.query.Query;
 import com.yandex.yoctodb.util.buf.Buffer;
@@ -68,7 +69,7 @@ public class CompositeFileDatabaseTest {
         for (int i = 0; i < DOCS; i++) {
             builder.merge(
                     FORMAT.newDocumentBuilder()
-                            .withField("field1", "1", FILTERABLE)
+                            .withField("field1", from("1"), FILTERABLE, DocumentBuilder.LengthOption.TRIE)
                             .withField("field2", "2", FILTERABLE)
                             .withField("index", i, FULL)
                             .withField("relevance", -i, SORTABLE)

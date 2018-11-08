@@ -76,7 +76,8 @@ public final class V1DatabaseFormat extends DatabaseFormat {
         VARIABLE_LENGTH_SORTABLE_INDEX(4000),
         FIXED_LENGTH_FULL_INDEX(5000),
         VARIABLE_LENGTH_FULL_INDEX(6000),
-        VARIABLE_LENGTH_STORED_INDEX(8000);
+        VARIABLE_LENGTH_STORED_INDEX(8000),
+        TRIE_FILTER(9000);
 
         private final int code;
 

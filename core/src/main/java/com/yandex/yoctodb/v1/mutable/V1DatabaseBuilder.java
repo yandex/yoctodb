@@ -80,7 +80,8 @@ public final class V1DatabaseBuilder
                     case FILTERABLE:
                         index = new V1FilterableIndex(
                                 fieldName,
-                                lengthOption == DocumentBuilder.LengthOption.FIXED
+                                lengthOption == DocumentBuilder.LengthOption.FIXED,
+                                lengthOption == DocumentBuilder.LengthOption.TRIE
                         );
                         break;
                     case SORTABLE:
