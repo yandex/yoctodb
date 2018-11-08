@@ -1,6 +1,6 @@
 package com.yandex.yoctodb.util.common;
 
-public class TrieNodeMetadata {
+public final class TrieNodeMetadata {
     public static final int INFIX_FLAG = 0b0001;
     public static final int VALUE_FLAG = 0b0010;
 
@@ -10,6 +10,10 @@ public class TrieNodeMetadata {
     public static final int EDGES_CONDENSED = 0b1100;
 
     private static final int EDGES_MASK = 0b1100;
+
+    static {
+        new TrieNodeMetadata(); // for coverage
+    }
 
     public static int edgeType(final int metadata) {
         return metadata & EDGES_MASK;
