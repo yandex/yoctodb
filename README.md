@@ -4,7 +4,7 @@
 
 YoctoDB is an embedded database engine with the following major features:
 
- * Java 7
+ * Java 8
  * Depends on Guava only
  * Immutable after construction
  * Optionally partitioned

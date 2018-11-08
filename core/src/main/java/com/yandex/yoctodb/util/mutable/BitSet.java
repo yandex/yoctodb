@@ -75,7 +75,7 @@ public interface BitSet {
     int nextSetBit(int fromIndexInclusive);
 
     /**
-     * Modify current bit set by applying bitwise {@code AND} operation
+     * Modify current bit set by applying bitwise {@code &} operation
      *
      * @param set source bit set
      *
@@ -86,13 +86,24 @@ public interface BitSet {
             BitSet set);
 
     /**
-     * Modify current bit set by applying bitwise {@code OR}
+     * Modify current bit set by applying bitwise {@code |}
      *
      * @param set source bit set
      *
      * @return whether there are nonzero bits
      */
     boolean or(
+            @NotNull
+            BitSet set);
+
+    /**
+     * Modify current bit set by applying bitwise {@code ^}
+     *
+     * @param set source bit set
+     *
+     * @return whether there are nonzero bits
+     */
+    boolean xor(
             @NotNull
             BitSet set);
 
@@ -105,7 +116,38 @@ public interface BitSet {
      *
      * @return whether there are nonzero bits
      */
+    boolean and(
+            @NotNull
+            Buffer longArrayBitSetInByteBuffer,
+            long startPosition,
+            int bitSetSizeInLongs);
+
+    /**
+     * Modify current bit set by applying bitwise {@code |} operation
+     *
+     * @param longArrayBitSetInByteBuffer source bit set
+     * @param startPosition               position to start reading from
+     * @param bitSetSizeInLongs           bit set size in {@code long}s
+     *
+     * @return whether there are nonzero bits
+     */
     boolean or(
+            @NotNull
+            Buffer longArrayBitSetInByteBuffer,
+            long startPosition,
+            int bitSetSizeInLongs);
+
+
+    /**
+     * Modify current bit set by applying bitwise {@code ^} operation
+     *
+     * @param longArrayBitSetInByteBuffer source bit set
+     * @param startPosition               position to start reading from
+     * @param bitSetSizeInLongs           bit set size in {@code long}s
+     *
+     * @return whether there are nonzero bits
+     */
+    boolean xor(
             @NotNull
             Buffer longArrayBitSetInByteBuffer,
             long startPosition,

@@ -18,6 +18,7 @@ import com.yandex.yoctodb.util.MessageDigestOutputStreamWrapper;
 import com.yandex.yoctodb.util.OutputStreamWritable;
 import com.yandex.yoctodb.util.UnsignedByteArray;
 import com.yandex.yoctodb.v1.V1DatabaseFormat;
+import com.yandex.yoctodb.v1.V1DatabaseFormat.Feature;
 import com.yandex.yoctodb.v1.mutable.segment.*;
 import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.NotNull;
@@ -157,7 +158,11 @@ public final class V1DatabaseBuilder
                     final OutputStream os) throws IOException {
                 // Header
                 os.write(DatabaseFormat.MAGIC);
-                os.write(Ints.toByteArray(V1DatabaseFormat.FORMAT));
+                os.write(Ints.toByteArray(
+                    Feature.intValue(
+                        Feature.ASCENDING_BIT_SET_INDEX
+                    )
+                ));
                 os.write(Ints.toByteArray(currentDocumentId));
 
                 final MessageDigest md;

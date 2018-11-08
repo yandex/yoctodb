@@ -51,9 +51,9 @@
         <!-- External -->
         <annotations.version>15.0</annotations.version>
         <guava.version>18.0</guava.version>
-        <javac.target>1.7</javac.target>
+        <javac.target>1.8</javac.target>
         <jcip-annotations.version>1.0</jcip-annotations.version>
-        <jmh.version>1.13</jmh.version>
+        <jmh.version>1.21</jmh.version>
         <junit.version>4.12</junit.version>
         <mockito.version>1.10.19</mockito.version>
 

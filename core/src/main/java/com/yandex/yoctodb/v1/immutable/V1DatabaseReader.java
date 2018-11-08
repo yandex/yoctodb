@@ -14,16 +14,16 @@ import com.yandex.yoctodb.immutable.*;
 import com.yandex.yoctodb.util.buf.Buffer;
 import com.yandex.yoctodb.util.mutable.ArrayBitSetPool;
 import com.yandex.yoctodb.v1.V1DatabaseFormat;
+import com.yandex.yoctodb.v1.V1DatabaseFormat.Feature;
 import com.yandex.yoctodb.v1.immutable.segment.Segment;
 import com.yandex.yoctodb.v1.immutable.segment.SegmentRegistry;
+import java.util.stream.Collectors;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.NotNull;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Builds immutable {@link Database}s from bytes in V1 format
@@ -33,6 +33,17 @@ import java.util.Map;
 @ThreadSafe
 public class V1DatabaseReader extends DatabaseReader {
     private static final int DIGEST_BUF_SIZE = 4096;
+    public static final V1DatabaseFormat.Feature[] SUPPORTED_FEATURES = {
+        Feature.LEGACY,
+        Feature.ASCENDING_BIT_SET_INDEX
+    };
+
+
+    private static String supportedFormatsString() {
+        return Arrays.stream(SUPPORTED_FEATURES)
+            .map(Enum::name)
+            .collect(Collectors.joining(", "));
+    }
 
     private static Buffer calculateDigest(
             @NotNull
@@ -77,17 +88,19 @@ public class V1DatabaseReader extends DatabaseReader {
             }
 
         // Checking the format version
-        final int format = buffer.getInt();
-        if (format != V1DatabaseFormat.FORMAT) {
+        final int dbFeatures = buffer.getInt();
+        final int unknownFeatures =
+            V1DatabaseFormat.Feature.clearSupported(dbFeatures, SUPPORTED_FEATURES);
+        if (unknownFeatures != 0) {
             throw new IllegalArgumentException(
-                    "Wrong format " + format + ". Supported format is " +
-                    V1DatabaseFormat.FORMAT + ".");
+                    "Encountered unknown features: <" + Integer.toBinaryString(unknownFeatures) +
+                        ">. Supported features: <" + supportedFormatsString() + ">.");
         }
 
         // Checking the format version
         final int documentCount = buffer.getInt();
         if (documentCount < 0) {
-            throw new IllegalArgumentException("Wrong document count " + format);
+            throw new IllegalArgumentException("Wrong document count " + documentCount);
         }
 
         if (buffer.remaining() < V1DatabaseFormat.getDigestSizeInBytes()) {

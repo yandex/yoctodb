@@ -11,6 +11,8 @@
 package com.yandex.yoctodb.util.immutable.impl;
 
 import com.yandex.yoctodb.util.buf.Buffer;
+import com.yandex.yoctodb.util.mutable.ArrayBitSet;
+import com.yandex.yoctodb.util.mutable.impl.LongArrayBitSet;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
 import com.yandex.yoctodb.util.immutable.IndexToIndexMultiMap;
@@ -18,6 +20,8 @@ import com.yandex.yoctodb.util.immutable.IntToIntArray;
 import com.yandex.yoctodb.util.mutable.BitSet;
 
 import java.util.Iterator;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  * @author svyatoslav
@@ -31,7 +35,7 @@ public class BitSetIndexToIndexMultiMap implements IndexToIndexMultiMap {
     private final long bitSetSizeInBytes;
 
     @NotNull
-    public static IndexToIndexMultiMap from(
+    public static BitSetIndexToIndexMultiMap from(
             @NotNull
             final Buffer buf) {
         final int keysCount = buf.getInt();
@@ -151,7 +155,11 @@ public class BitSetIndexToIndexMultiMap implements IndexToIndexMultiMap {
     public Iterator<IntToIntArray> ascending(
             @NotNull
             final BitSet valueFilter) {
-        throw new UnsupportedOperationException();
+        final ArrayBitSet bs = LongArrayBitSet.zero(valueFilter.getSize());
+        return IntStream.iterate(0, i -> i + 1)
+                .mapToObj(i -> getIntToIntArray(valueFilter, bs, i))
+                .limit(keysCount)
+                .iterator();
     }
 
     @NotNull
@@ -159,6 +167,30 @@ public class BitSetIndexToIndexMultiMap implements IndexToIndexMultiMap {
     public Iterator<IntToIntArray> descending(
             @NotNull
             final BitSet valueFilter) {
-        throw new UnsupportedOperationException();
+        final ArrayBitSet bs = LongArrayBitSet.zero(valueFilter.getSize());
+        return IntStream.iterate(keysCount - 1, i -> i - 1)
+                .mapToObj(i -> getIntToIntArray(valueFilter, bs, i))
+                .limit(keysCount)
+                .iterator();
+    }
+
+    @NotNull
+    private IntToIntArray getIntToIntArray(
+            @NotNull
+            final BitSet valueFilter,
+            final ArrayBitSet dest,
+            final int i) {
+        dest.clear();
+        get(dest, i);
+        dest.and(valueFilter);
+        final int count = dest.cardinality();
+
+        return new IntToIntArray(
+                i,
+                IntStream.iterate(dest.nextSetBit(0), b -> dest.nextSetBit(b + 1))
+                        .limit(count)
+                        .toArray(),
+                count
+        );
     }
 }

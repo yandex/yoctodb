@@ -20,6 +20,7 @@ import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -84,6 +85,16 @@ public class BitSetIndexToIndexMultiMapTest {
     }
 
     @Test
+    public void get() throws IOException {
+        final IndexToIndexMultiMap index = build();
+
+        final BitSet dest = LongArrayBitSet.zero(DOCS);
+        index.get(dest, 0);
+
+        assertTrue(dest.get(0));
+    }
+
+    @Test
     public void getFrom() throws IOException {
         final IndexToIndexMultiMap index = build();
 
@@ -125,13 +136,19 @@ public class BitSetIndexToIndexMultiMapTest {
         assertTrue(index.toString().contains(Integer.toString(DOCS / 2)));
     }
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void ascendingUnsupported() throws IOException {
-        build().ascending(LongArrayBitSet.one(DOCS));
+    @Test
+    public void ascending() throws IOException {
+        build().ascending(LongArrayBitSet.one(DOCS)).forEachRemaining(itia -> {
+            final int key = itia.getKey();
+            assertTrue(Arrays.stream(itia.getValues()).allMatch(v -> key == v / 2));
+        });
     }
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void descendingUnsupported() throws IOException {
-        build().descending(LongArrayBitSet.one(DOCS));
+    @Test
+    public void descending() throws IOException {
+        build().descending(LongArrayBitSet.one(DOCS)).forEachRemaining(itia -> {
+            final int key = itia.getKey();
+            assertTrue(Arrays.stream(itia.getValues()).allMatch(v -> key == v / 2));
+        });
     }
 }
