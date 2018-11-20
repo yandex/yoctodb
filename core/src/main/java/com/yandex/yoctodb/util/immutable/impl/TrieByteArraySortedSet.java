@@ -136,7 +136,7 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
                 final int infixSize = nodes.getInt(movingOffset);
                 movingOffset += Integer.BYTES;
                 final BufferIterator infix = new BufferIterator(nodes, movingOffset, infixSize);
-                if (query.strip(infix) != 0) {
+                if (query.compareToPrefix(infix) != 0) {
                     return NOT_FOUND;
                 }
                 movingOffset += infixSize * Byte.BYTES;
@@ -279,7 +279,7 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
                 final int infixSize = nodes.getInt(movingOffset);
                 movingOffset += Integer.BYTES;
                 final BufferIterator infix = new BufferIterator(nodes, movingOffset, infixSize);
-                final int infixCompare = query.strip(infix);
+                final int infixCompare = query.compareToPrefix(infix);
                 if (infixCompare > 0) { // query > node
                     return takeLastValueOnRight(nodeOffset) + 1;
                 } else if (infixCompare < 0) { // infix > query
@@ -368,7 +368,7 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
                 final int infixSize = nodes.getInt(movingOffset);
                 movingOffset += Integer.BYTES;
                 final BufferIterator infix = new BufferIterator(nodes, movingOffset, infixSize);
-                final int infixCompare = query.strip(infix);
+                final int infixCompare = query.compareToPrefix(infix);
                 if (infixCompare > 0) { // query > node
                     return takeLastValueOnRight(nodeOffset);
                 } else if (infixCompare < 0) { // infix > query

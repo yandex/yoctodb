@@ -79,7 +79,7 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
         int valueOf(@NotNull BufferIterator bytes) {
             Trie node = this;
             while (node != null) {
-                if (bytes.strip(BufferIterator.wrapCopy(node.infix)) < 0) {
+                if (bytes.compareToPrefix(BufferIterator.wrapCopy(node.infix)) < 0) {
                     throw new NoSuchElementException();
                 }
 

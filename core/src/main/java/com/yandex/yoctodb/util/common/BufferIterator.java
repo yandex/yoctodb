@@ -45,7 +45,7 @@ public final class BufferIterator {
      *         negative value if it was shorter or lexicographically smaller than {@code prefix}
      *         positive value if it was lexicographically larger than {@code prefix}
      */
-    public final int strip(@NotNull BufferIterator prefix) {
+    public final int compareToPrefix(@NotNull BufferIterator prefix) {
         while (this.hasNext() && prefix.hasNext()) {
             int result = Integer.compare(this.next(), prefix.next());
             if (result != 0) {
