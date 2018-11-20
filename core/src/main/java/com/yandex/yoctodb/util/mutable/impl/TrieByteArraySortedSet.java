@@ -36,7 +36,7 @@ import java.util.*;
 @NotThreadSafe
 public class TrieByteArraySortedSet implements ByteArraySortedSet {
     private static class Trie extends Freezable implements OutputStreamWritable {
-        private final List<Byte> infix = new LinkedList<>();
+        private final List<Byte> prefix = new LinkedList<>();
         private SortedMap<Integer, Trie> edges = new TreeMap<>();
         private Integer value = null;
         private long offset;
@@ -49,9 +49,9 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
         private void compress() {
             while (edges.size() == 1 && value == null) {
                 int key = edges.firstKey();
-                infix.add((byte) key);
+                prefix.add((byte) key);
                 Trie child = edges.get(key);
-                infix.addAll(child.infix);
+                prefix.addAll(child.prefix);
                 edges = child.edges;
                 value = child.value;
             }
@@ -79,7 +79,7 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
         int valueOf(@NotNull BufferIterator bytes) {
             Trie node = this;
             while (node != null) {
-                if (bytes.compareToPrefix(BufferIterator.wrapCopy(node.infix)) < 0) {
+                if (bytes.compareToPrefix(BufferIterator.wrapCopy(node.prefix)) < 0) {
                     throw new NoSuchElementException();
                 }
 
@@ -116,9 +116,9 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
 
         private long getNodeSizeInBytes() {
             long size = Byte.BYTES; // metadata
-            if (infix.size() > 0) {
-                size += Integer.BYTES + // size of infix
-                        Byte.BYTES * infix.size(); // infix elements
+            if (prefix.size() > 0) {
+                size += Integer.BYTES + // size of prefix
+                        Byte.BYTES * prefix.size(); // prefix elements
             }
 
             if (value != null) {
@@ -170,8 +170,8 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
         private void writeMetadata(@NotNull OutputStream os) throws IOException {
             int result = 0;
 
-            if (!infix.isEmpty()) {
-                result |= TrieNodeMetadata.INFIX_FLAG; // infix exists
+            if (!prefix.isEmpty()) {
+                result |= TrieNodeMetadata.PREFIX_FLAG; // prefix exists
             }
 
             if (value != null) {
@@ -192,11 +192,11 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
         private void writeNodeTo(@NotNull OutputStream os) throws IOException {
             writeMetadata(os);
 
-            if (infix.size() > 0) {
-                os.write(Ints.toByteArray(infix.size())); // infix size
-                for (byte b : infix) {
+            if (prefix.size() > 0) {
+                os.write(Ints.toByteArray(prefix.size())); // prefix size
+                for (byte b : prefix) {
                     os.write(b);
-                } // infix bytes
+                } // prefix bytes
             }
 
             if (value != null) {

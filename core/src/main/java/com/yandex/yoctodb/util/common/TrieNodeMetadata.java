@@ -1,7 +1,7 @@
 package com.yandex.yoctodb.util.common;
 
 public final class TrieNodeMetadata {
-    public static final int INFIX_FLAG = 0b0001;
+    public static final int PREFIX_FLAG = 0b0001;
     public static final int VALUE_FLAG = 0b0010;
 
     public static final int EDGES_NONE = 0b0000;
@@ -19,8 +19,8 @@ public final class TrieNodeMetadata {
         return metadata & EDGES_MASK;
     }
 
-    public static boolean hasInfix(final int metadata) {
-        return (metadata & INFIX_FLAG) != 0;
+    public static boolean hasPrefix(final int metadata) {
+        return (metadata & PREFIX_FLAG) != 0;
     }
 
     public static boolean hasValue(final int metadata) {

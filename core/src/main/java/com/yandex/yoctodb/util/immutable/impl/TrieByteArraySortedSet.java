@@ -132,14 +132,14 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
             final int metadata = Byte.toUnsignedInt(nodes.get(movingOffset));
             movingOffset += Byte.BYTES;
 
-            if (hasInfix(metadata)) { // there is an infix
-                final int infixSize = nodes.getInt(movingOffset);
+            if (hasPrefix(metadata)) { // there is an prefix
+                final int prefixSize = nodes.getInt(movingOffset);
                 movingOffset += Integer.BYTES;
-                final BufferIterator infix = new BufferIterator(nodes, movingOffset, infixSize);
-                if (query.compareToPrefix(infix) != 0) {
+                final BufferIterator prefix = new BufferIterator(nodes, movingOffset, prefixSize);
+                if (query.compareToPrefix(prefix) != 0) {
                     return NOT_FOUND;
                 }
-                movingOffset += infixSize * Byte.BYTES;
+                movingOffset += prefixSize * Byte.BYTES;
             }
 
             int maybeValue = NOT_FOUND;
@@ -192,10 +192,10 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
             final int metadata = Byte.toUnsignedInt(nodes.get(movingOffset));
             movingOffset += Byte.BYTES;
 
-            if (hasInfix(metadata)) { // there is an infix
-                int infixSize = nodes.getInt(movingOffset);
+            if (hasPrefix(metadata)) { // there is an prefix
+                int prefixSize = nodes.getInt(movingOffset);
                 movingOffset += Integer.BYTES;
-                movingOffset += infixSize * Byte.BYTES;
+                movingOffset += prefixSize * Byte.BYTES;
             }
 
             if (hasValue(metadata)) { // there is a value
@@ -224,10 +224,10 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
             final int metadata = Byte.toUnsignedInt(nodes.get(movingOffset));
             movingOffset += Byte.BYTES;
 
-            if (hasInfix(metadata)) { // there is an infix
-                int infixSize = nodes.getInt(movingOffset);
+            if (hasPrefix(metadata)) { // there is an prefix
+                int prefixSize = nodes.getInt(movingOffset);
                 movingOffset += Integer.BYTES;
-                movingOffset += infixSize * Byte.BYTES;
+                movingOffset += prefixSize * Byte.BYTES;
             }
 
             int value = NOT_FOUND;
@@ -275,17 +275,17 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
             nodeOffset = movingOffset;
             movingOffset += Byte.BYTES;
 
-            if (hasInfix(metadata)) { // there is an infix
-                final int infixSize = nodes.getInt(movingOffset);
+            if (hasPrefix(metadata)) { // there is an prefix
+                final int prefixSize = nodes.getInt(movingOffset);
                 movingOffset += Integer.BYTES;
-                final BufferIterator infix = new BufferIterator(nodes, movingOffset, infixSize);
-                final int infixCompare = query.compareToPrefix(infix);
-                if (infixCompare > 0) { // query > node
+                final BufferIterator prefix = new BufferIterator(nodes, movingOffset, prefixSize);
+                final int prefixCompare = query.compareToPrefix(prefix);
+                if (prefixCompare > 0) { // query > node
                     return takeLastValueOnRight(nodeOffset) + 1;
-                } else if (infixCompare < 0) { // infix > query
+                } else if (prefixCompare < 0) { // prefix > query
                     return takeFirstValueOnLeft(nodeOffset);
                 }
-                movingOffset += infixSize * Byte.BYTES;
+                movingOffset += prefixSize * Byte.BYTES;
             }
 
             int maybeValue = NOT_FOUND;
@@ -364,17 +364,17 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
             nodeOffset = movingOffset;
             movingOffset += Byte.BYTES;
 
-            if (hasInfix(metadata)) { // there is an infix
-                final int infixSize = nodes.getInt(movingOffset);
+            if (hasPrefix(metadata)) { // there is an prefix
+                final int prefixSize = nodes.getInt(movingOffset);
                 movingOffset += Integer.BYTES;
-                final BufferIterator infix = new BufferIterator(nodes, movingOffset, infixSize);
-                final int infixCompare = query.compareToPrefix(infix);
-                if (infixCompare > 0) { // query > node
+                final BufferIterator prefix = new BufferIterator(nodes, movingOffset, prefixSize);
+                final int prefixCompare = query.compareToPrefix(prefix);
+                if (prefixCompare > 0) { // query > node
                     return takeLastValueOnRight(nodeOffset);
-                } else if (infixCompare < 0) { // infix > query
+                } else if (prefixCompare < 0) { // prefix > query
                     return takeFirstValueOnLeft(nodeOffset) - 1;
                 }
-                movingOffset += infixSize * Byte.BYTES;
+                movingOffset += prefixSize * Byte.BYTES;
             }
 
             int maybeValue = NOT_FOUND;
