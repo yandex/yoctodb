@@ -10,28 +10,28 @@ import java.util.NoSuchElementException;
 public class BufferIterator {
     @NotNull
     private final Buffer buffer;
-    private final long remaining;
-    private long advance;
+    private final long limit;
+    private long position;
 
     public BufferIterator(@NotNull Buffer buffer) {
         this.buffer = buffer;
-        this.advance = buffer.position();
-        this.remaining = buffer.remaining();
+        this.position = buffer.position();
+        this.limit = this.position + buffer.remaining();
     }
 
     public BufferIterator(@NotNull Buffer buffer, long offset, long size) {
         this.buffer = buffer;
-        this.advance = offset;
-        this.remaining = Math.min(buffer.limit(), offset + size);
+        this.position = offset;
+        this.limit = Math.min(buffer.limit(), offset + size);
     }
 
     public boolean hasNext() {
-        return advance < remaining;
+        return position < limit;
     }
 
     public int next() {
         if (hasNext()) {
-            return Byte.toUnsignedInt(buffer.get(advance++));
+            return Byte.toUnsignedInt(buffer.get(position++));
         } else {
             throw new NoSuchElementException("Empty iterator");
         }
@@ -48,7 +48,7 @@ public class BufferIterator {
         return elements.hasNext() ? -1 : 0;
     }
 
-    public static BufferIterator wrapCopy(final Collection<Byte> bytes) {
+    public static BufferIterator wrapCopy(@NotNull final Collection<Byte> bytes) {
         final ByteBuffer allocated = ByteBuffer.allocate(bytes.size());
         for (Byte b : bytes) {
             allocated.put(b);
