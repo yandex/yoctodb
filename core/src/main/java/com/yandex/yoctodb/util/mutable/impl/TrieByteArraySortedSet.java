@@ -14,6 +14,7 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.yandex.yoctodb.util.OutputStreamWritable;
 import com.yandex.yoctodb.util.UnsignedByteArray;
+import com.yandex.yoctodb.util.common.BufferIterator;
 import com.yandex.yoctodb.util.common.TrieNodeMetadata;
 import com.yandex.yoctodb.util.mutable.ArrayBitSet;
 import com.yandex.yoctodb.util.mutable.ByteArraySortedSet;
@@ -77,15 +78,15 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
             }
         }
 
-        int valueOf(@NotNull Iterator<Byte> bytes) {
+        int valueOf(@NotNull BufferIterator bytes) {
             Trie node = this;
             while (node != null) {
-                if (strip(bytes, node.infix.iterator()) < 0) {
+                if (strip(bytes, BufferIterator.wrapCopy(node.infix)) < 0) {
                     throw new NoSuchElementException();
                 }
 
                 if (bytes.hasNext()) {
-                    node = node.edges.get(Byte.toUnsignedInt(bytes.next()));
+                    node = node.edges.get(bytes.next());
                 } else {
                     if (node.value == null) {
                         throw new NoSuchElementException();
@@ -263,7 +264,7 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
 
     @Override
     public int indexOf(@NotNull UnsignedByteArray e) throws NoSuchElementException {
-        return root.valueOf(e.iterator());
+        return root.valueOf(new BufferIterator(e.toByteBuffer()));
     }
 
     @Override

@@ -15,8 +15,6 @@ import com.yandex.yoctodb.util.common.BufferIterator;
 import com.yandex.yoctodb.util.immutable.ByteArraySortedSet;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Iterator;
-
 import static com.yandex.yoctodb.util.common.TrieNodeMetadata.*;
 
 /**
@@ -125,7 +123,7 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
         return NOT_FOUND;
     }
 
-    private int indexOf(@NotNull final Iterator<Byte> query) {
+    private int indexOf(@NotNull final BufferIterator query) {
         assert keysCount > 0;
 
         long movingOffset = 0L;
@@ -135,9 +133,9 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
             movingOffset += Byte.BYTES;
 
             if (hasInfix(metadata)) { // there is an infix
-                int infixSize = nodes.getInt(movingOffset);
+                final int infixSize = nodes.getInt(movingOffset);
                 movingOffset += Integer.BYTES;
-                Iterator<Byte> infix = new BufferIterator(nodes, movingOffset, infixSize);
+                final BufferIterator infix = new BufferIterator(nodes, movingOffset, infixSize);
                 if (BufferIterator.strip(query, infix) != 0) {
                     return NOT_FOUND;
                 }
@@ -154,7 +152,7 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
                 return maybeValue;
             }
 
-            int next = Byte.toUnsignedInt(query.next());
+            final int next = query.next();
             switch (edgeType(metadata)) {
                 case EDGES_SINGLE:
                     if (next != Byte.toUnsignedInt(nodes.get(movingOffset++))) {
@@ -183,7 +181,7 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
                     movingOffset = nodes.getLong(movingOffset + index * Long.BYTES);
                     break;
                 }
-                case EDGES_NONE:
+                default:
                     return NOT_FOUND;
             }
         }
@@ -261,11 +259,12 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
                 }
                 case EDGES_NONE:
                     return value;
+                default: // should be unreachable
             }
         }
     }
 
-    private int indexOfGreaterThan(@NotNull final Iterator<Byte> query, final boolean orEquals) {
+    private int indexOfGreaterThan(@NotNull final BufferIterator query, final boolean orEquals) {
         assert keysCount > 0;
 
         long movingOffset = 0L;
@@ -277,10 +276,10 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
             movingOffset += Byte.BYTES;
 
             if (hasInfix(metadata)) { // there is an infix
-                int infixSize = nodes.getInt(movingOffset);
+                final int infixSize = nodes.getInt(movingOffset);
                 movingOffset += Integer.BYTES;
-                Iterator<Byte> infix = new BufferIterator(nodes, movingOffset, infixSize);
-                int infixCompare = BufferIterator.strip(query, infix);
+                final BufferIterator infix = new BufferIterator(nodes, movingOffset, infixSize);
+                final int infixCompare = BufferIterator.strip(query, infix);
                 if (infixCompare > 0) { // query > node
                     return takeLastValueOnRight(nodeOffset) + 1;
                 } else if (infixCompare < 0) { // infix > query
@@ -302,7 +301,7 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
                 return takeFirstValueOnLeft(nodeOffset);
             }
 
-            int next = Byte.toUnsignedInt(query.next());
+            final int next = query.next();
             switch (edgeType(metadata)) {
                 case EDGES_SINGLE:
                     int key = Byte.toUnsignedInt(nodes.get(movingOffset++));
@@ -354,7 +353,7 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
         }
     }
 
-    private int indexOfLessThan(@NotNull final Iterator<Byte> query, final boolean orEquals) {
+    private int indexOfLessThan(@NotNull final BufferIterator query, final boolean orEquals) {
         assert keysCount > 0;
 
         long movingOffset = 0L;
@@ -366,10 +365,10 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
             movingOffset += Byte.BYTES;
 
             if (hasInfix(metadata)) { // there is an infix
-                int infixSize = nodes.getInt(movingOffset);
+                final int infixSize = nodes.getInt(movingOffset);
                 movingOffset += Integer.BYTES;
-                Iterator<Byte> infix = new BufferIterator(nodes, movingOffset, infixSize);
-                int infixCompare = BufferIterator.strip(query, infix);
+                final BufferIterator infix = new BufferIterator(nodes, movingOffset, infixSize);
+                final int infixCompare = BufferIterator.strip(query, infix);
                 if (infixCompare > 0) { // query > node
                     return takeLastValueOnRight(nodeOffset);
                 } else if (infixCompare < 0) { // infix > query
@@ -391,7 +390,7 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
                 return takeFirstValueOnLeft(nodeOffset) - 1;
             }
 
-            int next = Byte.toUnsignedInt(query.next());
+            final int next = query.next();
             switch (edgeType(metadata)) {
                 case EDGES_SINGLE:
                     int key = Byte.toUnsignedInt(nodes.get(movingOffset++));
