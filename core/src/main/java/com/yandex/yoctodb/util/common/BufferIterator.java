@@ -7,7 +7,7 @@ import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.NoSuchElementException;
 
-public class BufferIterator {
+public final class BufferIterator {
     @NotNull
     private final Buffer buffer;
     private final long limit;
@@ -25,11 +25,11 @@ public class BufferIterator {
         this.limit = Math.min(buffer.limit(), offset + size);
     }
 
-    public boolean hasNext() {
+    public final boolean hasNext() {
         return position < limit;
     }
 
-    public int next() {
+    public final int next() {
         if (hasNext()) {
             return Byte.toUnsignedInt(buffer.get(position++));
         } else {
@@ -37,15 +37,23 @@ public class BufferIterator {
         }
     }
 
-    public static int strip(@NotNull BufferIterator from, @NotNull BufferIterator elements) {
-        while (from.hasNext() && elements.hasNext()) {
-            int result = Integer.compare(from.next(), elements.next());
+    /**
+     * Strips equal bytes of this iterator by {@code prefix} iterator.
+     *
+     * @param prefix iterator that contains prefix
+     * @return {@code 0} if this iterator was equal to prefix or larger in length,
+     *         negative value if it was shorter or lexicographically smaller than {@code prefix}
+     *         positive value if it was lexicographically larger than {@code prefix}
+     */
+    public final int strip(@NotNull BufferIterator prefix) {
+        while (this.hasNext() && prefix.hasNext()) {
+            int result = Integer.compare(this.next(), prefix.next());
             if (result != 0) {
                 return result;
             }
         }
 
-        return elements.hasNext() ? -1 : 0;
+        return prefix.hasNext() ? -1 : 0;
     }
 
     public static BufferIterator wrapCopy(@NotNull final Collection<Byte> bytes) {

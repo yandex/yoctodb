@@ -26,8 +26,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.*;
 
-import static com.yandex.yoctodb.util.common.BufferIterator.strip;
-
 /**
  * Trie-based implementation for keys storage.
  * Provides an average complexity O(|key|) for all operations with
@@ -81,7 +79,7 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
         int valueOf(@NotNull BufferIterator bytes) {
             Trie node = this;
             while (node != null) {
-                if (strip(bytes, BufferIterator.wrapCopy(node.infix)) < 0) {
+                if (bytes.strip(BufferIterator.wrapCopy(node.infix)) < 0) {
                     throw new NoSuchElementException();
                 }
 
