@@ -69,7 +69,8 @@ public final class V1DatabaseFormat extends DatabaseFormat {
 
     public enum Feature {
         LEGACY(6), // 0b110
-        ASCENDING_BIT_SET_INDEX(1 << 3);
+        ASCENDING_BIT_SET_INDEX(1 << 3),
+        TRIE_BYTE_ARRAY_SORTED_SET(1 << 4);
 
         private final int code;
 

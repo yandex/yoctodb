@@ -161,7 +161,8 @@ public final class V1DatabaseBuilder
                 os.write(DatabaseFormat.MAGIC);
                 os.write(Ints.toByteArray(
                     Feature.intValue(
-                        Feature.ASCENDING_BIT_SET_INDEX
+                        Feature.ASCENDING_BIT_SET_INDEX,
+                        Feature.TRIE_BYTE_ARRAY_SORTED_SET
                     )
                 ));
                 os.write(Ints.toByteArray(currentDocumentId));
