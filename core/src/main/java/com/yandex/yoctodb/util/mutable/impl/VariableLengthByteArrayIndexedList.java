@@ -21,6 +21,8 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * {@link ByteArrayIndexedList} with variable sized elements
@@ -59,11 +61,17 @@ public final class VariableLengthByteArrayIndexedList
         // Element count
         os.write(Ints.toByteArray(elements.size()));
 
+        final Map<OutputStreamWritable, Long> valueOffset = new HashMap<>();
         // Element offsets
         long elementOffset = 0;
         for (OutputStreamWritable e : elements) {
-            os.write(Longs.toByteArray(elementOffset));
-            elementOffset += e.getSizeInBytes();
+            if (valueOffset.containsKey(e)) {
+                os.write(Longs.toByteArray(valueOffset.get(e)));
+            } else {
+                valueOffset.put(e, elementOffset);
+                os.write(Longs.toByteArray(elementOffset));
+                elementOffset += e.getSizeInBytes();
+            }
         }
         os.write(Longs.toByteArray(elementOffset));
 
