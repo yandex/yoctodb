@@ -20,8 +20,10 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -34,49 +36,55 @@ public final class VariableLengthByteArrayIndexedList
         implements ByteArrayIndexedList {
     @NotNull
     private final Collection<UnsignedByteArray> elements;
-    private final long elementSize;
+    private final List<UnsignedByteArray> uniqueElements;
+    private final Map<UnsignedByteArray, Long> valueOffset;
+    private final long lastOffsetValue;
+    private final long uniqueElementsSize;
+
 
     public VariableLengthByteArrayIndexedList(
-            @NotNull
-            final Collection<UnsignedByteArray> elements) {
+            @NotNull final Collection<UnsignedByteArray> elements) {
         this.elements = elements;
+        this.valueOffset = new HashMap<>();
+        this.uniqueElements = new ArrayList<>();
+
+        long elementOffset = 0;
+        for (UnsignedByteArray e : elements) {
+            if (!valueOffset.containsKey(e)) {
+                valueOffset.put(e, elementOffset);
+                elementOffset += e.getSizeInBytes();
+                uniqueElements.add(e);
+            }
+        }
+        this.lastOffsetValue = elementOffset;
         long elementSize = 0;
-        for (UnsignedByteArray element : elements) {
+        for (UnsignedByteArray element : uniqueElements) {
             elementSize += element.length();
         }
-        this.elementSize = elementSize;
+        this.uniqueElementsSize = elementSize;
     }
 
     @Override
     public long getSizeInBytes() {
         return 4L + // Element count
-               8L * (elements.size() + 1L) + // Element offsets
-               elementSize; // Element array size
+                8L * (elements.size() + 1L) + // Element offsets
+                uniqueElementsSize; // Element array size
     }
 
     @Override
     public void writeTo(
-            @NotNull
-            final OutputStream os) throws IOException {
+            @NotNull final OutputStream os) throws IOException {
         // Element count
-        os.write(Ints.toByteArray(elements.size()));
+        os.write(Ints.toByteArray(uniqueElements.size()));
 
-        final Map<UnsignedByteArray, Long> valueOffset = new HashMap<>();
         // Element offsets
-        long elementOffset = 0;
         for (UnsignedByteArray e : elements) {
-            if (valueOffset.containsKey(e)) {
-                os.write(Longs.toByteArray(valueOffset.get(e)));
-            } else {
-                valueOffset.put(e, elementOffset);
-                os.write(Longs.toByteArray(elementOffset));
-                elementOffset += e.getSizeInBytes();
-            }
+            os.write(Longs.toByteArray(valueOffset.get(e)));
         }
-        os.write(Longs.toByteArray(elementOffset));
+        os.write(Longs.toByteArray(lastOffsetValue));
 
         // Elements
-        for (OutputStreamWritable e : elements)
+        for (OutputStreamWritable e : uniqueElements)
             e.writeTo(os);
     }
 

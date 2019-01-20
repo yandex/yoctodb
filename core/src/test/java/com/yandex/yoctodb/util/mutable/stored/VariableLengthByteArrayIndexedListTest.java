@@ -7,6 +7,8 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 public class VariableLengthByteArrayIndexedListTest {
 
@@ -16,9 +18,6 @@ public class VariableLengthByteArrayIndexedListTest {
 
         VariableLengthByteArrayIndexedList indexedList =
                 new VariableLengthByteArrayIndexedList(elements);
-
-        System.out.println(indexedList.getSizeInBytes());
-        System.out.println(getSizeInBytes(elements));
 
         assert indexedList.getSizeInBytes() == getSizeInBytes(elements);
     }
@@ -31,9 +30,14 @@ public class VariableLengthByteArrayIndexedListTest {
     }
 
     public long getSizeInBytes(Collection<UnsignedByteArray> elements) {
+        Collection<UnsignedByteArray> uniqueElements = new HashSet<>();
+
         long elemSum = 0;
         for (UnsignedByteArray elem : elements) {
-            elemSum = elemSum + elem.length();
+            if (!uniqueElements.contains(elem)) {
+                uniqueElements.add(elem);
+                elemSum = elemSum + elem.length();
+            }
         }
         return 4L + // Element count
                 8L * (elements.size() + 1L) + // Element offsets
