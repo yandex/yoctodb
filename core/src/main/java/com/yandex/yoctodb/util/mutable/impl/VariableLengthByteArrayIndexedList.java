@@ -61,10 +61,10 @@ public final class VariableLengthByteArrayIndexedList
         // Element count
         os.write(Ints.toByteArray(elements.size()));
 
-        final Map<OutputStreamWritable, Long> valueOffset = new HashMap<>();
+        final Map<UnsignedByteArray, Long> valueOffset = new HashMap<>();
         // Element offsets
         long elementOffset = 0;
-        for (OutputStreamWritable e : elements) {
+        for (UnsignedByteArray e : elements) {
             if (valueOffset.containsKey(e)) {
                 os.write(Longs.toByteArray(valueOffset.get(e)));
             } else {
