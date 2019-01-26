@@ -20,11 +20,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * {@link ByteArrayIndexedList} with variable sized elements
@@ -36,55 +32,43 @@ public final class VariableLengthByteArrayIndexedList
         implements ByteArrayIndexedList {
     @NotNull
     private final Collection<UnsignedByteArray> elements;
-    private final List<UnsignedByteArray> uniqueElements;
-    private final Map<UnsignedByteArray, Long> valueOffset;
-    private final long lastOffsetValue;
-    private final long uniqueElementsSize;
-
+    private final long elementSize;
 
     public VariableLengthByteArrayIndexedList(
-            @NotNull final Collection<UnsignedByteArray> elements) {
+            @NotNull
+            final Collection<UnsignedByteArray> elements) {
         this.elements = elements;
-        this.valueOffset = new HashMap<>();
-        this.uniqueElements = new ArrayList<>();
-
-        long elementOffset = 0;
-        for (UnsignedByteArray e : elements) {
-            if (!valueOffset.containsKey(e)) {
-                valueOffset.put(e, elementOffset);
-                elementOffset += e.getSizeInBytes();
-                uniqueElements.add(e);
-            }
-        }
-        this.lastOffsetValue = elementOffset;
         long elementSize = 0;
-        for (UnsignedByteArray element : uniqueElements) {
+        for (UnsignedByteArray element : elements) {
             elementSize += element.length();
         }
-        this.uniqueElementsSize = elementSize;
+        this.elementSize = elementSize;
     }
 
     @Override
     public long getSizeInBytes() {
         return 4L + // Element count
-                8L * (elements.size() + 1L) + // Element offsets
-                uniqueElementsSize; // Element array size
+               8L * (elements.size() + 1L) + // Element offsets
+               elementSize; // Element array size
     }
 
     @Override
     public void writeTo(
-            @NotNull final OutputStream os) throws IOException {
+            @NotNull
+            final OutputStream os) throws IOException {
         // Element count
-        os.write(Ints.toByteArray(uniqueElements.size()));
+        os.write(Ints.toByteArray(elements.size()));
 
         // Element offsets
-        for (UnsignedByteArray e : elements) {
-            os.write(Longs.toByteArray(valueOffset.get(e)));
+        long elementOffset = 0;
+        for (OutputStreamWritable e : elements) {
+            os.write(Longs.toByteArray(elementOffset));
+            elementOffset += e.getSizeInBytes();
         }
-        os.write(Longs.toByteArray(lastOffsetValue));
+        os.write(Longs.toByteArray(elementOffset));
 
         // Elements
-        for (OutputStreamWritable e : uniqueElements)
+        for (OutputStreamWritable e : elements)
             e.writeTo(os);
     }
 

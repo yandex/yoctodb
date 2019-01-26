@@ -46,6 +46,8 @@ public final class V1Database implements IndexedDatabase {
     @NotNull
     private final Map<String, StoredIndex> storers;
     @NotNull
+    private final Map<String, FoldedIndex> folders;
+    @NotNull
     private final ArrayBitSetPool bitSetPool;
 
     public V1Database(
@@ -57,6 +59,8 @@ public final class V1Database implements IndexedDatabase {
             @NotNull
             final Map<String, StoredIndex> storers,
             @NotNull
+            final Map<String, FoldedIndex> folders,
+            @NotNull
             final ArrayBitSetPool bitSetPool) {
         assert size >= 0;
 
@@ -64,6 +68,7 @@ public final class V1Database implements IndexedDatabase {
         this.filters = unmodifiableMap(new HashMap<>(filters));
         this.sorters = unmodifiableMap(new HashMap<>(sorters));
         this.storers = unmodifiableMap(new HashMap<>(storers));
+        this.folders = unmodifiableMap(new HashMap<>(folders));
         this.bitSetPool = bitSetPool;
     }
 
@@ -111,6 +116,17 @@ public final class V1Database implements IndexedDatabase {
         assert storers.containsKey(fieldName);
 
         return storers.get(fieldName).getStoredValue(document);
+    }
+
+    @NotNull
+    @Override
+    public Buffer getFoldedFieldValue(
+            final int document,
+            @NotNull
+            final String fieldName) {
+        assert folders.containsKey(fieldName);
+
+        return folders.get(fieldName).getFoldedValue(document);
     }
 
     @Override

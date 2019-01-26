@@ -26,6 +26,7 @@ public interface DocumentBuilder {
         SORTABLE,
         FULL,
         STORED,
+        FOLDED,
         // For unit tests
         UNSUPPORTED
     }

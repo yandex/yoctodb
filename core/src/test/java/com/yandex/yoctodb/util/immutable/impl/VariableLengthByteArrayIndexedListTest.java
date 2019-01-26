@@ -38,7 +38,7 @@ public class VariableLengthByteArrayIndexedListTest {
             if (i % 2 == 0)
                 elements.add(from(i));
             else
-                elements.add(from((long) i));
+                elements.add(from(i % 3 == 0 ? 1L : (long) i));
         }
         final com.yandex.yoctodb.util.mutable.ByteArrayIndexedList mutable =
                 new com.yandex.yoctodb.util.mutable.impl.VariableLengthByteArrayIndexedList(elements);
