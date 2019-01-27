@@ -43,6 +43,12 @@ public class FoldedByteArrayIndexedListTest {
 
         System.out.println("Idexes remaining " + indexes.remaining());
 
+        System.out.println("remaining " + indexes.remaining());
+        System.out.println("value 0 " + getOffsetIndex(indexes, 0)); // todo в assert!
+        System.out.println("value 1 " + getOffsetIndex(indexes, 1));
+        System.out.println("value 2 " + getOffsetIndex(indexes, 2));
+        System.out.println("remaining " + indexes.remaining());
+
         long shift = indexes.remaining();
 
         final int offsetsCount = buf.slice()
@@ -67,12 +73,6 @@ public class FoldedByteArrayIndexedListTest {
                 .slice();
 
         System.out.println("Elements remaining " + elements.remaining());
-
-        System.out.println("remaining " + indexes.remaining());
-        System.out.println("value 0 " + getOffsetIndex(indexes, 0)); // todo в assert!
-        System.out.println("value 1 " + getOffsetIndex(indexes, 1));
-        System.out.println("value 2 " + getOffsetIndex(indexes, 2));
-        System.out.println("remaining " + indexes.remaining());
 
         System.out.println("remaining " + offsets.remaining());
         System.out.println("value 0 " + getValueIndex(indexes, offsets, 0));
@@ -133,7 +133,7 @@ public class FoldedByteArrayIndexedListTest {
     public void checkSize() {
         final FoldedByteArrayIndexedList foldedList =
                 new FoldedByteArrayIndexedList(initString());
-        assertEquals(foldedList.getSizeInBytes(), 55);
+        assertEquals(55, foldedList.getSizeInBytes());
     }
 
 
@@ -142,10 +142,8 @@ public class FoldedByteArrayIndexedListTest {
         final FoldedByteArrayIndexedList foldedList =
                 new FoldedByteArrayIndexedList(initString());
         final String text = foldedList.state();
-        System.out.println(text);
         assertTrue(text.contains("[0, 1, 0, 0]"));
-        assertTrue(text.contains("[0, 3]"));
-        assertTrue(text.contains("7"));
+        assertTrue(text.contains("[0, 3, 7]"));
     }
 
     @Test

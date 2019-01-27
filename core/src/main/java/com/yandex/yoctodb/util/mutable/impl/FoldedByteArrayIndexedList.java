@@ -21,7 +21,7 @@ final public class FoldedByteArrayIndexedList implements ByteArrayIndexedList {
     private final List<Long> offsets;
     private final List<Integer> offsetIndexes;
     private final Map<UnsignedByteArray, Long> valueOffset;
-    private final long lastOffsetValue;
+    private final int sizeOfIndexOffsetValue; // how many bites
 
 
     public FoldedByteArrayIndexedList(
@@ -44,31 +44,33 @@ final public class FoldedByteArrayIndexedList implements ByteArrayIndexedList {
             offsetIndexes.add(offsets.indexOf(valueOffset.get(elem)));
         }
 
-        this.lastOffsetValue = elementOffset;
+        offsets.add(elementOffset);
+
+        // analyze result of offsets
+//        int offsetCount = offsets.size();
+//        if (offsetCount <= 127) {
+//            sizeOfIndexOffsetValue = 1;
+//        } else if (offsetCount <= 256) {
+//            sizeOfIndexOffsetValue = 2;
+//        } else if (offsetCount <= 512) {
+//            sizeOfIndexOffsetValue = 3;
+//        } else
+        sizeOfIndexOffsetValue = 4;
+
     }
 
     @Override
     public long getSizeInBytes() {
-//        long sizeOfIndexOffsetValue;
-        int elementsCount = elements.size();
-        // I will optimize it later
-//        if (elementsSize <= 127) {
-//            sizeOfIndexOffsetValue = 1L;
-//        } else if (elementsSize <= 256) {
-//            sizeOfIndexOffsetValue = 2L;
-//        } else if (elementsSize <= 512) {
-//            sizeOfIndexOffsetValue = 3L;
-//        } else sizeOfIndexOffsetValue = 4L;
-
         long elementSize = 0;
         for (UnsignedByteArray element : uniqueElements) {
             elementSize += element.length();
         }
 
         return 4L + // Element count in bytes
-                4L * (elements.size()) + // indexes offsets in bytes
+                sizeOfIndexOffsetValue *
+                elements.size() + // indexes offsets in bytes
                 4L + // offsets count in bytes
-                8L * (offsets.size() + 1) + // offsets array size in bytes
+                8L * offsets.size() + // offsets array size in bytes
                 elementSize; // Element array size in bytes
     }
 
@@ -85,13 +87,12 @@ final public class FoldedByteArrayIndexedList implements ByteArrayIndexedList {
 
         // write offsets count!
         // + 1 because of lastOffsetValue
-        os.write(Ints.toByteArray(offsets.size() + 1));
+        os.write(Ints.toByteArray(offsets.size()));
 
         // offsets
         for (Long offset : offsets) {
             os.write(Longs.toByteArray(offset));
         }
-        os.write(Longs.toByteArray(lastOffsetValue));
 
         // elements
         for (OutputStreamWritable e : uniqueElements)
@@ -113,7 +114,6 @@ final public class FoldedByteArrayIndexedList implements ByteArrayIndexedList {
                 offsetIndexes.toString() + "\n" +
                 valueOffset.toString() + "\n" +
                 offsets.toString() + "\n" +
-                lastOffsetValue +
                 '}';
     }
 }
