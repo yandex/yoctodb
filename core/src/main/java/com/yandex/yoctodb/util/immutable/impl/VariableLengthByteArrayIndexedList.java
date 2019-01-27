@@ -32,7 +32,7 @@ public class VariableLengthByteArrayIndexedList
 
     /**
      * Create instance of VariableLengthByteArrayIndexedList
-     * "<< 3" is defined because of offset in long format, that means
+     * shift bytes by 3 is defined because of offset in long format, that means
      * that to get a size in bytes you to multiply elementCount by 8
      * Also, there extra (last) offset to define the size of last element,
      * that's why you need slice (elementsCount + 1)
