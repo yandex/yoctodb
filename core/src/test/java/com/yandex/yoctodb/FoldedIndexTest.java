@@ -2,7 +2,8 @@ package com.yandex.yoctodb;
 
 import com.yandex.yoctodb.immutable.Database;
 import com.yandex.yoctodb.mutable.DatabaseBuilder;
-import com.yandex.yoctodb.util.OutputStreamWritable;
+import com.yandex.yoctodb.util.UnsignedByteArray;
+import com.yandex.yoctodb.util.UnsignedByteArrays;
 import com.yandex.yoctodb.util.buf.Buffer;
 import org.junit.Test;
 
@@ -10,7 +11,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import static com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption.FOLDED;
-import static com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption.FULL;
+import static org.junit.Assert.assertEquals;
+
 
 public class FoldedIndexTest {
 
@@ -24,20 +26,34 @@ public class FoldedIndexTest {
                 DatabaseFormat
                         .getCurrent()
                         .newDocumentBuilder()
-                        .withField("state", "NEW", FOLDED)
-                        .withField("state", "USED", FOLDED)
                         .withField("state", "NEW", FOLDED));
-
-        OutputStreamWritable writable = dbBuilder.buildWritable();
+        dbBuilder.merge(
+                DatabaseFormat
+                        .getCurrent()
+                        .newDocumentBuilder()
+                        .withField("state", "USED", FOLDED));
+        dbBuilder.merge(
+                DatabaseFormat
+                        .getCurrent()
+                        .newDocumentBuilder()
+                        .withField("state", "NEW", FOLDED));
 
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
         dbBuilder.buildWritable().writeTo(os);
+
         final Database db =
                 DatabaseFormat.getCurrent()
                         .getDatabaseReader()
                         .from(Buffer.from(os.toByteArray()));
 
+        assertEquals("NEW",getValueFromBuffer(db.getFoldedFieldValue(0, "state")));
+        assertEquals("USED",getValueFromBuffer(db.getFoldedFieldValue(1, "state")));
+        assertEquals("NEW",getValueFromBuffer(db.getFoldedFieldValue(2, "state")));
+    }
 
+    private String getValueFromBuffer(Buffer buffer) {
+        UnsignedByteArray byteArray = UnsignedByteArrays.from(buffer);
+        return UnsignedByteArrays.toString(byteArray);
     }
 
 }
