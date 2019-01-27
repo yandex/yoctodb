@@ -1,5 +1,6 @@
 package com.yandex.yoctodb.util.mutable.impl;
 
+import com.google.common.primitives.Ints;
 import com.yandex.yoctodb.util.UnsignedByteArray;
 import com.yandex.yoctodb.util.UnsignedByteArrays;
 import com.yandex.yoctodb.util.buf.Buffer;
@@ -33,31 +34,39 @@ public class FoldedByteArrayIndexedListTest {
         // getInt() возвращает (первый Int?) количество элементов,
         // которое мы записали в буфер
         final int elementsCount = buf.getInt();
-
         assertEquals(elementsCount, list.size());
 
+        final int offsetsCount = buf.getInt();
+
+        System.out.println("Offsets count is: " + offsetsCount);
+        int sizeOfIndexOffsetValue;
+        if (offsetsCount <= 127) { // one byte 2^8 - 1 = 127
+            sizeOfIndexOffsetValue = 1;
+        } else if (offsetsCount <= 65535) {  // to  2^16 - 1 = 65535
+            sizeOfIndexOffsetValue = 2;
+        } else if (offsetsCount <= 16777215) {  // to 2^24 - 1 = 16777215
+            sizeOfIndexOffsetValue = 3;
+        } else {
+            sizeOfIndexOffsetValue = 4;
+        }
+
+
         System.out.println("Remaining: " + buf.remaining());
-        System.out.println(buf.slice());
         // indexes of offsets
-        final Buffer indexes = buf.slice((elementsCount) << 2);
+        final Buffer indexes = buf.slice((elementsCount) * sizeOfIndexOffsetValue);
 
         System.out.println("Idexes remaining " + indexes.remaining());
 
         System.out.println("remaining " + indexes.remaining());
-        System.out.println("value 0 " + getOffsetIndex(indexes, 0)); // todo в assert!
-        System.out.println("value 1 " + getOffsetIndex(indexes, 1));
-        System.out.println("value 2 " + getOffsetIndex(indexes, 2));
+        System.out.println("value 0 " + getOffsetIndex(indexes, 0, sizeOfIndexOffsetValue)); // todo в assert!
+        System.out.println("value 1 " + getOffsetIndex(indexes, 1, sizeOfIndexOffsetValue));
+        System.out.println("value 2 " + getOffsetIndex(indexes, 2, sizeOfIndexOffsetValue));
         System.out.println("remaining " + indexes.remaining());
 
         long shift = indexes.remaining();
 
-        final int offsetsCount = buf.slice()
-                .position(shift)
-                .slice().getInt();
-
         System.out.println(offsetsCount);
 
-        shift = shift + 4;
         // then offsets of element value
         final Buffer offsets = buf.slice() // получаем здесь копию buf
                 .position(shift) // смещаемся до места, с которого начинаются offsets
@@ -75,34 +84,33 @@ public class FoldedByteArrayIndexedListTest {
         System.out.println("Elements remaining " + elements.remaining());
 
         System.out.println("remaining " + offsets.remaining());
-        System.out.println("value 0 " + getValueIndex(indexes, offsets, 0));
-        System.out.println("value 1 " + getValueIndex(indexes, offsets, 1));
-        System.out.println("value 2 " + getValueIndex(indexes, offsets, 2));
+        System.out.println("value 0 " + getValueIndex(indexes, offsets, 0, sizeOfIndexOffsetValue));
+        System.out.println("value 1 " + getValueIndex(indexes, offsets, 1, sizeOfIndexOffsetValue ));
+        System.out.println("value 2 " + getValueIndex(indexes, offsets, 2, sizeOfIndexOffsetValue));
         System.out.println("remaining " + offsets.remaining());
 
         // осталось 7 бит - это NEW + USED!
         Buffer buffer;
 
-        buffer = getValue(indexes, offsets, elements, 0);
+        buffer = getValue(indexes, offsets, elements, 0, sizeOfIndexOffsetValue);
         UnsignedByteArray byteArray = UnsignedByteArrays.from(buffer);
         String value = UnsignedByteArrays.toString(byteArray);
         System.out.println(value);
 
-        buffer = getValue(indexes, offsets, elements, 1);
+        buffer = getValue(indexes, offsets, elements, 1, sizeOfIndexOffsetValue);
         byteArray = UnsignedByteArrays.from(buffer);
         value = UnsignedByteArrays.toString(byteArray);
         System.out.println(value);
 
-        buffer = getValue(indexes, offsets, elements, 2);
+        buffer = getValue(indexes, offsets, elements, 2, sizeOfIndexOffsetValue);
         byteArray = UnsignedByteArrays.from(buffer);
         value = UnsignedByteArrays.toString(byteArray);
         System.out.println(value);
 
-        assertEquals(getValueFromBuffer(getValue(indexes, offsets, elements, 0)), "NEW");
-        assertEquals(getValueFromBuffer(getValue(indexes, offsets, elements, 1)), "USED");
-        assertEquals(getValueFromBuffer(getValue(indexes, offsets, elements, 2)), "NEW");
-        assertEquals(getValueFromBuffer(getValue(indexes, offsets, elements, 3)), "NEW");
-
+        assertEquals(getValueFromBuffer(getValue(indexes, offsets, elements, 0, sizeOfIndexOffsetValue)), "NEW");
+        assertEquals(getValueFromBuffer(getValue(indexes, offsets, elements, 1, sizeOfIndexOffsetValue)), "USED");
+        assertEquals(getValueFromBuffer(getValue(indexes, offsets, elements, 2, sizeOfIndexOffsetValue)), "NEW");
+        assertEquals(getValueFromBuffer(getValue(indexes, offsets, elements, 3, sizeOfIndexOffsetValue)), "NEW");
     }
 
     private String getValueFromBuffer(Buffer buffer) {
@@ -110,30 +118,76 @@ public class FoldedByteArrayIndexedListTest {
         return UnsignedByteArrays.toString(byteArray);
     }
 
-    private Buffer getValue(Buffer indexes, Buffer offsets, Buffer elements, int docId) {
-        int offsetIndex = indexes.getInt(docId << 2);
+    private Buffer getValue(Buffer indexes,
+                            Buffer offsets,
+                            Buffer elements,
+                            int docId,
+                            int sizeOfIndexOffsetValue) {
+        int offsetIndex = getOffsetIndex(indexes, docId, sizeOfIndexOffsetValue);
         long start = offsets.getLong(offsetIndex << 3);
         long end = offsets.getLong((offsetIndex + 1) << 3); // берем соседа
         return elements.slice(start, end - start);
     }
 
 
-    private long getValueIndex(Buffer indexes, Buffer offsets, int docId) {
+    private long getValueIndex(Buffer indexes,
+                               Buffer offsets,
+                               int docId,
+                               int sizeOfIndexOffsetValue) {
         // если здесь не использовать slice - не ломается :)
-        int offsetIndex = indexes.getInt(docId << 2);
+        int offsetIndex = getOffsetIndex(indexes, docId, sizeOfIndexOffsetValue);
         return offsets.getLong(offsetIndex << 3);
     }
 
-    private int getOffsetIndex(Buffer indexes, int docId) {
+    private int getOffsetIndex(Buffer indexes, int docId, int sizeOfIndexOffsetValue) {
         // если здесь не использовать slice - не ломается :)
-        return indexes.getInt(docId << 2);
+        switch (sizeOfIndexOffsetValue) {
+            case (1): {
+                // write every int to one byte
+                return indexes.get(docId);
+            }
+            case (2): {
+                // write every int to two bytes
+                return twoBytesToInt(indexes, docId);
+            }
+            case (3): {
+                // write every int to three bytes
+                return threeBytesToInt(indexes, docId);
+            }
+            case (4): {
+                // write every int to four bytes
+                return indexes.getInt(docId >> 2); // как и раньше
+            }
+        }
+        throw new IllegalArgumentException();
+    }
+
+    private int twoBytesToInt(Buffer indexes, int docId) {
+        int byteIndex = docId * 2;
+        byte[] bytes = new byte[] {
+                indexes.get(byteIndex),
+                indexes.get(byteIndex + 1)
+        };
+        return (0xff & bytes[0]) << 8 | (0xff & bytes[1]);
+    }
+
+    private int threeBytesToInt(Buffer indexes, int docId) {
+        int byteIndex = docId * 3;
+        byte[] bytes = new byte[] {
+                indexes.get(byteIndex),
+                indexes.get(byteIndex + 1),
+                indexes.get(byteIndex + 2)
+        };
+        return (0xff & bytes[0]) << 16 |
+                (0xff & bytes[1]) << 8 |
+                (0xff & bytes[2]);
     }
 
     @Test
     public void checkSize() {
         final FoldedByteArrayIndexedList foldedList =
                 new FoldedByteArrayIndexedList(initString());
-        assertEquals(55, foldedList.getSizeInBytes());
+        assertEquals(43, foldedList.getSizeInBytes());
     }
 
 

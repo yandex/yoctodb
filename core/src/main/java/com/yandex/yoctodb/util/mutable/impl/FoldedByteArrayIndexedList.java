@@ -47,15 +47,16 @@ final public class FoldedByteArrayIndexedList implements ByteArrayIndexedList {
         offsets.add(elementOffset);
 
         // analyze result of offsets
-//        int offsetCount = offsets.size();
-//        if (offsetCount <= 127) {
-//            sizeOfIndexOffsetValue = 1;
-//        } else if (offsetCount <= 256) {
-//            sizeOfIndexOffsetValue = 2;
-//        } else if (offsetCount <= 512) {
-//            sizeOfIndexOffsetValue = 3;
-//        } else
-        sizeOfIndexOffsetValue = 4;
+        int offsetCount = offsets.size();
+        if (offsetCount <= 127) { // one byte 2^8 - 1 = 127
+            sizeOfIndexOffsetValue = 1;
+        } else if (offsetCount <= 65535) {  // to  2^16 - 1 = 65535
+            sizeOfIndexOffsetValue = 2;
+        } else if (offsetCount <= 16777215) {  // to 2^24 - 1 = 16777215
+            sizeOfIndexOffsetValue = 3;
+        } else {
+            sizeOfIndexOffsetValue = 4;
+        }
 
     }
 
@@ -67,9 +68,9 @@ final public class FoldedByteArrayIndexedList implements ByteArrayIndexedList {
         }
 
         return 4L + // Element count in bytes
-                sizeOfIndexOffsetValue *
-                elements.size() + // indexes offsets in bytes
                 4L + // offsets count in bytes
+                sizeOfIndexOffsetValue *
+                        elements.size() + // indexes offsets in bytes
                 8L * offsets.size() + // offsets array size in bytes
                 elementSize; // Element array size in bytes
     }
@@ -80,14 +81,42 @@ final public class FoldedByteArrayIndexedList implements ByteArrayIndexedList {
         // elements count
         os.write(Ints.toByteArray(elements.size()));
 
-        // indexes of offsets - in correct Order
-        for (Integer offsetIndex : offsetIndexes) {
-            os.write(Ints.toByteArray(offsetIndex));
-        }
-
         // write offsets count!
-        // + 1 because of lastOffsetValue
+        // before writing indexes because
+        // you should to know how to deserialize it
         os.write(Ints.toByteArray(offsets.size()));
+
+        // indexes of offsets - in correct Order
+        switch (sizeOfIndexOffsetValue) {
+            case (1): {
+                // write every int to one byte
+                for (Integer offsetIndex : offsetIndexes) {
+                    os.write(offsetIndex.byteValue());
+                }
+                break;
+            }
+            case (2): {
+                // write every int to two bytes
+                for (Integer offsetIndex : offsetIndexes) {
+                    os.write(twoBytesFromInteger(offsetIndex));
+                }
+                break;
+            }
+            case (3): {
+                // write every int to three bytes
+                for (Integer offsetIndex : offsetIndexes) {
+                    os.write(threeBytesFromInteger(offsetIndex));
+                }
+                break;
+            }
+            case (4): {
+                // write every int to four bytes
+                for (Integer offsetIndex : offsetIndexes) {
+                    os.write(Ints.toByteArray(offsetIndex));
+                }
+                break;
+            }
+        }
 
         // offsets
         for (Long offset : offsets) {
@@ -115,5 +144,20 @@ final public class FoldedByteArrayIndexedList implements ByteArrayIndexedList {
                 valueOffset.toString() + "\n" +
                 offsets.toString() + "\n" +
                 '}';
+    }
+
+    private byte[] twoBytesFromInteger(Integer data) { // to  2^16 - 1 = 65535
+        return new byte[] {
+                (byte) ((data >> 8) & 0xff),
+                (byte) ((data) & 0xff)
+        };
+    }
+
+    private byte[] threeBytesFromInteger(Integer data) { // to 2^24 - 1 = 16777215
+        return new byte[]{
+                (byte) ((data >> 16) & 0xff),
+                (byte) ((data >> 8) & 0xff),
+                (byte) ((data) & 0xff)
+        };
     }
 }
