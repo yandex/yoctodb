@@ -41,6 +41,8 @@ public class V1StoredIndex implements StoredIndex, Segment {
     }
 
     static void registerReader() {
+
+
         SegmentRegistry.register(
                 V1DatabaseFormat.SegmentType
                         .VARIABLE_LENGTH_STORED_INDEX.getCode(),

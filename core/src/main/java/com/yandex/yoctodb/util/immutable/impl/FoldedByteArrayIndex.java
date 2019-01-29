@@ -4,9 +4,11 @@ import com.yandex.yoctodb.util.buf.Buffer;
 import com.yandex.yoctodb.util.immutable.ByteArrayIndexedList;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.function.Function;
+
 public class FoldedByteArrayIndex implements ByteArrayIndexedList {
     private final int elementCount;
-    private final int sizeOfIndexOffsetValue;
+    private final Function<Integer, Integer> getOffsetIndex;
     @NotNull
     private final Buffer elements;
     @NotNull
@@ -50,7 +52,7 @@ public class FoldedByteArrayIndex implements ByteArrayIndexedList {
 
         return new FoldedByteArrayIndex(
                 elementsCount,
-                sizeOfIndexOffsetValue,
+                offsetsCount,
                 offsets,
                 elements,
                 indexes);
@@ -58,17 +60,26 @@ public class FoldedByteArrayIndex implements ByteArrayIndexedList {
 
     private FoldedByteArrayIndex(
             final int elementCount,
-            final int sizeOfIndexOffsetValue,
+            final int offsetsCount,
             @NotNull final Buffer offsets,
             @NotNull final Buffer elements,
             @NotNull final Buffer indexes) {
         assert elementCount >= 0 : "Negative element count";
 
         this.elementCount = elementCount;
-        this.sizeOfIndexOffsetValue = sizeOfIndexOffsetValue;
         this.elements = elements;
         this.offsets = offsets;
         this.indexes = indexes;
+
+        if (offsetsCount <= 127) { // one byte 2^8 - 1 = 127
+            this.getOffsetIndex = this::oneByteToInt;
+        } else if (offsetsCount <= 65535) {  // to  2^16 - 1 = 65535
+            this.getOffsetIndex = this::twoBytesToInt;
+        } else if (offsetsCount <= 16777215) {  // to 2^24 - 1 = 16777215
+            this.getOffsetIndex = this::threeBytesToInt;
+        } else {
+            this.getOffsetIndex = this::fourBytesToInt;
+        }
     }
 
     @NotNull
@@ -76,7 +87,7 @@ public class FoldedByteArrayIndex implements ByteArrayIndexedList {
     public Buffer get(final int docId) {
         assert 0 <= docId && docId < elementCount;
 
-        int offsetIndex = getOffsetIndex(docId);
+        int offsetIndex = getOffsetIndex.apply(docId);
         long start = offsets.getLong(offsetIndex << 3);
         long end = offsets.getLong((offsetIndex + 1) << 3);
         return elements.slice(start, end - start);
@@ -94,47 +105,24 @@ public class FoldedByteArrayIndex implements ByteArrayIndexedList {
                 '}';
     }
 
-    private int getOffsetIndex(int docId) {
-        // если здесь не использовать slice - не ломается :)
-        switch (sizeOfIndexOffsetValue) {
-            case (1): {
-                // write every int to one byte
-                return indexes.get(docId);
-            }
-            case (2): {
-                // write every int to two bytes
-                return twoBytesToInt(docId);
-            }
-            case (3): {
-                // write every int to three bytes
-                return threeBytesToInt(docId);
-            }
-            case (4): {
-                // write every int to four bytes
-                return indexes.getInt(docId >> 2); // как и раньше
-            }
-        }
-        throw new IllegalArgumentException();
+    private int oneByteToInt(int docId) {
+        return (0xff & indexes.get(docId));
     }
 
     private int twoBytesToInt(int docId) {
         int byteIndex = docId * 2;
-        byte[] bytes = new byte[] {
-                indexes.get(byteIndex),
-                indexes.get(byteIndex + 1)
-        };
-        return (0xff & bytes[0]) << 8 | (0xff & bytes[1]);
+        return (0xff & indexes.get(byteIndex)) << 8 |
+                (0xff & indexes.get(byteIndex + 1));
     }
 
     private int threeBytesToInt(int docId) {
         int byteIndex = docId * 3;
-        byte[] bytes = new byte[] {
-                indexes.get(byteIndex),
-                indexes.get(byteIndex + 1),
-                indexes.get(byteIndex + 2)
-        };
-        return (0xff & bytes[0]) << 16 |
-                (0xff & bytes[1]) << 8 |
-                (0xff & bytes[2]);
+        return (0xff & indexes.get(byteIndex)) << 16 |
+                (0xff & indexes.get(byteIndex + 1)) << 8 |
+                (0xff & indexes.get(byteIndex + 2));
+    }
+
+    private int fourBytesToInt(int docId) {
+        return indexes.getInt(docId >> 2);
     }
 }

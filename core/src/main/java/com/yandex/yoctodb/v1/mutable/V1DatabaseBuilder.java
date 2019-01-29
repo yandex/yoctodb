@@ -99,9 +99,6 @@ public final class V1DatabaseBuilder
                     case STORED:
                         index = new V1StoredIndex(fieldName);
                         break;
-                    case FOLDED:
-                        index = new V1FoldedIndex(fieldName);
-                        break;
                     default:
                         throw new UnsupportedOperationException(
                                 "Unsupported index option: " + indexOption);

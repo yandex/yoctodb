@@ -10,7 +10,7 @@ import org.junit.Test;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import static com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption.FOLDED;
+import static com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption.STORED;
 import static org.junit.Assert.assertEquals;
 
 
@@ -26,17 +26,17 @@ public class FoldedIndexTest {
                 DatabaseFormat
                         .getCurrent()
                         .newDocumentBuilder()
-                        .withField("state", "NEW", FOLDED));
+                        .withField("state", "NEW", STORED));
         dbBuilder.merge(
                 DatabaseFormat
                         .getCurrent()
                         .newDocumentBuilder()
-                        .withField("state", "USED", FOLDED));
+                        .withField("state", "USED", STORED));
         dbBuilder.merge(
                 DatabaseFormat
                         .getCurrent()
                         .newDocumentBuilder()
-                        .withField("state", "NEW", FOLDED));
+                        .withField("state", "NEW", STORED));
 
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
         dbBuilder.buildWritable().writeTo(os);

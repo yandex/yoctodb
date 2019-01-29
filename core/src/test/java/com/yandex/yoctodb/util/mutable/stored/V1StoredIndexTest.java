@@ -32,17 +32,12 @@ public class V1StoredIndexTest {
         OutputStreamWritable outputStreamWritable = index.buildWritable();
 
         assert (outputStreamWritable.getSizeInBytes() == getSizeInBytes(fieldName, indexedList));
-
     }
 
     private Map<Integer, UnsignedByteArray> initData() {
         Map<Integer, UnsignedByteArray> data = new HashMap<>();
         data.put(0, UnsignedByteArrays.from("NEW"));
         data.put(1, UnsignedByteArrays.from("USED"));
-        data.put(2, UnsignedByteArrays.from("NEW"));
-        data.put(3, UnsignedByteArrays.from("USED"));
-        data.put(4, UnsignedByteArrays.from("NEW"));
-        data.put(5, UnsignedByteArrays.from("USED"));
         return data;
     }
 

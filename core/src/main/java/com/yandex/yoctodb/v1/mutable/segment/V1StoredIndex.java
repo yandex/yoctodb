@@ -5,6 +5,7 @@ import com.google.common.primitives.Longs;
 import com.yandex.yoctodb.util.OutputStreamWritable;
 import com.yandex.yoctodb.util.UnsignedByteArray;
 import com.yandex.yoctodb.util.UnsignedByteArrays;
+import com.yandex.yoctodb.util.mutable.impl.FoldedByteArrayIndexedList;
 import com.yandex.yoctodb.util.mutable.impl.VariableLengthByteArrayIndexedList;
 import com.yandex.yoctodb.v1.V1DatabaseFormat;
 import org.jetbrains.annotations.NotNull;
@@ -25,6 +26,7 @@ public class V1StoredIndex
     private final byte[] fieldName;
     private SortedMap<Integer, UnsignedByteArray> values = new TreeMap<>();
     private int databaseDocumentsCount = -1;
+    private boolean notUniqueValues = false;
 
     public V1StoredIndex(
             @NotNull
@@ -68,7 +70,7 @@ public class V1StoredIndex
 
         // Padding
 
-        final Collection<UnsignedByteArray> padded =
+        final List<UnsignedByteArray> padded =
                 new ArrayList<>(databaseDocumentsCount);
         int expectedDocument = 0;
         final UnsignedByteArray empty = UnsignedByteArrays.from(new byte[]{});
@@ -78,7 +80,9 @@ public class V1StoredIndex
                 padded.add(empty);
                 expectedDocument++;
             }
-
+            if (padded.contains(e.getValue())) {
+                notUniqueValues = true;
+            }
             padded.add(e.getValue());
             expectedDocument++;
         }
@@ -90,7 +94,7 @@ public class V1StoredIndex
 
         // Building the index
         final OutputStreamWritable valueIndex =
-                new VariableLengthByteArrayIndexedList(padded);
+                getWritable(padded);
 
         // Free memory
         values = null;
@@ -111,11 +115,20 @@ public class V1StoredIndex
                 os.write(Longs.toByteArray(getSizeInBytes()));
 
                 // Payload segment type
-                os.write(
-                        Ints.toByteArray(
-                                V1DatabaseFormat.SegmentType
-                                        .VARIABLE_LENGTH_STORED_INDEX
-                                        .getCode()));
+                int segmentTypeCode;
+                if (notUniqueValues) {
+                    segmentTypeCode = V1DatabaseFormat
+                            .SegmentType
+                            .VARIABLE_LENGTH_FOLDED_INDEX
+                            .getCode();
+                } else {
+                    segmentTypeCode = V1DatabaseFormat
+                            .SegmentType
+                            .VARIABLE_LENGTH_STORED_INDEX
+                            .getCode();
+                }
+
+                os.write(Ints.toByteArray(segmentTypeCode));
 
                 // Field name
                 os.write(Ints.toByteArray(fieldName.length));
@@ -126,5 +139,13 @@ public class V1StoredIndex
                 valueIndex.writeTo(os);
             }
         };
+    }
+
+    private OutputStreamWritable getWritable(List<UnsignedByteArray> padded) {
+        if (notUniqueValues) {
+            return new FoldedByteArrayIndexedList(padded);
+        } else {
+            return new VariableLengthByteArrayIndexedList(padded);
+        }
     }
 }
