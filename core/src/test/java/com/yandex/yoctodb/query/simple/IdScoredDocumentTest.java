@@ -49,13 +49,6 @@ public class IdScoredDocumentTest {
                     throw new IllegalStateException();
                 }
 
-                @NotNull
-                @Override
-                public Buffer getFoldedFieldValue(int document,
-                                                  @NotNull String fieldName) {
-                    throw new IllegalStateException();
-                }
-
                 @Override
                 public void execute(
                         @NotNull

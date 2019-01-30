@@ -128,7 +128,6 @@ public class V1DatabaseReader extends DatabaseReader {
         final Map<String, FilterableIndex> filters = new HashMap<>();
         final Map<String, SortableIndex> sorters = new HashMap<>();
         final Map<String, StoredIndex> storers = new HashMap<>();
-        final Map<String, FoldedIndex> folders = new HashMap<>();
 
         while (body.hasRemaining()) {
             final long size = body.getLong();
@@ -168,21 +167,11 @@ public class V1DatabaseReader extends DatabaseReader {
                 storers.put(name, index);
             }
 
-            if (segment instanceof FoldedIndex) {
-                final FoldedIndex index = (FoldedIndex) segment;
-                final String name = index.getFieldName();
-
-                assert !folders.containsKey(name) :
-                        "Duplicate stored index for field <" + name + ">";
-
-                folders.put(name, index);
-            }
-
             // Skipping read index
             body.position(body.position() + size);
         }
 
-        return new V1Database(documentCount, filters, sorters, storers, folders, bitSetPool);
+        return new V1Database(documentCount, filters, sorters, storers, bitSetPool);
     }
 
     @NotNull

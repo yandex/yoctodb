@@ -46,9 +46,9 @@ public class FoldedIndexTest {
                         .getDatabaseReader()
                         .from(Buffer.from(os.toByteArray()));
 
-        assertEquals("NEW",getValueFromBuffer(db.getFoldedFieldValue(0, "state")));
-        assertEquals("USED",getValueFromBuffer(db.getFoldedFieldValue(1, "state")));
-        assertEquals("NEW",getValueFromBuffer(db.getFoldedFieldValue(2, "state")));
+        assertEquals("NEW",getValueFromBuffer(db.getFieldValue(0, "state")));
+        assertEquals("USED",getValueFromBuffer(db.getFieldValue(1, "state")));
+        assertEquals("NEW",getValueFromBuffer(db.getFieldValue(2, "state")));
     }
 
     private String getValueFromBuffer(Buffer buffer) {

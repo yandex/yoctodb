@@ -101,18 +101,6 @@ public final class V1CompositeDatabase implements Database {
                         fieldName);
     }
 
-    @NotNull
-    @Override
-    // todo разобрать можно ли так оставить
-    public Buffer getFoldedFieldValue(int document,
-                                      @NotNull String fieldName) {
-        final int dbIndex = databaseByDocIndex(document);
-        return databases.get(dbIndex)
-                .getFieldValue(
-                        document - documentOffsets[dbIndex],
-                        fieldName);
-    }
-
     @Override
     public void execute(
             @NotNull

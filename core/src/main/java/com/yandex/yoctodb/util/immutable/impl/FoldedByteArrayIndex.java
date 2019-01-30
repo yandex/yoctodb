@@ -23,7 +23,7 @@ public class FoldedByteArrayIndex implements ByteArrayIndexedList {
         final int offsetsCount = buf.getInt();
 
         int sizeOfIndexOffsetValue;
-        if (offsetsCount <= 127) { // one byte 2^8 - 1 = 127
+        if (offsetsCount <= 255) { // one byte 2^8 - 1 = 127
             sizeOfIndexOffsetValue = 1;
         } else if (offsetsCount <= 65535) {  // to  2^16 - 1 = 65535
             sizeOfIndexOffsetValue = 2;
@@ -71,7 +71,7 @@ public class FoldedByteArrayIndex implements ByteArrayIndexedList {
         this.offsets = offsets;
         this.indexes = indexes;
 
-        if (offsetsCount <= 127) { // one byte 2^8 - 1 = 127
+        if (offsetsCount <= 255) { // one byte 2^8 - 1 = 127
             this.getOffsetIndex = this::oneByteToInt;
         } else if (offsetsCount <= 65535) {  // to  2^16 - 1 = 65535
             this.getOffsetIndex = this::twoBytesToInt;

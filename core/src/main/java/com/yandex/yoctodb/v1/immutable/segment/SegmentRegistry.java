@@ -69,6 +69,5 @@ public final class SegmentRegistry {
         V1SortableIndex.registerReader();
         V1FullIndex.registerReader();
         V1StoredIndex.registerReader();
-        V1FoldedIndex.registerReader();
     }
 }

@@ -51,22 +51,4 @@ public interface DocumentProvider {
             @NotNull
             String fieldName);
 
-    /**
-     * Get {@code document} document {@code fieldName} field value.
-     *
-     * The field must be folded.
-     *
-     * @see com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption#SORTABLE
-     * @see com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption#FULL
-     * @see com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption#STORED
-     * // todo add for folded
-     * @param document  document index
-     * @param fieldName field name
-     * @return document field value
-     */
-    @NotNull
-    Buffer getFoldedFieldValue(
-            int document,
-            @NotNull
-                    String fieldName);
 }
