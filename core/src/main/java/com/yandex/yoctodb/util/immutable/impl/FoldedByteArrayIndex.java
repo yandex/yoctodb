@@ -27,8 +27,6 @@ public class FoldedByteArrayIndex implements ByteArrayIndexedList {
             sizeOfIndexOffsetValue = 1;
         } else if (offsetsCount <= 65535) {  // to  2^16 - 1 = 65535
             sizeOfIndexOffsetValue = 2;
-        } else if (offsetsCount <= 16777215) {  // to 2^24 - 1 = 16777215
-            sizeOfIndexOffsetValue = 3;
         } else {
             sizeOfIndexOffsetValue = 4;
         }
@@ -75,8 +73,6 @@ public class FoldedByteArrayIndex implements ByteArrayIndexedList {
             this.getOffsetIndex = this::oneByteToInt;
         } else if (offsetsCount <= 65535) {  // to  2^16 - 1 = 65535
             this.getOffsetIndex = this::twoBytesToInt;
-        } else if (offsetsCount <= 16777215) {  // to 2^24 - 1 = 16777215
-            this.getOffsetIndex = this::threeBytesToInt;
         } else {
             this.getOffsetIndex = this::fourBytesToInt;
         }
@@ -115,14 +111,7 @@ public class FoldedByteArrayIndex implements ByteArrayIndexedList {
                 (0xff & indexes.get(byteIndex + 1));
     }
 
-    private int threeBytesToInt(int docId) {
-        int byteIndex = docId * 3;
-        return (0xff & indexes.get(byteIndex)) << 16 |
-                (0xff & indexes.get(byteIndex + 1)) << 8 |
-                (0xff & indexes.get(byteIndex + 2));
-    }
-
     private int fourBytesToInt(int docId) {
-        return indexes.getInt(docId >> 2);
+        return indexes.getInt(docId * 4);
     }
 }

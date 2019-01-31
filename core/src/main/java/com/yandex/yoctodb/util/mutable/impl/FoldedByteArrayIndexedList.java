@@ -51,13 +51,8 @@ final public class FoldedByteArrayIndexedList implements ByteArrayIndexedList {
         if (offsetCount <= 255) { // one byte 2^8 - 1 = 255
             sizeOfIndexOffsetValue = 1;
         } else if (offsetCount <= 65535) {  // to  2^16 - 1 = 65535
-            // todo test
             sizeOfIndexOffsetValue = 2;
-        } else if (offsetCount <= 16777215) {  // to 2^24 - 1 = 16777215
-            // todo test
-            sizeOfIndexOffsetValue = 3;
         } else {
-            // todo test
             sizeOfIndexOffsetValue = 4;
         }
 
@@ -102,13 +97,6 @@ final public class FoldedByteArrayIndexedList implements ByteArrayIndexedList {
                 // write every int to two bytes
                 for (Integer offsetIndex : offsetIndexes) {
                     os.write(twoBytesFromInteger(offsetIndex));
-                }
-                break;
-            }
-            case (3): {
-                // write every int to three bytes
-                for (Integer offsetIndex : offsetIndexes) {
-                    os.write(threeBytesFromInteger(offsetIndex));
                 }
                 break;
             }
@@ -162,11 +150,4 @@ final public class FoldedByteArrayIndexedList implements ByteArrayIndexedList {
         };
     }
 
-    private byte[] threeBytesFromInteger(Integer data) { // to 2^24 - 1 = 16777215
-        return new byte[]{
-                (byte) ((data >> 16) & 0xff),
-                (byte) ((data >> 8) & 0xff),
-                (byte) ((data) & 0xff)
-        };
-    }
 }

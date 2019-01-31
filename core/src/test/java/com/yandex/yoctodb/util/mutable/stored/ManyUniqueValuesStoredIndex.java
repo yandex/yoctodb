@@ -1,4 +1,4 @@
-package com.yandex.yoctodb.util.mutable.impl;
+package com.yandex.yoctodb.util.mutable.stored;
 
 import com.yandex.yoctodb.DatabaseFormat;
 import com.yandex.yoctodb.immutable.Database;
@@ -14,58 +14,69 @@ import java.io.IOException;
 import static com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption.STORED;
 import static org.junit.Assert.assertEquals;
 
-public class FoldedByteArrayManyValuesTest {
+public class ManyUniqueValuesStoredIndex {
     private String fieldName = "test";
     @Test
-    public void oneByte() throws IOException {
+    public void values100() throws IOException {
         testDB(100);
     }
     @Test
-    public void twoByte() throws IOException {
+    public void values300() throws IOException {
         testDB(300);
-
+        /*
+        Result:
+        Write 300 values in 41 ms
+        Read database in 12 ms
+        Read 300 values in 5 ms
+         */
     }
 
     @Test
-     // отрабатывает за минуту
-    public void threeByte() throws IOException {
+    public void values70000() throws IOException {
         testDB(70000);
+        /*
+        Result
+        Write 70000 values in 321 ms
+        Read database in 12 ms
+        Read 70000 values56 ms
+         */
     }
 
-//    @Test
-    // слишком долго работает
-//    public void fourByte() throws IOException {
-//        // attention - a really heavy test
-//        testDB(17777215);
-//    }
 
     private void testDB(final int size) throws IOException {
         final DatabaseBuilder dbBuilder =
                 DatabaseFormat.getCurrent().newDatabaseBuilder();
-        // инициализируем первые 10 элементов одинаковым значением
-        for (int i = 0; i < 10; i++) {
-            dbBuilder.merge(buildTestDocument(Integer.toString((0))));
-        }
-        for (int i = 10; i < size; i++) {
+        long start = System.currentTimeMillis();
+        for (int i = 0; i < size; i++) {
             dbBuilder.merge(buildTestDocument(Integer.toString((i))));
         }
+        long end = System.currentTimeMillis();
+        System.out.println("Write " + size +
+                " values in " +
+                (end - start) + " ms");
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
         dbBuilder.buildWritable().writeTo(os);
 
+        start = System.currentTimeMillis();
         final Database db =
                 DatabaseFormat.getCurrent()
                         .getDatabaseReader()
                         .from(Buffer.from(os.toByteArray()));
-        for (int i = 0; i < 10; i++) {
-            assertEquals(Integer.toString((0)),
-                    UnsignedByteArrays.toString(
-                            UnsignedByteArrays.from(db.getFieldValue(i, fieldName))));
-        }
-        for (int i = 11; i < size; i++) {
+        end = System.currentTimeMillis();
+        System.out.println("Read database in " + (end - start) + " ms");
+
+
+
+        start = System.currentTimeMillis();
+        for (int i = 0; i < size; i++) {
             assertEquals(Integer.toString((i)),
                     UnsignedByteArrays.toString(
                             UnsignedByteArrays.from(db.getFieldValue(i, fieldName))));
         }
+        end = System.currentTimeMillis();
+        System.out.println("Read " + size + " values in " +
+                (end - start) + " ms");
+
     }
 
     private DocumentBuilder buildTestDocument(String value) {
@@ -75,3 +86,4 @@ public class FoldedByteArrayManyValuesTest {
 
 
 }
+

@@ -427,8 +427,6 @@ public class SimpleDatabaseTest {
         final DatabaseBuilder dbBuilder =
                 DatabaseFormat.getCurrent().newDatabaseBuilder();
 
-        // todo add folded
-
         dbBuilder.merge(
                 DatabaseFormat
                         .getCurrent()
@@ -457,8 +455,6 @@ public class SimpleDatabaseTest {
                 DatabaseFormat.getCurrent()
                         .getDatabaseReader()
                         .from(Buffer.from(os.toByteArray()));
-
-        // todo get folded
 
         // Document 1
 
