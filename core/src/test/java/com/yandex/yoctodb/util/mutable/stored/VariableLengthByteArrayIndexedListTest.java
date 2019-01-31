@@ -15,7 +15,6 @@ public class VariableLengthByteArrayIndexedListTest {
     @Test
     public void buildV1StoredIndex() {
         final Collection<UnsignedByteArray> elements = initElements();
-
         VariableLengthByteArrayIndexedList indexedList =
                 new VariableLengthByteArrayIndexedList(elements);
 
@@ -43,5 +42,4 @@ public class VariableLengthByteArrayIndexedListTest {
                 8L * (elements.size() + 1L) + // Element offsets
                 elemSum; // Element array size
     }
-
 }

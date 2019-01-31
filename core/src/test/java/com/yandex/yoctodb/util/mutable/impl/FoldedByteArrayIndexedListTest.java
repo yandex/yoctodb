@@ -220,5 +220,4 @@ public class FoldedByteArrayIndexedListTest {
         elements.add(from("NEW"));
         return elements;
     }
-
 }

@@ -20,6 +20,7 @@ public class ManyUniqueValuesStoredIndex {
     public void values100() throws IOException {
         testDB(100);
     }
+
     @Test
     public void values300() throws IOException {
         testDB(300);
@@ -41,7 +42,6 @@ public class ManyUniqueValuesStoredIndex {
         Read 70000 values56 ms
          */
     }
-
 
     private void testDB(final int size) throws IOException {
         final DatabaseBuilder dbBuilder =
@@ -83,7 +83,5 @@ public class ManyUniqueValuesStoredIndex {
         return DatabaseFormat.getCurrent().newDocumentBuilder()
                 .withField(fieldName, value, STORED);
     }
-
-
 }
 

@@ -128,7 +128,6 @@ public class V1DatabaseReader extends DatabaseReader {
         final Map<String, FilterableIndex> filters = new HashMap<>();
         final Map<String, SortableIndex> sorters = new HashMap<>();
         final Map<String, StoredIndex> storers = new HashMap<>();
-
         while (body.hasRemaining()) {
             final long size = body.getLong();
             final int type = body.getInt();

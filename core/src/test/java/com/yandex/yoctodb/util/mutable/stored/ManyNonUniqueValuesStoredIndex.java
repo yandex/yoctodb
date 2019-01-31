@@ -30,11 +30,9 @@ public class ManyNonUniqueValuesStoredIndex {
         Read 10 values in 0 ms
         Read 290 in 3 ms
          */
-
     }
 
     @Test
-     // отрабатывает за минуту
     public void fourByte() throws IOException {
         testDB(70000);
         /*
@@ -43,14 +41,13 @@ public class ManyNonUniqueValuesStoredIndex {
         Read database in 53 ms
         Read and compare 10 values in 0 ms
         Read and compare 69990 in 56 ms
-         *
-         */
+        */
     }
 
     private void testDB(final int size) throws IOException {
         final DatabaseBuilder dbBuilder =
                 DatabaseFormat.getCurrent().newDatabaseBuilder();
-        // инициализируем первые 10 элементов одинаковым значением
+        // init first 10 elements by the same values
         for (int i = 0; i < 10; i++) {
             dbBuilder.merge(buildTestDocument(Integer.toString((0))));
         }
@@ -99,6 +96,4 @@ public class ManyNonUniqueValuesStoredIndex {
         return DatabaseFormat.getCurrent().newDocumentBuilder()
                 .withField(fieldName, value, STORED);
     }
-
-
 }

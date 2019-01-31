@@ -50,5 +50,4 @@ public interface DocumentProvider {
             int document,
             @NotNull
             String fieldName);
-
 }
