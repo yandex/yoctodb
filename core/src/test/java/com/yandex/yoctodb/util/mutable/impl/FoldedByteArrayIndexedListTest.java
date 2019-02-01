@@ -142,19 +142,15 @@ public class FoldedByteArrayIndexedListTest {
     private int getOffsetIndex(Buffer indexes, int docId, int sizeOfIndexOffsetValue) {
         // если здесь не использовать slice - не ломается :)
         switch (sizeOfIndexOffsetValue) {
-            case (1): {
+            case (Byte.BYTES): {
                 // write every int to one byte
                 return indexes.get(docId);
             }
-            case (2): {
+            case (Short.BYTES): {
                 // write every int to two bytes
                 return twoBytesToInt(indexes, docId);
             }
-            case (3): {
-                // write every int to three bytes
-                return threeBytesToInt(indexes, docId);
-            }
-            case (4): {
+            case (Integer.BYTES): {
                 // write every int to four bytes
                 return indexes.getInt(docId >> 2); // как и раньше
             }
@@ -163,7 +159,7 @@ public class FoldedByteArrayIndexedListTest {
     }
 
     private int twoBytesToInt(Buffer indexes, int docId) {
-        int byteIndex = docId * 2;
+        int byteIndex = docId * Short.BYTES;
         byte[] bytes = new byte[] {
                 indexes.get(byteIndex),
                 indexes.get(byteIndex + 1)
@@ -171,33 +167,11 @@ public class FoldedByteArrayIndexedListTest {
         return (0xff & bytes[0]) << 8 | (0xff & bytes[1]);
     }
 
-    private int threeBytesToInt(Buffer indexes, int docId) {
-        int byteIndex = docId * 3;
-        byte[] bytes = new byte[] {
-                indexes.get(byteIndex),
-                indexes.get(byteIndex + 1),
-                indexes.get(byteIndex + 2)
-        };
-        return (0xff & bytes[0]) << 16 |
-                (0xff & bytes[1]) << 8 |
-                (0xff & bytes[2]);
-    }
-
     @Test
     public void checkSize() {
         final FoldedByteArrayIndexedList foldedList =
                 new FoldedByteArrayIndexedList(initString());
         assertEquals(43, foldedList.getSizeInBytes());
-    }
-
-
-    @Test
-    public void state() {
-        final FoldedByteArrayIndexedList foldedList =
-                new FoldedByteArrayIndexedList(initString());
-        final String text = foldedList.state();
-        assertTrue(text.contains("[0, 1, 0, 0]"));
-        assertTrue(text.contains("[0, 3, 7]"));
     }
 
     @Test

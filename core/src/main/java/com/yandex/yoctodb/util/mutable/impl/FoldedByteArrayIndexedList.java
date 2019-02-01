@@ -17,9 +17,13 @@ import java.util.Map;
 final public class FoldedByteArrayIndexedList implements ByteArrayIndexedList {
     @NotNull
     private final List<UnsignedByteArray> elements;
+    @NotNull
     private final List<UnsignedByteArray> uniqueElements;
+    @NotNull
     private final List<Long> offsets;
+    @NotNull
     private final List<Integer> offsetIndexes;
+    @NotNull
     private final Map<UnsignedByteArray, Long> valueOffset;
     private final int sizeOfIndexOffsetValue; // how many bites
 
@@ -48,12 +52,12 @@ final public class FoldedByteArrayIndexedList implements ByteArrayIndexedList {
 
         // analyze result of offsets
         int offsetCount = offsets.size();
-        if (offsetCount <= 255) { // one byte 2^8 - 1 = 255
-            sizeOfIndexOffsetValue = 1;
-        } else if (offsetCount <= 65535) {  // to  2^16 - 1 = 65535
-            sizeOfIndexOffsetValue = 2;
+        if (offsetCount < (1 << Byte.SIZE)) { // one byte 2^8 - 1 = 255
+            sizeOfIndexOffsetValue = Byte.BYTES;
+        } else if (offsetCount < (1 << Short.SIZE)) {  // to  2^16 - 1 = 65535
+            sizeOfIndexOffsetValue = Short.BYTES;
         } else {
-            sizeOfIndexOffsetValue = 4;
+            sizeOfIndexOffsetValue = Integer.BYTES;
         }
 
     }
@@ -65,11 +69,11 @@ final public class FoldedByteArrayIndexedList implements ByteArrayIndexedList {
             elementSize += element.length();
         }
 
-        return 4L + // Element count in bytes
-                4L + // offsets count in bytes
+        return Integer.BYTES + // Element count in bytes
+                Integer.BYTES + // offsets count in bytes
                 sizeOfIndexOffsetValue *
                         elements.size() + // indexes offsets in bytes
-                8L * offsets.size() + // offsets array size in bytes
+                Long.BYTES * offsets.size() + // offsets array size in bytes
                 elementSize; // Element array size in bytes
     }
 
@@ -86,21 +90,21 @@ final public class FoldedByteArrayIndexedList implements ByteArrayIndexedList {
 
         // indexes of offsets - in correct Order
         switch (sizeOfIndexOffsetValue) {
-            case (1): {
+            case (Byte.BYTES): {
                 // write every int to one byte
                 for (Integer offsetIndex : offsetIndexes) {
                     os.write(oneByteFromInteger(offsetIndex));
                 }
                 break;
             }
-            case (2): {
+            case (Short.BYTES): {
                 // write every int to two bytes
                 for (Integer offsetIndex : offsetIndexes) {
                     os.write(twoBytesFromInteger(offsetIndex));
                 }
                 break;
             }
-            case (4): {
+            case (Integer.BYTES): {
                 // write every int to four bytes
                 for (Integer offsetIndex : offsetIndexes) {
                     os.write(Ints.toByteArray(offsetIndex));
@@ -123,17 +127,6 @@ final public class FoldedByteArrayIndexedList implements ByteArrayIndexedList {
     public String toString() {
         return "FoldedByteArrayIndexedList{" +
                 "elementsCount=" + elements.size() +
-                '}';
-    }
-
-    public String state() {
-        return "FoldedByteArrayIndexedList{" +
-                "elementsCount=" + elements.size() + "\n" +
-                elements.toString() + "\n" +
-                uniqueElements.toString() + "\n" +
-                offsetIndexes.toString() + "\n" +
-                valueOffset.toString() + "\n" +
-                offsets.toString() + "\n" +
                 '}';
     }
 

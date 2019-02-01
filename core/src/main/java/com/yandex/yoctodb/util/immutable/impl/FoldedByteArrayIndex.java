@@ -8,6 +8,7 @@ import java.util.function.Function;
 
 public class FoldedByteArrayIndex implements ByteArrayIndexedList {
     private final int elementCount;
+    @NotNull
     private final Function<Integer, Integer> getOffsetIndex;
     @NotNull
     private final Buffer elements;
@@ -23,12 +24,12 @@ public class FoldedByteArrayIndex implements ByteArrayIndexedList {
         final int offsetsCount = buf.getInt();
 
         int sizeOfIndexOffsetValue;
-        if (offsetsCount <= 255) { // one byte 2^8 - 1 = 127
-            sizeOfIndexOffsetValue = 1;
-        } else if (offsetsCount <= 65535) {  // to  2^16 - 1 = 65535
-            sizeOfIndexOffsetValue = 2;
+        if (offsetsCount < (1 << Byte.SIZE)) {
+            sizeOfIndexOffsetValue = Byte.BYTES;
+        } else if (offsetsCount < (1 << Short.SIZE)) {
+            sizeOfIndexOffsetValue = Short.BYTES;
         } else {
-            sizeOfIndexOffsetValue = 4;
+            sizeOfIndexOffsetValue = Integer.BYTES;
         }
 
         // indexes of offsets
@@ -50,7 +51,7 @@ public class FoldedByteArrayIndex implements ByteArrayIndexedList {
 
         return new FoldedByteArrayIndex(
                 elementsCount,
-                offsetsCount,
+                sizeOfIndexOffsetValue,
                 offsets,
                 elements,
                 indexes);
@@ -58,7 +59,7 @@ public class FoldedByteArrayIndex implements ByteArrayIndexedList {
 
     private FoldedByteArrayIndex(
             final int elementCount,
-            final int offsetsCount,
+            final int sizeOfIndexOffsetValue,
             @NotNull final Buffer offsets,
             @NotNull final Buffer elements,
             @NotNull final Buffer indexes) {
@@ -69,9 +70,9 @@ public class FoldedByteArrayIndex implements ByteArrayIndexedList {
         this.offsets = offsets;
         this.indexes = indexes;
 
-        if (offsetsCount <= 255) { // one byte 2^8 - 1 = 127
+        if (sizeOfIndexOffsetValue == Byte.BYTES) { // one byte 2^8 - 1 = 127
             this.getOffsetIndex = this::oneByteToInt;
-        } else if (offsetsCount <= 65535) {  // to  2^16 - 1 = 65535
+        } else if (sizeOfIndexOffsetValue == Short.BYTES) {  // to  2^16 - 1 = 65535
             this.getOffsetIndex = this::twoBytesToInt;
         } else {
             this.getOffsetIndex = this::fourBytesToInt;
@@ -106,12 +107,12 @@ public class FoldedByteArrayIndex implements ByteArrayIndexedList {
     }
 
     private int twoBytesToInt(int docId) {
-        int byteIndex = docId * 2;
+        int byteIndex = docId * Short.BYTES;
         return (0xff & indexes.get(byteIndex)) << 8 |
                 (0xff & indexes.get(byteIndex + 1));
     }
 
     private int fourBytesToInt(int docId) {
-        return indexes.getInt(docId * 4);
+        return indexes.getInt(docId * Integer.BYTES);
     }
 }
