@@ -1,11 +1,9 @@
 package com.yandex.yoctodb.util.mutable.impl;
 
-import com.google.common.primitives.Ints;
 import com.yandex.yoctodb.util.UnsignedByteArray;
 import com.yandex.yoctodb.util.UnsignedByteArrays;
 import com.yandex.yoctodb.util.buf.Buffer;
 import com.yandex.yoctodb.util.mutable.ByteArrayIndexedList;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
@@ -44,8 +42,6 @@ public class FoldedByteArrayIndexedListTest {
             sizeOfIndexOffsetValue = 1;
         } else if (offsetsCount <= 65535) {  // to  2^16 - 1 = 65535
             sizeOfIndexOffsetValue = 2;
-        } else if (offsetsCount <= 16777215) {  // to 2^24 - 1 = 16777215
-            sizeOfIndexOffsetValue = 3;
         } else {
             sizeOfIndexOffsetValue = 4;
         }

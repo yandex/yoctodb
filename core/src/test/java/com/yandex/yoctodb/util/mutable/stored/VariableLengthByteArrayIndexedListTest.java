@@ -33,8 +33,7 @@ public class VariableLengthByteArrayIndexedListTest {
 
         long elemSum = 0;
         for (UnsignedByteArray elem : elements) {
-            if (!uniqueElements.contains(elem)) {
-                uniqueElements.add(elem);
+            if (uniqueElements.add(elem)) {
                 elemSum = elemSum + elem.length();
             }
         }
