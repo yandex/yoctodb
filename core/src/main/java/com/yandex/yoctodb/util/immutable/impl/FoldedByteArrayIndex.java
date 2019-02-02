@@ -70,9 +70,9 @@ public class FoldedByteArrayIndex implements ByteArrayIndexedList {
         this.offsets = offsets;
         this.indexes = indexes;
 
-        if (sizeOfIndexOffsetValue == Byte.BYTES) { // one byte 2^8 - 1 = 127
+        if (sizeOfIndexOffsetValue == Byte.BYTES) {
             this.getOffsetIndex = this::oneByteToInt;
-        } else if (sizeOfIndexOffsetValue == Short.BYTES) {  // to  2^16 - 1 = 65535
+        } else if (sizeOfIndexOffsetValue == Short.BYTES) {
             this.getOffsetIndex = this::twoBytesToInt;
         } else {
             this.getOffsetIndex = this::fourBytesToInt;

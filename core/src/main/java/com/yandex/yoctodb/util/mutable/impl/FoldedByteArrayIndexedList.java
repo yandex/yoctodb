@@ -1,5 +1,6 @@
 package com.yandex.yoctodb.util.mutable.impl;
 
+import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.yandex.yoctodb.util.OutputStreamWritable;
@@ -52,9 +53,9 @@ final public class FoldedByteArrayIndexedList implements ByteArrayIndexedList {
 
         // analyze result of offsets
         int offsetCount = offsets.size();
-        if (offsetCount < (1 << Byte.SIZE)) { // one byte 2^8 - 1 = 255
+        if (offsetCount < (1 << Byte.SIZE)) {
             sizeOfIndexOffsetValue = Byte.BYTES;
-        } else if (offsetCount < (1 << Short.SIZE)) {  // to  2^16 - 1 = 65535
+        } else if (offsetCount < (1 << Short.SIZE)) {
             sizeOfIndexOffsetValue = Short.BYTES;
         } else {
             sizeOfIndexOffsetValue = Integer.BYTES;
@@ -119,8 +120,9 @@ final public class FoldedByteArrayIndexedList implements ByteArrayIndexedList {
         }
 
         // elements
-        for (OutputStreamWritable e : uniqueElements)
+        for (OutputStreamWritable e : uniqueElements) {
             e.writeTo(os);
+        }
     }
 
     @Override

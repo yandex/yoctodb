@@ -26,7 +26,7 @@ public class V1StoredIndex
     private final byte[] fieldName;
     private SortedMap<Integer, UnsignedByteArray> values = new TreeMap<>();
     private int databaseDocumentsCount = -1;
-    private boolean notUniqueValues = false;
+    private boolean uniqueValues = false;
 
     public V1StoredIndex(
             @NotNull
@@ -68,6 +68,10 @@ public class V1StoredIndex
 
         assert databaseDocumentsCount > 0;
 
+        uniqueValues = values.values()
+                .stream()
+                .allMatch(new HashSet<>()::add);
+
         // Padding
 
         final List<UnsignedByteArray> padded =
@@ -79,9 +83,6 @@ public class V1StoredIndex
             while (expectedDocument < e.getKey()) {
                 padded.add(empty);
                 expectedDocument++;
-            }
-            if (padded.contains(e.getValue())) {
-                notUniqueValues = true;
             }
             padded.add(e.getValue());
             expectedDocument++;
@@ -116,15 +117,15 @@ public class V1StoredIndex
 
                 // Payload segment type
                 int segmentTypeCode;
-                if (notUniqueValues) {
+                if (uniqueValues) {
                     segmentTypeCode = V1DatabaseFormat
                             .SegmentType
-                            .VARIABLE_LENGTH_FOLDED_INDEX
+                            .VARIABLE_LENGTH_STORED_INDEX
                             .getCode();
                 } else {
                     segmentTypeCode = V1DatabaseFormat
                             .SegmentType
-                            .VARIABLE_LENGTH_STORED_INDEX
+                            .VARIABLE_LENGTH_FOLDED_INDEX
                             .getCode();
                 }
 
@@ -142,10 +143,10 @@ public class V1StoredIndex
     }
 
     private OutputStreamWritable getWritable(List<UnsignedByteArray> padded) {
-        if (notUniqueValues) {
-            return new FoldedByteArrayIndexedList(padded);
-        } else {
+        if (uniqueValues) {
             return new VariableLengthByteArrayIndexedList(padded);
+        } else {
+            return new FoldedByteArrayIndexedList(padded);
         }
     }
 }
