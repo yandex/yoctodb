@@ -103,16 +103,17 @@ public class FoldedByteArrayIndex implements ByteArrayIndexedList {
     }
 
     private int oneByteToInt(int docId) {
-        return (0xff & indexes.get(docId));
+        return (Byte.toUnsignedInt(indexes.get(docId)));
     }
 
     private int twoBytesToInt(int docId) {
-        int byteIndex = docId * Short.BYTES;
-        return (0xff & indexes.get(byteIndex)) << 8 |
-                (0xff & indexes.get(byteIndex + 1));
+        return (Short.toUnsignedInt(
+                indexes.getShort(docId
+                        * Short.BYTES)));
     }
 
     private int fourBytesToInt(int docId) {
-        return indexes.getInt(docId * Integer.BYTES);
+        return indexes.getInt(docId
+                * Integer.BYTES);
     }
 }
