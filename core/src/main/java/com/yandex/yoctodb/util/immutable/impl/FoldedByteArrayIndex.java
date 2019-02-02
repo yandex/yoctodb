@@ -39,15 +39,14 @@ public class FoldedByteArrayIndex implements ByteArrayIndexedList {
 
         // then offsets of element value
         final Buffer offsets = buf.slice()
-                .position(shift)
+                .slice(shift, buf.remaining() - shift)
                 .slice((offsetsCount) << 3);
 
         shift = shift + offsets.remaining();
 
         // then elements value
         final Buffer elements = buf.slice()
-                .position(shift)
-                .slice();
+                .slice(shift, buf.remaining() - shift);
 
         return new FoldedByteArrayIndex(
                 elementsCount,

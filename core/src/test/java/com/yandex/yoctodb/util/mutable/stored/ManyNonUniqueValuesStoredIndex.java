@@ -32,17 +32,17 @@ public class ManyNonUniqueValuesStoredIndex {
          */
     }
 
-//    @Test
-//    public void fourByte() throws IOException {
-//        testDB(70000);
-//        /*
-//        Result:
-//        Write 69990 values in 265 ms
-//        Read database in 53 ms
-//        Read and compare 10 values in 0 ms
-//        Read and compare 69990 in 56 ms
-//        */
-//    }
+    @Test
+    public void fourByte() throws IOException {
+        testDB(70000);
+        /*
+        Result:
+        Write 69990 values in 265 ms
+        Read database in 53 ms
+        Read and compare 10 values in 0 ms
+        Read and compare 69990 in 56 ms
+        */
+    }
 
     private void testDB(final int size) throws IOException {
         final DatabaseBuilder dbBuilder =

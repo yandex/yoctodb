@@ -64,18 +64,26 @@ public class FoldedByteArrayIndexedListTest {
         System.out.println(offsetsCount);
 
         // then offsets of element value
+        System.out.println("After slicing indexes shift is: " + shift);
+        System.out.println("After slicing indexes offsets size is: " + (buf.remaining() - shift));
+
         final Buffer offsets = buf.slice() // получаем здесь копию buf
-                .position(shift) // смещаемся до места, с которого начинаются offsets
+                .slice(shift, buf.remaining() - shift) // смещаемся до места, с которого начинаются offsets
                 .slice((offsetsCount) << 3); // отрезаем столько, сколько offsets занимают!
 
         System.out.println("Offset remaining " + offsets.remaining());
 
         shift = shift + offsets.remaining();
 
+        System.out.println("After slicing indexes shift is: " + shift);
+        System.out.println("After slicing indexes offsets size is: " + (buf.remaining() - shift));
+
+
         // then elements value
         final Buffer elements = buf.slice()
-                .position(shift)
-                .slice();
+                .slice(shift, (long)(buf.remaining() - shift))
+                .slice()
+                ;
 
         System.out.println("Elements remaining " + elements.remaining());
 
