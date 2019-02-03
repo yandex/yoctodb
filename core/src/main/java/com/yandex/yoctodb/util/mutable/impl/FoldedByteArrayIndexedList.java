@@ -1,6 +1,5 @@
 package com.yandex.yoctodb.util.mutable.impl;
 
-import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.yandex.yoctodb.util.OutputStreamWritable;
@@ -11,42 +10,43 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 final public class FoldedByteArrayIndexedList implements ByteArrayIndexedList {
     @NotNull
-    private final List<UnsignedByteArray> elements;
-    @NotNull
-    private final List<UnsignedByteArray> uniqueElements;
+    private final Set<UnsignedByteArray> elements;
     @NotNull
     private final List<Long> offsets;
     @NotNull
-    private final List<Integer> offsetIndexes;
-    @NotNull
-    private final Map<UnsignedByteArray, Long> valueOffset;
+    private final SortedMap<Integer, Integer> docIdOffsetIndex;
     private final int sizeOfIndexOffsetValue; // how many bites
 
 
     public FoldedByteArrayIndexedList(
-            @NotNull final List<UnsignedByteArray> elements) {
-        this.elements = elements;
-        this.offsetIndexes = new ArrayList<>();
-        this.valueOffset = new HashMap<>();
+            @NotNull final Map<UnsignedByteArray, LinkedList<Integer>> elements) {
+
+
+        this.docIdOffsetIndex = new TreeMap<>();
         this.offsets = new ArrayList<>();
-        this.uniqueElements = new ArrayList<>();
+        this.elements = elements.keySet();
 
         long elementOffset = 0;
-        for (int docId = 0; docId < elements.size(); docId++) {
-            UnsignedByteArray elem = elements.get(docId);
-            if (!valueOffset.containsKey(elements.get(docId))) {
-                valueOffset.putIfAbsent(elements.get(docId), elementOffset);
-                offsets.add(elementOffset);
-                elementOffset += elem.getSizeInBytes();
-                uniqueElements.add(elem);
-            }
-            offsetIndexes.add(offsets.indexOf(valueOffset.get(elem)));
+        for (Map.Entry<UnsignedByteArray, LinkedList<Integer>> elem :
+                elements.entrySet()) {
+            UnsignedByteArray value = elem.getKey();
+            offsets.add(elementOffset);
+
+            final long currentElementOffset = elementOffset;
+            elem.getValue().forEach( docId ->
+                    docIdOffsetIndex
+                         .put(docId,
+                         offsets.indexOf(currentElementOffset)));
+            elementOffset += value.getSizeInBytes();
         }
 
         offsets.add(elementOffset);
@@ -66,14 +66,14 @@ final public class FoldedByteArrayIndexedList implements ByteArrayIndexedList {
     @Override
     public long getSizeInBytes() {
         long elementSize = 0;
-        for (UnsignedByteArray element : uniqueElements) {
+        for (UnsignedByteArray element : elements) {
             elementSize += element.length();
         }
 
         return Integer.BYTES + // Element count in bytes
                 Integer.BYTES + // offsets count in bytes
                 sizeOfIndexOffsetValue *
-                        elements.size() + // indexes offsets in bytes
+                        docIdOffsetIndex.size() + // indexes offsets in bytes
                 Long.BYTES * offsets.size() + // offsets array size in bytes
                 elementSize; // Element array size in bytes
     }
@@ -82,7 +82,7 @@ final public class FoldedByteArrayIndexedList implements ByteArrayIndexedList {
     public void writeTo(
             @NotNull final OutputStream os) throws IOException {
         // elements count
-        os.write(Ints.toByteArray(elements.size()));
+        os.write(Ints.toByteArray(docIdOffsetIndex.size()));
 
         // write offsets count!
         // before writing indexes because
@@ -93,21 +93,23 @@ final public class FoldedByteArrayIndexedList implements ByteArrayIndexedList {
         switch (sizeOfIndexOffsetValue) {
             case (Byte.BYTES): {
                 // write every int to one byte
-                for (Integer offsetIndex : offsetIndexes) {
+                // The collection's iterator returns the elements
+                // in ascending order of the corresponding keys.
+                for (Integer offsetIndex : docIdOffsetIndex.values()) {
                     os.write(oneByteFromInteger(offsetIndex));
                 }
                 break;
             }
             case (Short.BYTES): {
                 // write every int to two bytes
-                for (Integer offsetIndex : offsetIndexes) {
+                for (Integer offsetIndex : docIdOffsetIndex.values()) {
                     os.write(twoBytesFromInteger(offsetIndex));
                 }
                 break;
             }
             case (Integer.BYTES): {
                 // write every int to four bytes
-                for (Integer offsetIndex : offsetIndexes) {
+                for (Integer offsetIndex : docIdOffsetIndex.values()) {
                     os.write(Ints.toByteArray(offsetIndex));
                 }
                 break;
@@ -120,7 +122,7 @@ final public class FoldedByteArrayIndexedList implements ByteArrayIndexedList {
         }
 
         // elements
-        for (OutputStreamWritable e : uniqueElements) {
+        for (OutputStreamWritable e : elements) {
             e.writeTo(os);
         }
     }
@@ -128,18 +130,18 @@ final public class FoldedByteArrayIndexedList implements ByteArrayIndexedList {
     @Override
     public String toString() {
         return "FoldedByteArrayIndexedList{" +
-                "elementsCount=" + elements.size() +
+                "elementsCount=" + docIdOffsetIndex.size() +
                 '}';
     }
 
-    private byte[] oneByteFromInteger(Integer data) { // to  2^16 - 1 = 65535
-        return new byte[] {
+    private byte[] oneByteFromInteger(Integer data) {
+        return new byte[]{
                 (byte) ((data) & 0xff)
         };
     }
 
-    private byte[] twoBytesFromInteger(Integer data) { // to  2^16 - 1 = 65535
-        return new byte[] {
+    private byte[] twoBytesFromInteger(Integer data) {
+        return new byte[]{
                 (byte) ((data >> 8) & 0xff),
                 (byte) ((data) & 0xff)
         };

@@ -24,13 +24,15 @@ public class V1StoredIndex
         implements IndexSegment {
     @NotNull
     private final byte[] fieldName;
-    private SortedMap<Integer, UnsignedByteArray> values = new TreeMap<>();
+    private Map<UnsignedByteArray, LinkedList<Integer>> values = new LinkedHashMap<>();
     private int databaseDocumentsCount = -1;
-    private boolean uniqueValues = false;
+    private boolean uniqueValues = true;
+    private int segmentTypeCode;
+    private int documentCount = -1;
+
 
     public V1StoredIndex(
-            @NotNull
-            final String fieldName) {
+            @NotNull final String fieldName) {
         this.fieldName = fieldName.getBytes();
     }
 
@@ -38,8 +40,7 @@ public class V1StoredIndex
     @Override
     public IndexSegment addDocument(
             final int documentId,
-            @NotNull
-            final Collection<UnsignedByteArray> values) {
+            @NotNull final Collection<UnsignedByteArray> values) {
         if (documentId < 0)
             throw new IllegalArgumentException("Negative document ID");
         if (values.size() != 1)
@@ -47,8 +48,25 @@ public class V1StoredIndex
 
         checkNotFrozen();
 
-        this.values.put(documentId, values.iterator().next());
+        final UnsignedByteArray value = values.iterator().next();
 
+//        this.values.putIfAbsent(value, new LinkedList<>());
+//        if (this.values.get(value).size() != 0) {
+//            uniqueValues = false;
+//        }
+//        this.values.get(value).add(documentId);
+
+        this.values.merge(value,
+                new LinkedList<Integer>() {{
+                    add(documentId);
+                }},
+                (oldList, newList) -> {
+                    uniqueValues = false;
+                    oldList.addAll(newList);
+                    return oldList;
+                });
+
+        documentCount++;
         return this;
     }
 
@@ -68,34 +86,12 @@ public class V1StoredIndex
 
         assert databaseDocumentsCount > 0;
 
-        uniqueValues = values.values()
-                .stream()
-                .allMatch(new HashSet<>()::add);
-
         // Padding
 
-        final List<UnsignedByteArray> padded =
-                new ArrayList<>(databaseDocumentsCount);
-        int expectedDocument = 0;
-        final UnsignedByteArray empty = UnsignedByteArrays.from(new byte[]{});
-
-        for (Map.Entry<Integer, UnsignedByteArray> e : values.entrySet()) {
-            while (expectedDocument < e.getKey()) {
-                padded.add(empty);
-                expectedDocument++;
-            }
-            padded.add(e.getValue());
-            expectedDocument++;
-        }
-
-        while (expectedDocument < databaseDocumentsCount) {
-            padded.add(empty);
-            expectedDocument++;
-        }
 
         // Building the index
         final OutputStreamWritable valueIndex =
-                getWritable(padded);
+                getWritable();
 
         // Free memory
         values = null;
@@ -104,31 +100,17 @@ public class V1StoredIndex
             @Override
             public long getSizeInBytes() {
                 return 4L + // Field name
-                       fieldName.length +
-                       8 + // Values
-                       valueIndex.getSizeInBytes();
+                        fieldName.length +
+                        8 + // Values
+                        valueIndex.getSizeInBytes();
             }
 
             @Override
             public void writeTo(
-                    @NotNull
-                    final OutputStream os) throws IOException {
+                    @NotNull final OutputStream os) throws IOException {
                 os.write(Longs.toByteArray(getSizeInBytes()));
 
                 // Payload segment type
-                int segmentTypeCode;
-                if (uniqueValues) {
-                    segmentTypeCode = V1DatabaseFormat
-                            .SegmentType
-                            .VARIABLE_LENGTH_STORED_INDEX
-                            .getCode();
-                } else {
-                    segmentTypeCode = V1DatabaseFormat
-                            .SegmentType
-                            .VARIABLE_LENGTH_FOLDED_INDEX
-                            .getCode();
-                }
-
                 os.write(Ints.toByteArray(segmentTypeCode));
 
                 // Field name
@@ -142,11 +124,39 @@ public class V1StoredIndex
         };
     }
 
-    private OutputStreamWritable getWritable(List<UnsignedByteArray> padded) {
+    private OutputStreamWritable getWritable() {
         if (uniqueValues) {
+
+            final Collection<UnsignedByteArray> padded =
+                    new ArrayList<>(databaseDocumentsCount);
+            int expectedDocument = 0;
+            final UnsignedByteArray empty = UnsignedByteArrays.from(new byte[]{});
+            for (Map.Entry<UnsignedByteArray, LinkedList<Integer>> e : values.entrySet()) {
+                while (expectedDocument < e.getValue().iterator().next()) {
+                    padded.add(empty);
+                    expectedDocument++;
+                }
+                padded.add(e.getKey());
+                expectedDocument++;
+            }
+
+            while (expectedDocument < databaseDocumentsCount) {
+                padded.add(empty);
+                expectedDocument++;
+            }
+            segmentTypeCode = V1DatabaseFormat
+                    .SegmentType
+                    .VARIABLE_LENGTH_STORED_INDEX
+                    .getCode();
+
             return new VariableLengthByteArrayIndexedList(padded);
+
         } else {
-            return new FoldedByteArrayIndexedList(padded);
+            segmentTypeCode = V1DatabaseFormat
+                    .SegmentType
+                    .VARIABLE_LENGTH_FOLDED_INDEX
+                    .getCode();
+            return new FoldedByteArrayIndexedList(values);
         }
     }
 }

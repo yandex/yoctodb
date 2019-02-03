@@ -8,8 +8,10 @@ import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import static com.yandex.yoctodb.util.UnsignedByteArrays.from;
 import static org.junit.Assert.assertEquals;
@@ -20,9 +22,10 @@ public class FoldedByteArrayIndexedListTest {
 
     @Test
     public void checkOutputStream() throws IOException {
-        List<UnsignedByteArray> list = initString();
+        final List<UnsignedByteArray> strings = initString();
+        Map<UnsignedByteArray, LinkedList<Integer>> data = initData(strings);
         final FoldedByteArrayIndexedList set =
-                new FoldedByteArrayIndexedList(list);
+                new FoldedByteArrayIndexedList(data);
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
         set.writeTo(os);
 
@@ -32,7 +35,7 @@ public class FoldedByteArrayIndexedListTest {
         // getInt() возвращает (первый Int?) количество элементов,
         // которое мы записали в буфер
         final int elementsCount = buf.getInt();
-        assertEquals(elementsCount, list.size());
+        assertEquals(elementsCount, strings.size());
 
         final int offsetsCount = buf.getInt();
 
@@ -81,15 +84,14 @@ public class FoldedByteArrayIndexedListTest {
 
         // then elements value
         final Buffer elements = buf.slice()
-                .slice(shift, (long)(buf.remaining() - shift))
-                .slice()
-                ;
+                .slice(shift, (long) (buf.remaining() - shift))
+                .slice();
 
         System.out.println("Elements remaining " + elements.remaining());
 
         System.out.println("remaining " + offsets.remaining());
         System.out.println("value 0 " + getValueIndex(indexes, offsets, 0, sizeOfIndexOffsetValue));
-        System.out.println("value 1 " + getValueIndex(indexes, offsets, 1, sizeOfIndexOffsetValue ));
+        System.out.println("value 1 " + getValueIndex(indexes, offsets, 1, sizeOfIndexOffsetValue));
         System.out.println("value 2 " + getValueIndex(indexes, offsets, 2, sizeOfIndexOffsetValue));
         System.out.println("remaining " + offsets.remaining());
 
@@ -164,7 +166,7 @@ public class FoldedByteArrayIndexedListTest {
 
     private int twoBytesToInt(Buffer indexes, int docId) {
         int byteIndex = docId * Short.BYTES;
-        byte[] bytes = new byte[] {
+        byte[] bytes = new byte[]{
                 indexes.get(byteIndex),
                 indexes.get(byteIndex + 1)
         };
@@ -174,7 +176,7 @@ public class FoldedByteArrayIndexedListTest {
     @Test
     public void checkSize() {
         final FoldedByteArrayIndexedList foldedList =
-                new FoldedByteArrayIndexedList(initString());
+                new FoldedByteArrayIndexedList(initData(initString()));
         assertEquals(43, foldedList.getSizeInBytes());
     }
 
@@ -185,7 +187,7 @@ public class FoldedByteArrayIndexedListTest {
         for (int i = 0; i < size; i++)
             elements.add(from(i));
         final ByteArrayIndexedList set =
-                new FoldedByteArrayIndexedList(elements);
+                new FoldedByteArrayIndexedList(initData(elements));
         final String text = set.toString();
         assertTrue(text.contains(Integer.toString(size)));
     }
@@ -197,5 +199,23 @@ public class FoldedByteArrayIndexedListTest {
         elements.add(from("NEW"));
         elements.add(from("NEW"));
         return elements;
+    }
+
+    private final Map<UnsignedByteArray, LinkedList<Integer>> initData(List<UnsignedByteArray> elements) {
+
+        Map<UnsignedByteArray, LinkedList<Integer>> values = new LinkedHashMap<>();
+        for (int i = 0; i < elements.size(); i++) {
+            int documentId = i;
+            UnsignedByteArray val = elements.get(documentId);
+            values.merge(val,
+                    new LinkedList<Integer>() {{
+                        add(documentId);
+                    }},
+                    (oldList, newList) -> {
+                        oldList.addAll(newList);
+                        return oldList;
+                    });
+        }
+        return values;
     }
 }
