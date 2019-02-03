@@ -156,7 +156,7 @@ public class V1StoredIndex
                     .SegmentType
                     .VARIABLE_LENGTH_FOLDED_INDEX
                     .getCode();
-            return new FoldedByteArrayIndexedList(values);
+            return new FoldedByteArrayIndexedList(values, databaseDocumentsCount);
         }
     }
 }

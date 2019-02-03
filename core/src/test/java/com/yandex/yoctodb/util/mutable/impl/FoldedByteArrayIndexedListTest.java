@@ -25,7 +25,7 @@ public class FoldedByteArrayIndexedListTest {
         final List<UnsignedByteArray> strings = initString();
         Map<UnsignedByteArray, LinkedList<Integer>> data = initData(strings);
         final FoldedByteArrayIndexedList set =
-                new FoldedByteArrayIndexedList(data);
+                new FoldedByteArrayIndexedList(data, strings.size());
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
         set.writeTo(os);
 
@@ -176,8 +176,8 @@ public class FoldedByteArrayIndexedListTest {
     @Test
     public void checkSize() {
         final FoldedByteArrayIndexedList foldedList =
-                new FoldedByteArrayIndexedList(initData(initString()));
-        assertEquals(43, foldedList.getSizeInBytes());
+                new FoldedByteArrayIndexedList(initData(initString()), initString().size());
+        assertEquals(51, foldedList.getSizeInBytes());
     }
 
     @Test
@@ -187,7 +187,7 @@ public class FoldedByteArrayIndexedListTest {
         for (int i = 0; i < size; i++)
             elements.add(from(i));
         final ByteArrayIndexedList set =
-                new FoldedByteArrayIndexedList(initData(elements));
+                new FoldedByteArrayIndexedList(initData(elements), elements.size());
         final String text = set.toString();
         assertTrue(text.contains(Integer.toString(size)));
     }

@@ -25,17 +25,22 @@ final public class FoldedByteArrayIndexedList implements ByteArrayIndexedList {
     @NotNull
     private final SortedMap<Integer, Integer> docIdOffsetIndex;
     private final int sizeOfIndexOffsetValue; // how many bites
+    private final int databaseDocumentsCount;
 
 
     public FoldedByteArrayIndexedList(
-            @NotNull final Map<UnsignedByteArray, LinkedList<Integer>> elements) {
+            @NotNull final Map<UnsignedByteArray, LinkedList<Integer>> elements,
+            int databaseDocumentsCount) {
 
-
+        this.databaseDocumentsCount = databaseDocumentsCount;
         this.docIdOffsetIndex = new TreeMap<>();
         this.offsets = new ArrayList<>();
         this.elements = elements.keySet();
 
         long elementOffset = 0;
+        // reserve first value for empty documents
+        offsets.add(-1L);
+
         for (Map.Entry<UnsignedByteArray, LinkedList<Integer>> elem :
                 elements.entrySet()) {
             UnsignedByteArray value = elem.getKey();
@@ -50,6 +55,7 @@ final public class FoldedByteArrayIndexedList implements ByteArrayIndexedList {
         }
 
         offsets.add(elementOffset);
+        offsets.set(0, 0L);
 
         // analyze result of offsets
         int offsetCount = offsets.size();
@@ -73,7 +79,7 @@ final public class FoldedByteArrayIndexedList implements ByteArrayIndexedList {
         return Integer.BYTES + // Element count in bytes
                 Integer.BYTES + // offsets count in bytes
                 sizeOfIndexOffsetValue *
-                        docIdOffsetIndex.size() + // indexes offsets in bytes
+                        databaseDocumentsCount + // indexes offsets in bytes
                 Long.BYTES * offsets.size() + // offsets array size in bytes
                 elementSize; // Element array size in bytes
     }
@@ -82,12 +88,27 @@ final public class FoldedByteArrayIndexedList implements ByteArrayIndexedList {
     public void writeTo(
             @NotNull final OutputStream os) throws IOException {
         // elements count
-        os.write(Ints.toByteArray(docIdOffsetIndex.size()));
+        os.write(Ints.toByteArray(databaseDocumentsCount));
 
         // write offsets count!
         // before writing indexes because
         // you should to know how to deserialize it
         os.write(Ints.toByteArray(offsets.size()));
+
+        List<Integer> offsetIndexes = new ArrayList<>();
+        int expectedDocument = 0;
+        for (Integer docId : docIdOffsetIndex.keySet()) {
+            while (expectedDocument < docId) {
+                offsetIndexes.add(0);
+                expectedDocument++;
+            }
+            offsetIndexes.add(docIdOffsetIndex.get(docId));
+            expectedDocument++;
+        }
+        while (expectedDocument < databaseDocumentsCount) {
+            offsetIndexes.add(0);
+            expectedDocument++;
+        }
 
         // indexes of offsets - in correct Order
         switch (sizeOfIndexOffsetValue) {
@@ -95,21 +116,21 @@ final public class FoldedByteArrayIndexedList implements ByteArrayIndexedList {
                 // write every int to one byte
                 // The collection's iterator returns the elements
                 // in ascending order of the corresponding keys.
-                for (Integer offsetIndex : docIdOffsetIndex.values()) {
+                for (Integer offsetIndex : offsetIndexes) {
                     os.write(oneByteFromInteger(offsetIndex));
                 }
                 break;
             }
             case (Short.BYTES): {
                 // write every int to two bytes
-                for (Integer offsetIndex : docIdOffsetIndex.values()) {
+                for (Integer offsetIndex : offsetIndexes) {
                     os.write(twoBytesFromInteger(offsetIndex));
                 }
                 break;
             }
             case (Integer.BYTES): {
                 // write every int to four bytes
-                for (Integer offsetIndex : docIdOffsetIndex.values()) {
+                for (Integer offsetIndex : offsetIndexes) {
                     os.write(Ints.toByteArray(offsetIndex));
                 }
                 break;

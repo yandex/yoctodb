@@ -46,7 +46,7 @@ public class FoldedIndexWithEmptyTest {
                 DatabaseFormat
                         .getCurrent()
                         .newDocumentBuilder()
-                        .withField("region", "2", STORED));
+                        .withField("region", "1", STORED));
 
         dbBuilder.merge(
                 DatabaseFormat

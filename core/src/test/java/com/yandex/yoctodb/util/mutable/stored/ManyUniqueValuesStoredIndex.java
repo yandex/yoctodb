@@ -32,16 +32,16 @@ public class ManyUniqueValuesStoredIndex {
          */
     }
 
-//    @Test
-//    public void values70000() throws IOException {
-//        testDB(70000);
-//        /*
-//        Result
-//        Write 70000 values in 321 ms
-//        Read database in 12 ms
-//        Read 70000 values56 ms
-//         */
-//    }
+    @Test
+    public void values70000() throws IOException {
+        testDB(70000);
+        /*
+        Result
+        Write 70000 values in 321 ms
+        Read database in 12 ms
+        Read 70000 values56 ms
+         */
+    }
 
     private void testDB(final int size) throws IOException {
         final DatabaseBuilder dbBuilder =
@@ -68,7 +68,7 @@ public class ManyUniqueValuesStoredIndex {
 
 
         start = System.currentTimeMillis();
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < 100; i++) {
             assertEquals(Integer.toString((i)),
                     UnsignedByteArrays.toString(
                             UnsignedByteArrays.from(db.getFieldValue(i, fieldName))));
