@@ -28,8 +28,6 @@ public class V1StoredIndex
     private int databaseDocumentsCount = -1;
     private boolean uniqueValues = true;
     private int segmentTypeCode;
-    private int documentCount = -1;
-
 
     public V1StoredIndex(
             @NotNull final String fieldName) {
@@ -66,7 +64,6 @@ public class V1StoredIndex
                     return oldList;
                 });
 
-        documentCount++;
         return this;
     }
 
@@ -99,9 +96,9 @@ public class V1StoredIndex
         return new OutputStreamWritable() {
             @Override
             public long getSizeInBytes() {
-                return 4L + // Field name
+                return Integer.BYTES + // Field name
                         fieldName.length +
-                        8 + // Values
+                        Long.BYTES + // Values
                         valueIndex.getSizeInBytes();
             }
 
