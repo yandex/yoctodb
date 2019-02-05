@@ -23,6 +23,8 @@ public class ManyNonUniqueValuesStoredIndex {
     @Test
     public void twoByte() throws IOException {
         testDB(300);
+        testDB(1000);
+        testDB(2000);
         /*
         Result:
         Write 290 values in 10 ms
@@ -35,6 +37,8 @@ public class ManyNonUniqueValuesStoredIndex {
     @Test
     public void fourByte() throws IOException {
         testDB(70000);
+        testDB(69999);
+        testDB(70001);
         /*
         Result:
         Write 69990 values in 265 ms
