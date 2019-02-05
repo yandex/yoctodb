@@ -24,7 +24,7 @@ public class V1StoredIndex
         implements IndexSegment {
     @NotNull
     private final byte[] fieldName;
-    private Map<UnsignedByteArray, LinkedList<Integer>> values = new LinkedHashMap<>();
+    private Map<UnsignedByteArray, LinkedList<Integer>> valueDocId = new LinkedHashMap<>();
     private int databaseDocumentsCount = -1;
     private boolean uniqueValues = true;
     private int segmentTypeCode;
@@ -48,21 +48,11 @@ public class V1StoredIndex
 
         final UnsignedByteArray value = values.iterator().next();
 
-//        this.values.putIfAbsent(value, new LinkedList<>());
-//        if (this.values.get(value).size() != 0) {
-//            uniqueValues = false;
-//        }
-//        this.values.get(value).add(documentId);
-
-        this.values.merge(value,
-                new LinkedList<Integer>() {{
-                    add(documentId);
-                }},
-                (oldList, newList) -> {
-                    uniqueValues = false;
-                    oldList.addAll(newList);
-                    return oldList;
-                });
+        this.valueDocId.putIfAbsent(value, new LinkedList<>());
+        if (this.valueDocId.get(value).size() != 0) {
+            uniqueValues = false;
+        }
+        this.valueDocId.get(value).add(documentId);
 
         return this;
     }
@@ -91,7 +81,7 @@ public class V1StoredIndex
                 getWritable();
 
         // Free memory
-        values = null;
+        valueDocId = null;
 
         return new OutputStreamWritable() {
             @Override
@@ -128,7 +118,7 @@ public class V1StoredIndex
                     new ArrayList<>(databaseDocumentsCount);
             int expectedDocument = 0;
             final UnsignedByteArray empty = UnsignedByteArrays.from(new byte[]{});
-            for (Map.Entry<UnsignedByteArray, LinkedList<Integer>> e : values.entrySet()) {
+            for (Map.Entry<UnsignedByteArray, LinkedList<Integer>> e : valueDocId.entrySet()) {
                 while (expectedDocument < e.getValue().iterator().next()) {
                     padded.add(empty);
                     expectedDocument++;
@@ -153,7 +143,7 @@ public class V1StoredIndex
                     .SegmentType
                     .VARIABLE_LENGTH_FOLDED_INDEX
                     .getCode();
-            return new FoldedByteArrayIndexedList(values, databaseDocumentsCount);
+            return new FoldedByteArrayIndexedList(valueDocId, databaseDocumentsCount);
         }
     }
 }

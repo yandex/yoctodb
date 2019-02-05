@@ -11,6 +11,7 @@
 package com.yandex.yoctodb.util.buf;
 
 import com.google.common.base.Charsets;
+import com.yandex.yoctodb.util.UnsignedByteArrays;
 import org.junit.Test;
 
 import java.nio.ByteBuffer;
@@ -105,6 +106,18 @@ public abstract class BufferTest {
         assertEquals(
                 ByteBuffer.wrap(ALPHABET_BYTES, 0, 10),
                 ByteBuffer.wrap(bytes, 128, 10));
+    }
+
+    @Test
+    public void testGetShort() {
+        short data = 32765;
+        byte[] bytes = new byte[]{
+                (byte) ((data >> 8) & 0xff),
+                (byte) ((data) & 0xff)
+        };
+        final Buffer buf = Buffer.from(bytes);
+        short result = buf.getShort();
+        assertEquals(data, result);
     }
 
     @Test
