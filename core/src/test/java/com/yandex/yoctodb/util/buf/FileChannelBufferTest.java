@@ -19,6 +19,8 @@ import java.nio.channels.FileChannel;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 /**
@@ -63,6 +65,44 @@ public class FileChannelBufferTest extends BufferTest {
         return File.createTempFile(
                 "file_channel_buffer_test_",
                 suffix);
+    }
+
+    @Test
+    public void getShortTest() throws IOException {
+        short data = 32765;
+        byte[] bytes = new byte[]{
+                (byte) ((data >> 8) & 0xff),
+                (byte) ((data) & 0xff)
+        };
+        final Path path = nextTempFile(bytes);
+        final FileChannel read = FileChannel.open(
+                path,
+                StandardOpenOption.READ,
+                StandardOpenOption.DELETE_ON_CLOSE);
+
+        final Buffer buf = Buffer.from(read);
+
+        short result = buf.getShort();
+        assertEquals(data, result);
+    }
+
+    @Test
+    public void getShortTestWithIndex() throws IOException {
+        short data = 32765;
+        byte[] bytes = new byte[]{
+                (byte) ((data >> 8) & 0xff),
+                (byte) ((data) & 0xff)
+        };
+        final Path path = nextTempFile(bytes);
+        final FileChannel read = FileChannel.open(
+                path,
+                StandardOpenOption.READ,
+                StandardOpenOption.DELETE_ON_CLOSE);
+
+        final Buffer buf = Buffer.from(read);
+
+        short result = buf.getShort(0);
+        assertEquals(data, result);
     }
 
     @Test(expected = RuntimeException.class)
@@ -157,7 +197,7 @@ public class FileChannelBufferTest extends BufferTest {
     public void getShort() throws IOException {
         final FileChannel broken = mock(FileChannel.class);
         when(broken.size()).thenReturn(1024L);
-        when(broken.read(any(ByteBuffer.class), anyShort()))
+        when(broken.read(any(ByteBuffer.class), anyLong()))
                 .thenThrow(new IOException("Test"));
         new FileChannelBuffer(broken).getShort();
     }
@@ -166,7 +206,7 @@ public class FileChannelBufferTest extends BufferTest {
     public void getShortByIndex() throws IOException {
         final FileChannel broken = mock(FileChannel.class);
         when(broken.size()).thenReturn(1024L);
-        when(broken.read(any(ByteBuffer.class), anyShort()))
+        when(broken.read(any(ByteBuffer.class), anyLong()))
                 .thenThrow(new IOException("Test"));
         new FileChannelBuffer(broken).getShort(0L);
     }
