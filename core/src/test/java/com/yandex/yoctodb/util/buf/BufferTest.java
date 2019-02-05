@@ -121,6 +121,18 @@ public abstract class BufferTest {
     }
 
     @Test
+    public void testGetShortWithIndex() {
+        short data = 32765;
+        byte[] bytes = new byte[]{
+                (byte) ((data >> 8) & 0xff),
+                (byte) ((data) & 0xff)
+        };
+        final Buffer buf = Buffer.from(bytes);
+        short result = buf.getShort(0);
+        assertEquals(data, result);
+    }
+
+    @Test
     public void testToString() {
         final Buffer buf = bufferOf(ALPHABET);
         assertTrue(
