@@ -17,7 +17,7 @@ import static org.junit.Assert.assertTrue;
 public class FoldedByteArrayIndexTest {
     private final int VALUES = 128;
 
-    private ByteArrayIndexedList build() throws IOException {
+    private ByteArrayIndexedList build(int size) throws IOException {
         final Collection<UnsignedByteArray> elements = new LinkedList<>();
         for (int i = 0; i < VALUES; i++) {
             if (i % 2 == 0)
@@ -25,6 +25,10 @@ public class FoldedByteArrayIndexTest {
             else
                 elements.add(from(i % 3 == 0 ? 1L : (long) i));
         }
+        for (int i = VALUES; i < size; i++) {
+            elements.add(from(i));
+        }
+
         final com.yandex.yoctodb.util.mutable.ByteArrayIndexedList mutable =
                 new com.yandex.yoctodb.util.mutable.impl.VariableLengthByteArrayIndexedList(elements);
 
@@ -42,7 +46,17 @@ public class FoldedByteArrayIndexTest {
     }
 
     @Test
-    public void string() throws IOException {
-        assertTrue(build().toString().contains(Integer.toString(VALUES)));
+    public void testBytesFolding() throws IOException {
+        assertTrue(build(100).toString().contains(Integer.toString(VALUES)));
+    }
+
+    @Test
+    public void tesShortFolding() throws IOException {
+        assertTrue(build(1000).toString().contains(Integer.toString(VALUES)));
+    }
+
+    @Test
+    public void testIntegerFolding() throws IOException {
+        assertTrue(build(70000).toString().contains(Integer.toString(VALUES)));
     }
 }

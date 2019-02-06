@@ -27,7 +27,7 @@ public class FoldedByteArrayIndexedListTest {
 
     @Test
     public void testFourBytesFolding() {
-        testManyValues(7000);
+        testManyValues(70000);
     }
 
 
