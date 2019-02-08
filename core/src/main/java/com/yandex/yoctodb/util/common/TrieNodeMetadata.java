@@ -10,16 +10,19 @@
 
 package com.yandex.yoctodb.util.common;
 
+/**
+ *
+ */
 public final class TrieNodeMetadata {
-    public static final int PREFIX_FLAG = 0b0001;
-    public static final int VALUE_FLAG = 0b0010;
+    public static final int PREFIX_FLAG       = 0b0001; // there is a prefix that must be consumed
+    public static final int VALUE_FLAG        = 0b0010; // there is a value in this node
 
-    public static final int EDGES_NONE = 0b0000;
-    public static final int EDGES_SINGLE = 0b0100;
-    public static final int EDGES_BITSET = 0b1000;
-    public static final int EDGES_CONDENSED = 0b1100;
+    public static final int EDGES_NONE        = 0b0000; // there is no edges
+    public static final int EDGES_SINGLE      = 0b0100; // there is exactly one edge
+    public static final int EDGES_BITSET      = 0b1000; // there is multiple scattered edges
+    public static final int EDGES_CONDENSED   = 0b1100; // there is multiple continuous edges
 
-    private static final int EDGES_MASK = 0b1100;
+    private static final int EDGES_MASK       = 0b1100;
 
     static {
         new TrieNodeMetadata(); // for coverage

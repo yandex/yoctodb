@@ -22,6 +22,8 @@ import static com.yandex.yoctodb.util.common.TrieNodeMetadata.*;
  * Provides an average complexity O(|key|) for all operations with
  * worst-case performance proportional to the depth of compressed trie.
  *
+ * Trie
+ *
  * @author Andrey Korzinev (ya-goodfella@yandex.com)
  */
 public class TrieByteArraySortedSet implements ByteArraySortedSet {
@@ -71,14 +73,14 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
      * Look up for key in trie.
      * Complexity: O(|key|)
      *
-     * @param e the element to lookup
+     * @param element the element to lookup
      *
      * @return index of key matching the query or -1 if there is no match
      */
     @Override
-    public int indexOf(@NotNull Buffer e) {
+    public int indexOf(@NotNull Buffer element) {
         if (size() > 0) {
-            return indexOf(new BufferIterator(e));
+            return indexOf(new BufferIterator(element));
         }
 
         return NOT_FOUND;
@@ -88,16 +90,16 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
      * Looks up for index of key, that would be greater than element with respect to orEquals
      * Complexity: O(|key|)
      *
-     * @param e                  element to compare to
+     * @param element            element to compare to
      * @param orEquals           inclusive flag
      * @param upToIndexInclusive right bound (inclusive)
      *
      * @return index of key matching the query or -1 if there is no match
      */
     @Override
-    public int indexOfGreaterThan(@NotNull Buffer e, boolean orEquals, int upToIndexInclusive) {
+    public int indexOfGreaterThan(@NotNull Buffer element, boolean orEquals, int upToIndexInclusive) {
         if (size() > 0) {
-            int result = indexOfGreaterThan(new BufferIterator(e), orEquals);
+            int result = indexOfGreaterThan(new BufferIterator(element), orEquals);
             return result == keysCount ? NOT_FOUND : Math.min(result, upToIndexInclusive);
         }
 
@@ -108,80 +110,96 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
      * Looks up for index of key, that would be less than element with respect to orEquals
      * Complexity: O(|key|)
      *
-     * @param e                  element to compare to
+     * @param element            element to compare to
      * @param orEquals           inclusive flag
      * @param fromIndexInclusive left bound (inclusive)
      *
      * @return index of key matching the query or -1 if there is no match
      */
     @Override
-    public int indexOfLessThan(@NotNull Buffer e, boolean orEquals, int fromIndexInclusive) {
+    public int indexOfLessThan(@NotNull Buffer element, boolean orEquals, int fromIndexInclusive) {
         if (size() > 0) {
-            return indexOfLessThan(new BufferIterator(e), orEquals);
+            return indexOfLessThan(new BufferIterator(element), orEquals);
         }
 
         return NOT_FOUND;
     }
 
-    private int indexOf(@NotNull final BufferIterator query) {
+    private int indexOf(@NotNull final BufferIterator key) {
         assert keysCount > 0;
 
+        // start with the root node
         long movingOffset = 0L;
 
+        // infinite loop for tail recursion emulation
         while (true) {
+            // read metadata from the first byte of node
             final int metadata = Byte.toUnsignedInt(nodes.get(movingOffset));
             movingOffset += Byte.BYTES;
 
-            if (hasPrefix(metadata)) { // there is an prefix
+            if (hasPrefix(metadata)) { // there is a prefix, key must consume it to proceed
                 final int prefixSize = nodes.getInt(movingOffset);
                 movingOffset += Integer.BYTES;
                 final BufferIterator prefix = new BufferIterator(nodes, movingOffset, prefixSize);
-                if (query.compareToPrefix(prefix) != 0) {
+                if (key.compareToPrefix(prefix) != 0) {
+                    // key didn't math the prefix
                     return NOT_FOUND;
                 }
                 movingOffset += prefixSize * Byte.BYTES;
             }
 
             int maybeValue = NOT_FOUND;
-            if (hasValue(metadata)) { // there is a value
+            if (hasValue(metadata)) { // there is a value, we must consume and store it before proceeding
                 maybeValue = nodes.getInt(movingOffset);
                 movingOffset += Integer.BYTES;
             }
 
-            if (!query.hasNext()) {
+            if (!key.hasNext()) {
+                // key exhausted, return stored value (or NOT_FOUND if this not didn't have value)
                 return maybeValue;
             }
 
-            final int next = query.next();
+            // we still have bytes in a key - let's find moves
+            final int next = key.next();
             switch (edgeType(metadata)) {
-                case EDGES_SINGLE:
+                case EDGES_SINGLE: {
+                    // there is only one path to the next node
                     if (next != Byte.toUnsignedInt(nodes.get(movingOffset++))) {
+                        // path didn't match key, there is no node we are looking for
                         return NOT_FOUND;
                     }
-                    movingOffset = nodes.getLong(movingOffset);
+                    movingOffset = nodes.getLong(movingOffset); // jump to the next node
                     break;
+                }
                 case EDGES_BITSET: {
+                    // there is a bitset backed map for passing this node
+                    // for compression and performance reasons we stored min and max value for the transition
                     int min = Byte.toUnsignedInt(nodes.get(movingOffset++));
                     int max = Byte.toUnsignedInt(nodes.get(movingOffset++));
                     if (min > next || max < next || !BufferBitSet.get(nodes, movingOffset, next - min)) {
+                        // path didn't match key, there is no node we are looking for
                         return NOT_FOUND;
                     }
+                    // count bits before desired index, that would be index in transitions array
                     int index = BufferBitSet.cardinalityTo(nodes, movingOffset, next - min);
                     movingOffset += BufferBitSet.arraySize(max - min + 1) * Long.BYTES;
-                    movingOffset = nodes.getLong(movingOffset + index * Long.BYTES);
+                    movingOffset = nodes.getLong(movingOffset + index * Long.BYTES); // jump to the next node
                     break;
                 }
                 case EDGES_CONDENSED: {
+                    // there is a continuous range of edges [min, max]
                     int min = Byte.toUnsignedInt(nodes.get(movingOffset++));
                     int max = Byte.toUnsignedInt(nodes.get(movingOffset++));
                     if (min > next || max < next) {
+                        // path didn't match key, there is no node we are looking for
                         return NOT_FOUND;
                     }
                     int index = next - min;
-                    movingOffset = nodes.getLong(movingOffset + index * Long.BYTES);
+                    movingOffset = nodes.getLong(movingOffset + index * Long.BYTES); // jump to the next node
                     break;
                 }
                 default:
+                    // we reached terminal node and key still have bytes that we didn't consume. Key not found
                     return NOT_FOUND;
             }
         }
@@ -192,7 +210,7 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
             final int metadata = Byte.toUnsignedInt(nodes.get(movingOffset));
             movingOffset += Byte.BYTES;
 
-            if (hasPrefix(metadata)) { // there is an prefix
+            if (hasPrefix(metadata)) { // there is a prefix
                 int prefixSize = nodes.getInt(movingOffset);
                 movingOffset += Integer.BYTES;
                 movingOffset += prefixSize * Byte.BYTES;
@@ -203,18 +221,24 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
             }
 
             switch (edgeType(metadata)) {
-                case EDGES_BITSET:
+                case EDGES_BITSET: {
                     int min = Byte.toUnsignedInt(nodes.get(movingOffset++));
                     int max = Byte.toUnsignedInt(nodes.get(movingOffset++));
 
                     movingOffset += BufferBitSet.arraySize(max - min + 1) * Long.BYTES;
                     movingOffset = nodes.getLong(movingOffset);
                     break;
-                case EDGES_CONDENSED:
+                }
+                case EDGES_CONDENSED: {
                     movingOffset += 2 * Byte.BYTES;
                     movingOffset = nodes.getLong(movingOffset);
                     break;
-                default: // should be unreachable
+                }
+                default:
+                    /**
+                     * This section must be unreachable since we cannot have a correct trie node with
+                     * no value and edges different than EDGES_BITSET or EDGES_CONDENSED.
+                     */
             }
         }
     }
@@ -224,7 +248,7 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
             final int metadata = Byte.toUnsignedInt(nodes.get(movingOffset));
             movingOffset += Byte.BYTES;
 
-            if (hasPrefix(metadata)) { // there is an prefix
+            if (hasPrefix(metadata)) { // there is a prefix
                 int prefixSize = nodes.getInt(movingOffset);
                 movingOffset += Integer.BYTES;
                 movingOffset += prefixSize * Byte.BYTES;
@@ -237,10 +261,11 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
             }
 
             switch (edgeType(metadata)) {
-                case EDGES_SINGLE:
+                case EDGES_SINGLE: {
                     movingOffset += Byte.BYTES;
                     movingOffset = nodes.getLong(movingOffset);
                     break;
+                }
                 case EDGES_BITSET: {
                     int min = Byte.toUnsignedInt(nodes.get(movingOffset++));
                     int max = Byte.toUnsignedInt(nodes.get(movingOffset++));
@@ -259,60 +284,75 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
                 }
                 case EDGES_NONE:
                     return value;
-                default: // should be unreachable
+                default:
+                    /**
+                     * This section must be unreachable since we cannot have a correct trie node with
+                     * no value and edges different than EDGES_BITSET or EDGES_CONDENSED.
+                     */
             }
         }
     }
 
-    private int indexOfGreaterThan(@NotNull final BufferIterator query, final boolean orEquals) {
+    private int indexOfGreaterThan(@NotNull final BufferIterator key, final boolean orEquals) {
         assert keysCount > 0;
 
+        // start with the root node
         long movingOffset = 0L;
+        // fix every node start offset
         long nodeOffset;
 
         while (true) {
-            final int metadata = Byte.toUnsignedInt(nodes.get(movingOffset));
+            // fix node start
             nodeOffset = movingOffset;
+            // read metadata from the first byte of node
+            final int metadata = Byte.toUnsignedInt(nodes.get(movingOffset));
             movingOffset += Byte.BYTES;
 
-            if (hasPrefix(metadata)) { // there is an prefix
+            if (hasPrefix(metadata)) { // there is a prefix, key must consume it to proceed
                 final int prefixSize = nodes.getInt(movingOffset);
                 movingOffset += Integer.BYTES;
                 final BufferIterator prefix = new BufferIterator(nodes, movingOffset, prefixSize);
-                final int prefixCompare = query.compareToPrefix(prefix);
-                if (prefixCompare > 0) { // query > node
+                // compare key to prefix lexicographically
+                final int prefixCompare = key.compareToPrefix(prefix);
+                if (prefixCompare > 0) { // key > node, answer would be the last value of this node + 1
                     return takeLastValueOnRight(nodeOffset) + 1;
-                } else if (prefixCompare < 0) { // prefix > query
+                } else if (prefixCompare < 0) { // prefix > key, answer would be first value of this node
                     return takeFirstValueOnLeft(nodeOffset);
                 }
                 movingOffset += prefixSize * Byte.BYTES;
             }
 
             int maybeValue = NOT_FOUND;
-            if (hasValue(metadata)) { // there is a value
+            if (hasValue(metadata)) { // there is a value, we must consume and store it before proceeding
                 maybeValue = nodes.getInt(movingOffset);
                 movingOffset += Integer.BYTES;
             }
 
-            if (!query.hasNext()) {
+            if (!key.hasNext()) {
+                // key exhausted, return stored value (or first value under this node if it does not have any)
                 if (maybeValue != NOT_FOUND) {
                     return orEquals ? maybeValue : maybeValue + 1;
                 }
                 return takeFirstValueOnLeft(nodeOffset);
             }
 
-            final int next = query.next();
+            // we still have bytes in a key - let's find moves
+            final int next = key.next();
             switch (edgeType(metadata)) {
-                case EDGES_SINGLE:
-                    int key = Byte.toUnsignedInt(nodes.get(movingOffset++));
-                    if (next > key) {
+                case EDGES_SINGLE: {
+                    // there is only one path to the next node
+                    int path = Byte.toUnsignedInt(nodes.get(movingOffset++));
+                    if (next > path) {
                         return takeLastValueOnRight(nodes.getLong(movingOffset)) + 1;
-                    } else if (next < key) {
+                    } else if (next < path) {
                         return takeFirstValueOnLeft(nodes.getLong(movingOffset));
                     }
                     movingOffset = nodes.getLong(movingOffset);
                     break;
+                }
                 case EDGES_BITSET: {
+                    // there is a bitset backed map for passing this node
+                    // for compression and performance reasons we stored min and max value for the transition
                     int min = Byte.toUnsignedInt(nodes.get(movingOffset++));
                     int max = Byte.toUnsignedInt(nodes.get(movingOffset++));
                     long bitsetOffset = movingOffset;
@@ -334,6 +374,7 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
                     break;
                 }
                 case EDGES_CONDENSED: {
+                    // there is a continuous range of edges [min, max]
                     int min = Byte.toUnsignedInt(nodes.get(movingOffset++));
                     int max = Byte.toUnsignedInt(nodes.get(movingOffset++));
 
@@ -353,7 +394,7 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
         }
     }
 
-    private int indexOfLessThan(@NotNull final BufferIterator query, final boolean orEquals) {
+    private int indexOfLessThan(@NotNull final BufferIterator key, final boolean orEquals) {
         assert keysCount > 0;
 
         long movingOffset = 0L;
@@ -364,44 +405,51 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
             nodeOffset = movingOffset;
             movingOffset += Byte.BYTES;
 
-            if (hasPrefix(metadata)) { // there is an prefix
+            if (hasPrefix(metadata)) { // there is a prefix, key must consume it to proceed
                 final int prefixSize = nodes.getInt(movingOffset);
                 movingOffset += Integer.BYTES;
                 final BufferIterator prefix = new BufferIterator(nodes, movingOffset, prefixSize);
-                final int prefixCompare = query.compareToPrefix(prefix);
-                if (prefixCompare > 0) { // query > node
+                // compare key to prefix lexicographically
+                final int prefixCompare = key.compareToPrefix(prefix);
+                if (prefixCompare > 0) { // key > node, answer would be the last value of this node
                     return takeLastValueOnRight(nodeOffset);
-                } else if (prefixCompare < 0) { // prefix > query
+                } else if (prefixCompare < 0) { // prefix > key, answer would be the first value of this node - 1
                     return takeFirstValueOnLeft(nodeOffset) - 1;
                 }
                 movingOffset += prefixSize * Byte.BYTES;
             }
 
             int maybeValue = NOT_FOUND;
-            if (hasValue(metadata)) { // there is a value
+            if (hasValue(metadata)) { // there is a value, we must consume and store it before proceeding
                 maybeValue = nodes.getInt(movingOffset);
                 movingOffset += Integer.BYTES;
             }
 
-            if (!query.hasNext()) {
+            if (!key.hasNext()) {
+                // key exhausted, return stored value (or first value under this node - 1 if it does not have any)
                 if (maybeValue != NOT_FOUND) {
                     return orEquals ? maybeValue : maybeValue - 1;
                 }
                 return takeFirstValueOnLeft(nodeOffset) - 1;
             }
 
-            final int next = query.next();
+            // we still have bytes in a key - let's find moves
+            final int next = key.next();
             switch (edgeType(metadata)) {
-                case EDGES_SINGLE:
-                    int key = Byte.toUnsignedInt(nodes.get(movingOffset++));
-                    if (next > key) {
+                case EDGES_SINGLE: {
+                    // there is only one path to the next node
+                    int path = Byte.toUnsignedInt(nodes.get(movingOffset++));
+                    if (next > path) {
                         return takeLastValueOnRight(nodes.getLong(movingOffset));
-                    } else if (next < key) {
+                    } else if (next < path) {
                         return takeFirstValueOnLeft(nodes.getLong(movingOffset)) - 1;
                     }
                     movingOffset = nodes.getLong(movingOffset);
                     break;
+                }
                 case EDGES_BITSET: {
+                    // there is a bitset backed map for passing this node
+                    // for compression and performance reasons we stored min and max value for the transition
                     int min = Byte.toUnsignedInt(nodes.get(movingOffset++));
                     int max = Byte.toUnsignedInt(nodes.get(movingOffset++));
                     long bitsetOffset = movingOffset;
@@ -423,6 +471,7 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
                     break;
                 }
                 case EDGES_CONDENSED: {
+                    // there is a continuous range of edges [min, max]
                     int min = Byte.toUnsignedInt(nodes.get(movingOffset++));
                     int max = Byte.toUnsignedInt(nodes.get(movingOffset++));
 

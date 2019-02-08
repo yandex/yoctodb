@@ -74,27 +74,27 @@ public final class V1DatabaseBuilder
                 final DocumentBuilder.IndexOption indexOption =
                         builder.index.get(fieldName);
                 @NotNull
-                final DocumentBuilder.LengthOption lengthOption =
+                final DocumentBuilder.IndexType indexType =
                         builder.length.get(fieldName);
 
                 switch (indexOption) {
                     case FILTERABLE:
                         index = new V1FilterableIndex(
                                 fieldName,
-                                lengthOption == DocumentBuilder.LengthOption.FIXED,
-                                lengthOption == DocumentBuilder.LengthOption.TRIE
+                                indexType == DocumentBuilder.IndexType.FIXED_LENGTH,
+                                indexType == DocumentBuilder.IndexType.TRIE
                         );
                         break;
                     case SORTABLE:
                         index = new V1SortableIndex(
                                 fieldName,
-                                lengthOption == DocumentBuilder.LengthOption.FIXED
+                                indexType == DocumentBuilder.IndexType.FIXED_LENGTH
                         );
                         break;
                     case FULL:
                         index = new V1FullIndex(
                                 fieldName,
-                                lengthOption == DocumentBuilder.LengthOption.FIXED
+                                indexType == DocumentBuilder.IndexType.FIXED_LENGTH
                         );
                         break;
                     case STORED:

@@ -58,20 +58,27 @@ public class BufferBitSet {
         }
     }
 
+    /**
+     * Counts bits from 0 until {@code bitIndex}
+     * @param buf buffer with array of long, representing bit set
+     * @param bufferOffset offset in buffer where array starts
+     * @param bitIndex index of desired bit
+     * @return
+     */
     public static int cardinalityTo(@NotNull final Buffer buf,
                                     final long bufferOffset,
-                                    final int i) {
-        assert bufferOffset <= buf.limit() - (i / Long.SIZE + 1) * Long.BYTES;
+                                    final int bitIndex) {
+        assert bufferOffset <= buf.limit() - (bitIndex / Long.SIZE + 1) * Long.BYTES;
 
         int result = 0;
-        final int toWordIndex = i >> 6;
+        final int toWordIndex = bitIndex >> 6;
         int word = 0;
         while (word < toWordIndex) {
             result += Long.bitCount(buf.getLong(bufferOffset + word * Long.BYTES));
             word++;
         }
 
-        final int bit = i & 0x3f;
+        final int bit = bitIndex & 0x3f;
         final long mask = (1L << bit) - 1;
         result += Long.bitCount(buf.getLong(bufferOffset + word * Long.BYTES) & mask);
 

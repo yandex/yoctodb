@@ -146,7 +146,6 @@ public class TrieByteArraySortedSetTest {
         queries.addAll(falseQueries);
     }
 
-
     @Test
     public void size() {
         assertEquals(keys.size(), trieSet.size());

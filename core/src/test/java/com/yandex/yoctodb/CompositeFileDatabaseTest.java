@@ -69,7 +69,7 @@ public class CompositeFileDatabaseTest {
         for (int i = 0; i < DOCS; i++) {
             builder.merge(
                     FORMAT.newDocumentBuilder()
-                            .withField("field1", from("1"), FILTERABLE, DocumentBuilder.LengthOption.TRIE)
+                            .withField("field1", from("1"), FILTERABLE, DocumentBuilder.IndexType.TRIE)
                             .withField("field2", "2", FILTERABLE)
                             .withField("index", i, FULL)
                             .withField("relevance", -i, SORTABLE)

@@ -155,7 +155,7 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
         }
 
         private boolean isCondensed() {
-            return !edges.isEmpty() && getMax() - getMin() == edges.size() - 1;
+            return !edges.isEmpty() && ((getMax() - getMin()) == (edges.size() - 1));
         }
 
         @Override
@@ -194,9 +194,10 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
 
             if (prefix.size() > 0) {
                 os.write(Ints.toByteArray(prefix.size())); // prefix size
+                // prefix bytes
                 for (byte b : prefix) {
                     os.write(b);
-                } // prefix bytes
+                }
             }
 
             if (value != null) {
@@ -210,18 +211,21 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
             } else if (isCondensed()) {
                 os.write(getMin()); // min element
                 os.write(getMax()); // max element
+                // offsets
                 for (Trie n : edges.values()) {
                     os.write(Longs.toByteArray(n.offset));
-                } // offsets
+                }
             } else if (!edges.isEmpty()) {
                 os.write(getMin()); // min element
                 os.write(getMax()); // max element
+                // backing bitset
                 for (long bsChunk : edgesToBitSet().toArray()) {
                     os.write(Longs.toByteArray(bsChunk));
-                } // backing bitset
+                }
+                // offsets
                 for (Trie n : edges.values()) {
                     os.write(Longs.toByteArray(n.offset));
-                } // offsets
+                }
             }
         }
 
