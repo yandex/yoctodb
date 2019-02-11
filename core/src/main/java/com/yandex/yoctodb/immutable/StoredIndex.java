@@ -29,4 +29,19 @@ public interface StoredIndex extends Index {
      */
     @NotNull
     Buffer getStoredValue(int document);
+
+    /**
+     * Get stored value as long by document ID
+     *
+     * @param document document ID
+     * @return stored value
+     */
+    long getLongValue(int document);
+
+    /**
+     * Get stored value as int by document ID
+     * @param document document ID
+     * @return stored value
+     */
+    int getIntValue(int document);
 }

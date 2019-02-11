@@ -71,6 +71,26 @@ public class VariableLengthByteArrayIndexedList
     }
 
     @Override
+    public long getLongUnsafe(final int i) {
+        assert 0 <= i && i < elementCount;
+
+        final long base = ((long) i) << 3;
+        final long start = offsets.getLong(base);
+
+        return elements.getLong(start) ^ Long.MIN_VALUE;
+    }
+
+    @Override
+    public int getIntUnsafe(final int i) {
+        assert 0 <= i && i < elementCount;
+
+        final long base = ((long) i) << 3;
+        final long start = offsets.getLong(base);
+
+        return elements.getInt(start) ^ Integer.MIN_VALUE;
+    }
+
+    @Override
     public int size() {
         return elementCount;
     }

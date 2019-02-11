@@ -50,4 +50,43 @@ public interface DocumentProvider {
             int document,
             @NotNull
             String fieldName);
+
+    /**
+     * Get {@code document} document {@code fieldName} field value as long.
+     *
+     * The field must be sortable
+     *
+     * @see com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption#SORTABLE
+     * @see com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption#FULL
+     * @see com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption#STORED
+     * @param document document index
+     * @param fieldName field name
+     * @return document field value as long
+     */
+
+    @NotNull
+    long getLongValue(
+            int document,
+            @NotNull
+            String fieldName);
+
+    /**
+     * Get {@code document} document {@code fieldName} field value as int.
+     *
+     * The field must be sortable
+     *
+     * @see com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption#SORTABLE
+     * @see com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption#FULL
+     * @see com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption#STORED
+     * @param document document index
+     * @param fieldName field name
+     * @return document field value as int
+     */
+
+    @NotNull
+    int getIntValue(
+            int document,
+            @NotNull
+            String fieldName);
+
 }

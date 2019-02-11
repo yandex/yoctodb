@@ -40,6 +40,16 @@ public class V1StoredIndex implements StoredIndex, Segment {
         return values.get(document);
     }
 
+    @Override
+    public long getLongValue(final int document) {
+        return values.getLongUnsafe(document);
+    }
+
+    @Override
+    public int getIntValue(final int document) {
+        return values.getIntUnsafe(document);
+    }
+
     static void registerReader() {
         SegmentRegistry.register(
                 V1DatabaseFormat.SegmentType

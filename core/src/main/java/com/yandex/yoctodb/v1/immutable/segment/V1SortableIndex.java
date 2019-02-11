@@ -83,6 +83,16 @@ public final class V1SortableIndex
         return values.get(documentToValue.get(document));
     }
 
+    @Override
+    public long getLongValue(int document) {
+        return values.getLongUnsafe(document);
+    }
+
+    @Override
+    public int getIntValue(int document) {
+        return values.getIntUnsafe(document);
+    }
+
     @NotNull
     @Override
     public Iterator<IntToIntArray> ascending(

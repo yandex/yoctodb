@@ -61,6 +61,22 @@ public class FixedLengthByteArrayIndexedList
     }
 
     @Override
+    public long getLongUnsafe(final int i) {
+        assert 0 <= i && i < elementCount;
+        assert elementSize == Long.BYTES;
+
+        return elements.getLong() ^ Long.MIN_VALUE;
+    }
+
+    @Override
+    public int getIntUnsafe(final int i) {
+        assert 0 <= i && i < elementCount;
+        assert elementSize == Integer.BYTES;
+
+        return elements.getInt() ^ Integer.MIN_VALUE;
+    }
+
+    @Override
     public int size() {
         return elementCount;
     }

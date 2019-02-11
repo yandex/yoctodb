@@ -98,6 +98,32 @@ public final class VariableLengthByteArraySortedSet
     }
 
     @Override
+    public long getLongUnsafe(final int i) {
+        assert 0 <= i && i < size;
+
+        final long base = ((long) i) << 3;
+        final long start = offsets.getLong(base);
+        final long end = offsets.getLong(base + 8L);
+
+        assert end - start == Long.BYTES;
+
+        return elements.getLong(start) ^ Long.MIN_VALUE;
+    }
+
+    @Override
+    public int getIntUnsafe(final int i) {
+        assert 0 <= i && i < size;
+
+        final long base = ((long) i) << 3;
+        final long start = offsets.getLong(base);
+        final long end = offsets.getLong(base + 8L);
+
+        assert end - start == Integer.BYTES;
+
+        return elements.getInt(start) ^ Integer.MIN_VALUE;
+    }
+
+    @Override
     public String toString() {
         return "VariableLengthByteArraySortedSet{" +
                "size=" + size +

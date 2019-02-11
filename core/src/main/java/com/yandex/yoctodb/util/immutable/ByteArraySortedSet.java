@@ -26,6 +26,10 @@ public interface ByteArraySortedSet {
     @NotNull
     Buffer get(int i);
 
+    long getLongUnsafe(int i);
+
+    int getIntUnsafe(int i);
+
     /**
      * Get index of the element
      *

@@ -24,5 +24,9 @@ public interface ByteArrayIndexedList {
     @NotNull
     Buffer get(int i);
 
+    long getLongUnsafe(int i);
+
+    int getIntUnsafe(int i);
+
     int size();
 }

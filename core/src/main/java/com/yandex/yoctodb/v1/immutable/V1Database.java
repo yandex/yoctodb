@@ -114,6 +114,26 @@ public final class V1Database implements IndexedDatabase {
     }
 
     @Override
+    public long getLongValue(
+            final int document,
+            @NotNull
+            final String fieldName) {
+        assert storers.containsKey(fieldName);
+
+        return storers.get(fieldName).getLongValue(document);
+    }
+
+    @Override
+    public int getIntValue(
+            final int document,
+            @NotNull
+            final String fieldName) {
+        assert  storers.containsKey(fieldName);
+
+        return storers.get(fieldName).getIntValue(document);
+    }
+
+    @Override
     public void execute(
             @NotNull
             final Query query,
