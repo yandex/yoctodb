@@ -10,25 +10,40 @@
 
 package com.yandex.yoctodb;
 
-import com.google.common.primitives.Ints;
 import com.yandex.yoctodb.immutable.Database;
 import com.yandex.yoctodb.mutable.DatabaseBuilder;
 import com.yandex.yoctodb.query.DocumentProcessor;
 import com.yandex.yoctodb.query.Query;
 import com.yandex.yoctodb.query.simple.SimpleDescendingOrder;
 import com.yandex.yoctodb.query.simple.SimpleRangeCondition;
-import com.yandex.yoctodb.util.UnsignedByteArrays;
 import com.yandex.yoctodb.util.buf.Buffer;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption.*;
-import static com.yandex.yoctodb.query.QueryBuilder.*;
+import static com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption.FILTERABLE;
+import static com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption.FULL;
+import static com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption.SORTABLE;
+import static com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption.STORED;
+import static com.yandex.yoctodb.query.QueryBuilder.asc;
+import static com.yandex.yoctodb.query.QueryBuilder.desc;
+import static com.yandex.yoctodb.query.QueryBuilder.eq;
+import static com.yandex.yoctodb.query.QueryBuilder.gt;
+import static com.yandex.yoctodb.query.QueryBuilder.gte;
+import static com.yandex.yoctodb.query.QueryBuilder.in;
+import static com.yandex.yoctodb.query.QueryBuilder.lt;
+import static com.yandex.yoctodb.query.QueryBuilder.lte;
+import static com.yandex.yoctodb.query.QueryBuilder.not;
+import static com.yandex.yoctodb.query.QueryBuilder.or;
+import static com.yandex.yoctodb.query.QueryBuilder.select;
 import static com.yandex.yoctodb.util.UnsignedByteArrays.from;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -435,6 +450,12 @@ public class SimpleDatabaseTest {
                         .withField("sorted", 12, SORTABLE)
                         .withField("stored", 13, STORED)
                         .withField("first", 14, STORED)
+                        .withField("long_stored", 15L, STORED)
+                        .withField("int_stored", 16, STORED)
+                        .withField("long_full", 15L, FULL)
+                        .withField("int_full", 16, FULL)
+                        .withField("long_sortable", 15L, SORTABLE)
+                        .withField("int_sortable", 16, SORTABLE)
                         .withPayload(("payload1").getBytes())
         );
 
@@ -464,6 +485,24 @@ public class SimpleDatabaseTest {
         assertEquals(from(14).toByteBuffer(), db.getFieldValue(0, "first"));
         assertEquals(from("payload1").toByteBuffer(), db.getDocument(0));
         assertFalse(db.getFieldValue(0, "second").hasRemaining());
+
+        final long puttedLongValueStored = from(15L).toByteBuffer().getLong() ^ Long.MIN_VALUE;
+        assertEquals(puttedLongValueStored, db.getLongValue(0, "long_stored"));
+
+        final int puttedIntValueStored = from(16).toByteBuffer().getInt() ^ Integer.MIN_VALUE;
+        assertEquals(puttedIntValueStored, db.getIntValue(0, "int_stored"));
+
+        final long puttedLongValueFull = from(15L).toByteBuffer().getLong() ^ Long.MIN_VALUE;
+        assertEquals(puttedLongValueFull, db.getLongValue(0, "long_full"));
+
+        final int puttedIntValueFull = from(16).toByteBuffer().getInt() ^ Integer.MIN_VALUE;
+        assertEquals(puttedIntValueFull, db.getIntValue(0, "int_full"));
+
+        final long puttedLongValueSortable = from(15L).toByteBuffer().getLong() ^ Long.MIN_VALUE;
+        assertEquals(puttedLongValueSortable, db.getLongValue(0, "long_sortable"));
+
+        final int puttedIntValueSortable = from(16).toByteBuffer().getInt() ^ Integer.MIN_VALUE;
+        assertEquals(puttedIntValueSortable, db.getIntValue(0, "int_sortable"));
 
         // Document 2
 

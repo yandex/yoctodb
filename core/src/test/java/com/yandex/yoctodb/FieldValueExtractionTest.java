@@ -29,6 +29,8 @@ import static org.junit.Assert.assertEquals;
  */
 public class FieldValueExtractionTest {
     private static final String FIELD_NAME = "id";
+    private static final String INT_FIELD_NAME = "int_id";
+    private static final String LONG_FIELD_NAME = "long_id";
 
     private DocumentProvider build(
             final IndexOption indexOption) throws IOException {
@@ -43,6 +45,8 @@ public class FieldValueExtractionTest {
                                 FIELD_NAME,
                                 0,
                                 indexOption)
+                        .withField(INT_FIELD_NAME, 25, indexOption)
+                        .withField(LONG_FIELD_NAME, 25L, indexOption)
                         .withPayload("payload".getBytes())
         );
 
@@ -66,6 +70,26 @@ public class FieldValueExtractionTest {
         final DocumentProvider db = build(IndexOption.SORTABLE);
 
         assertEquals(from(0).toByteBuffer(), db.getFieldValue(0, FIELD_NAME));
+    }
+
+    @Test
+    public void extractStoredFieldValue() throws IOException {
+        final DocumentProvider db = build(IndexOption.STORED);
+        assertEquals(from(0).toByteBuffer(), db.getFieldValue(0, FIELD_NAME));
+    }
+
+    @Test
+    public void extractStoredLong() throws IOException {
+        final DocumentProvider db = build(IndexOption.STORED);
+        final long storedValue = from(25L).toByteBuffer().getLong() ^ Long.MIN_VALUE;
+        assertEquals(storedValue, db.getLongValue(0, LONG_FIELD_NAME));
+    }
+
+    @Test
+    public void extractStoredInt() throws IOException {
+        final DocumentProvider db = build(IndexOption.STORED);
+        final long storedValue = from(25).toByteBuffer().getInt() ^ Integer.MIN_VALUE;
+        assertEquals(storedValue, db.getIntValue(0, INT_FIELD_NAME));
     }
 
     @Test(expected = AssertionError.class)

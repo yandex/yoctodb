@@ -72,6 +72,8 @@ public class CompositeFileDatabaseTest {
                             .withField("field2", "2", FILTERABLE)
                             .withField("index", i, FULL)
                             .withField("relevance", -i, SORTABLE)
+                            .withField("stored_long_value", Long.valueOf(i), STORED)
+                            .withField("stored_int_value", i, STORED)
                             .withPayload(("payload1=" + i).getBytes())
             );
         }
@@ -95,6 +97,8 @@ public class CompositeFileDatabaseTest {
                             .withField("field2", "1", FILTERABLE)
                             .withField("index", i, FULL)
                             .withField("relevance", i, SORTABLE)
+                            .withField("stored_long_value", Long.valueOf(i), STORED)
+                            .withField("stored_int_value", i, STORED)
                             .withPayload(("payload2=" + i).getBytes())
             );
         }
@@ -529,7 +533,7 @@ public class CompositeFileDatabaseTest {
 
     @Test
     public void emptyCompositeDatabaseFieldSearch() {
-        final Database db = READER.composite(new ArrayList<IndexedDatabase>());
+        final Database db = READER.composite(new ArrayList<>());
 
         final Query query =
                 select().where(
@@ -591,6 +595,28 @@ public class CompositeFileDatabaseTest {
             assertEquals(
                     from(-id).toByteBuffer(),
                     db.getFieldValue(id, "relevance"));
+        }
+    }
+
+    @Test
+    public void extractFieldValuesAsLong() {
+        for (int i = 0; i < 2 * DOCS; i++) {
+            final int id = i % DOCS;
+            final long puttedValue = from(Long.valueOf(id)).toByteBuffer().getLong() ^ Long.MIN_VALUE;
+            assertEquals(
+                    puttedValue,
+                    db.getLongValue(id, "stored_long_value"));
+        }
+    }
+
+    @Test
+    public void extractFieldValueAsInt() {
+        for (int i = 0; i < 2 * DOCS; i++) {
+            final int id = i % DOCS;
+            final long puttedValue = from(id).toByteBuffer().getInt() ^ Integer.MIN_VALUE;
+            assertEquals(
+                    puttedValue,
+                    db.getIntValue(id, "stored_int_value"));
         }
     }
 }
