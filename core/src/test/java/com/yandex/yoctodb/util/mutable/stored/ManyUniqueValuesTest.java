@@ -24,23 +24,11 @@ public class ManyUniqueValuesTest {
     @Test
     public void values300() throws IOException {
         testDB(300);
-        /*
-        Result:
-        Write 300 values in 41 ms
-        Read database in 12 ms
-        Read 300 values in 5 ms
-         */
     }
 
     @Test
     public void values70000() throws IOException {
         testDB(70000);
-        /*
-        Result
-        Write 70000 values in 321 ms
-        Read database in 12 ms
-        Read 70000 values56 ms
-         */
     }
 
     private void testDB(final int size) throws IOException {

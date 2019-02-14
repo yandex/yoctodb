@@ -3,7 +3,7 @@ package com.yandex.yoctodb.v1.immutable.segment;
 import com.yandex.yoctodb.immutable.StoredIndex;
 import com.yandex.yoctodb.util.buf.Buffer;
 import com.yandex.yoctodb.util.immutable.ByteArrayIndexedList;
-import com.yandex.yoctodb.util.immutable.impl.FoldedByteArrayIndex;
+import com.yandex.yoctodb.util.immutable.impl.FoldedByteArrayIndexedList;
 import com.yandex.yoctodb.util.immutable.impl.VariableLengthByteArrayIndexedList;
 import com.yandex.yoctodb.v1.V1DatabaseFormat;
 import org.jetbrains.annotations.NotNull;
@@ -51,7 +51,7 @@ public class V1StoredIndex implements StoredIndex, Segment {
                         final String fieldName = Segments.extractString(buffer);
 
                         final ByteArrayIndexedList values =
-                                FoldedByteArrayIndex.from(
+                                FoldedByteArrayIndexedList.from(
                                         Segments.extract(buffer));
 
                         return new V1StoredIndex(

@@ -35,7 +35,10 @@ public class VariableLengthByteArrayIndexedListTest {
     private ByteArrayIndexedList build() throws IOException {
         final Collection<UnsignedByteArray> elements = new LinkedList<>();
         for (int i = 0; i < VALUES; i++) {
+            if (i % 2 == 0)
                 elements.add(from(i));
+            else
+                elements.add(from((long) i));
         }
         final com.yandex.yoctodb.util.mutable.ByteArrayIndexedList mutable =
                 new com.yandex.yoctodb.util.mutable.impl.VariableLengthByteArrayIndexedList(elements);

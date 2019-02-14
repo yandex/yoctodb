@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
 
-public class FoldedByteArrayIndex implements ByteArrayIndexedList {
+public class FoldedByteArrayIndexedList implements ByteArrayIndexedList {
     private final int elementCount;
     @NotNull
     private final Function<Integer, Integer> getOffsetIndex;
@@ -23,7 +23,7 @@ public class FoldedByteArrayIndex implements ByteArrayIndexedList {
         final int elementsCount = buf.getInt();
         final int offsetsCount = buf.getInt();
 
-        int sizeOfIndexOffsetValue;
+        final int sizeOfIndexOffsetValue;
         if (offsetsCount < (1 << Byte.SIZE)) {
             sizeOfIndexOffsetValue = Byte.BYTES;
         } else if (offsetsCount < (1 << Short.SIZE)) {
@@ -48,7 +48,7 @@ public class FoldedByteArrayIndex implements ByteArrayIndexedList {
         final Buffer elements = buf.slice()
                 .slice(shift, buf.remaining() - shift);
 
-        return new FoldedByteArrayIndex(
+        return new FoldedByteArrayIndexedList(
                 elementsCount,
                 sizeOfIndexOffsetValue,
                 offsets,
@@ -56,7 +56,7 @@ public class FoldedByteArrayIndex implements ByteArrayIndexedList {
                 indexes);
     }
 
-    private FoldedByteArrayIndex(
+    private FoldedByteArrayIndexedList(
             final int elementCount,
             final int sizeOfIndexOffsetValue,
             @NotNull final Buffer offsets,
@@ -96,7 +96,7 @@ public class FoldedByteArrayIndex implements ByteArrayIndexedList {
 
     @Override
     public String toString() {
-        return "FoldedByteArrayIndex{" +
+        return "FoldedByteArrayIndexedList{" +
                 "elementCount=" + elementCount +
                 '}';
     }

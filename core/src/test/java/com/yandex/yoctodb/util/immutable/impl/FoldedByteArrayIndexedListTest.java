@@ -14,7 +14,7 @@ import static com.yandex.yoctodb.util.UnsignedByteArrays.from;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class FoldedByteArrayIndexTest {
+public class FoldedByteArrayIndexedListTest {
 
     private ByteArrayIndexedList build(int size) throws IOException {
         final Collection<UnsignedByteArray> elements = new LinkedList<>();
@@ -37,7 +37,7 @@ public class FoldedByteArrayIndexTest {
         final Buffer buf = Buffer.from(baos.toByteArray());
 
         final ByteArrayIndexedList result =
-                FoldedByteArrayIndex.from(buf);
+                FoldedByteArrayIndexedList.from(buf);
 
         assertEquals(size, result.size());
 

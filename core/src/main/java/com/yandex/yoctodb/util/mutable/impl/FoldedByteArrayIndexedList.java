@@ -58,7 +58,7 @@ final public class FoldedByteArrayIndexedList implements ByteArrayIndexedList {
         offsets.set(0, 0L);
 
         // analyze result of offsets
-        int offsetCount = offsets.size();
+        final int offsetCount = offsets.size();
         if (offsetCount < (1 << Byte.SIZE)) {
             sizeOfIndexOffsetValue = Byte.BYTES;
         } else if (offsetCount < (1 << Short.SIZE)) {

@@ -23,25 +23,11 @@ public class ManyNonUniqueValuesTest {
     @Test
     public void twoByte() throws IOException {
         testDB(300);
-        /*
-        Result:
-        Write 290 values in 10 ms
-        Read database in 76 ms
-        Read 10 values in 0 ms
-        Read 290 in 3 ms
-         */
     }
 
     @Test
     public void fourByte() throws IOException {
         testDB(70000);
-        /*
-        Result:
-        Write 69990 values in 265 ms
-        Read database in 53 ms
-        Read and compare 10 values in 0 ms
-        Read and compare 69990 in 56 ms
-        */
     }
 
     private void testDB(final int size) throws IOException {

@@ -75,7 +75,7 @@ public class FoldedByteArrayIndexedListTest {
 
         final int offsetsCount = buf.getInt();
 
-        System.out.println("Offsets count is: " + offsetsCount);
+//        System.out.println("Offsets count is: " + offsetsCount);
         int sizeOfIndexOffsetValue;
         if (offsetsCount <= 127) { // one byte 2^8 - 1 = 127
             sizeOfIndexOffsetValue = 1;
@@ -90,32 +90,32 @@ public class FoldedByteArrayIndexedListTest {
         // indexes of offsets
         final Buffer indexes = buf.slice((elementsCount) * sizeOfIndexOffsetValue);
 
-        System.out.println("Idexes remaining " + indexes.remaining());
+//        System.out.println("Idexes remaining " + indexes.remaining());
 
-        System.out.println("remaining " + indexes.remaining());
-        System.out.println("value 0 " + getOffsetIndex(indexes, 0, sizeOfIndexOffsetValue)); // todo в assert!
-        System.out.println("value 1 " + getOffsetIndex(indexes, 1, sizeOfIndexOffsetValue));
-        System.out.println("value 2 " + getOffsetIndex(indexes, 2, sizeOfIndexOffsetValue));
-        System.out.println("remaining " + indexes.remaining());
+//        System.out.println("remaining " + indexes.remaining());
+//        System.out.println("value 0 " + getOffsetIndex(indexes, 0, sizeOfIndexOffsetValue)); // todo в assert!
+//        System.out.println("value 1 " + getOffsetIndex(indexes, 1, sizeOfIndexOffsetValue));
+//        System.out.println("value 2 " + getOffsetIndex(indexes, 2, sizeOfIndexOffsetValue));
+//        System.out.println("remaining " + indexes.remaining());
 
         long shift = indexes.remaining();
 
-        System.out.println(offsetsCount);
+//        System.out.println(offsetsCount);
 
         // then offsets of element value
-        System.out.println("After slicing indexes shift is: " + shift);
-        System.out.println("After slicing indexes offsets size is: " + (buf.remaining() - shift));
+//        System.out.println("After slicing indexes shift is: " + shift);
+//        System.out.println("After slicing indexes offsets size is: " + (buf.remaining() - shift));
 
         final Buffer offsets = buf.slice() // получаем здесь копию buf
                 .slice(shift, buf.remaining() - shift) // смещаемся до места, с которого начинаются offsets
                 .slice((offsetsCount) << 3); // отрезаем столько, сколько offsets занимают!
 
-        System.out.println("Offset remaining " + offsets.remaining());
+//        System.out.println("Offset remaining " + offsets.remaining());
 
         shift = shift + offsets.remaining();
 
-        System.out.println("After slicing indexes shift is: " + shift);
-        System.out.println("After slicing indexes offsets size is: " + (buf.remaining() - shift));
+//        System.out.println("After slicing indexes shift is: " + shift);
+//        System.out.println("After slicing indexes offsets size is: " + (buf.remaining() - shift));
 
 
         // then elements value
@@ -123,31 +123,13 @@ public class FoldedByteArrayIndexedListTest {
                 .slice(shift, (long) (buf.remaining() - shift))
                 .slice();
 
-        System.out.println("Elements remaining " + elements.remaining());
-
-        System.out.println("remaining " + offsets.remaining());
-        System.out.println("value 0 " + getValueIndex(indexes, offsets, 0, sizeOfIndexOffsetValue));
-        System.out.println("value 1 " + getValueIndex(indexes, offsets, 1, sizeOfIndexOffsetValue));
-        System.out.println("value 2 " + getValueIndex(indexes, offsets, 2, sizeOfIndexOffsetValue));
-        System.out.println("remaining " + offsets.remaining());
-
-        // осталось 7 бит - это NEW + USED!
-        Buffer buffer;
-
-        buffer = getValue(indexes, offsets, elements, 0, sizeOfIndexOffsetValue);
-        UnsignedByteArray byteArray = UnsignedByteArrays.from(buffer);
-        String value = UnsignedByteArrays.toString(byteArray);
-        System.out.println(value);
-
-        buffer = getValue(indexes, offsets, elements, 1, sizeOfIndexOffsetValue);
-        byteArray = UnsignedByteArrays.from(buffer);
-        value = UnsignedByteArrays.toString(byteArray);
-        System.out.println(value);
-
-        buffer = getValue(indexes, offsets, elements, 2, sizeOfIndexOffsetValue);
-        byteArray = UnsignedByteArrays.from(buffer);
-        value = UnsignedByteArrays.toString(byteArray);
-        System.out.println(value);
+//        System.out.println("Elements remaining " + elements.remaining());
+//
+//        System.out.println("remaining " + offsets.remaining());
+//        System.out.println("value 0 " + getValueIndex(indexes, offsets, 0, sizeOfIndexOffsetValue));
+//        System.out.println("value 1 " + getValueIndex(indexes, offsets, 1, sizeOfIndexOffsetValue));
+//        System.out.println("value 2 " + getValueIndex(indexes, offsets, 2, sizeOfIndexOffsetValue));
+//        System.out.println("remaining " + offsets.remaining());
 
         assertEquals(getValueFromBuffer(getValue(indexes, offsets, elements, 0, sizeOfIndexOffsetValue)), "NEW");
         assertEquals(getValueFromBuffer(getValue(indexes, offsets, elements, 1, sizeOfIndexOffsetValue)), "USED");

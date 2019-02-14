@@ -103,7 +103,7 @@ public final class V1DatabaseFormat extends DatabaseFormat {
         FIXED_LENGTH_FULL_INDEX(5000),
         VARIABLE_LENGTH_FULL_INDEX(6000),
         VARIABLE_LENGTH_STORED_INDEX(8000),
-        VARIABLE_LENGTH_FOLDED_INDEX( 7000);
+        VARIABLE_LENGTH_FOLDED_INDEX(7000);
 
         private final int code;
 
