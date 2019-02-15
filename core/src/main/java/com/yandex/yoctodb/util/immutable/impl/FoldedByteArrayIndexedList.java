@@ -2,10 +2,17 @@ package com.yandex.yoctodb.util.immutable.impl;
 
 import com.yandex.yoctodb.util.buf.Buffer;
 import com.yandex.yoctodb.util.immutable.ByteArrayIndexedList;
+import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
-
+/**
+ * {@link com.yandex.yoctodb.util.immutable.ByteArrayIndexedList} with fixed size
+ * elements
+ *
+ * @author irenkamalova
+ */
+@Immutable
 public class FoldedByteArrayIndexedList implements ByteArrayIndexedList {
     private final int elementCount;
     @NotNull

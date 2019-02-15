@@ -5,6 +5,7 @@ import com.google.common.primitives.Longs;
 import com.yandex.yoctodb.util.OutputStreamWritable;
 import com.yandex.yoctodb.util.UnsignedByteArray;
 import com.yandex.yoctodb.util.mutable.ByteArrayIndexedList;
+import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -17,7 +18,14 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-final public class FoldedByteArrayIndexedList implements ByteArrayIndexedList {
+/**
+ * {@link ByteArrayIndexedList} with variable sized elements
+ *
+ * @author irenkamalova
+ */
+@NotThreadSafe
+public final class FoldedByteArrayIndexedList
+        implements ByteArrayIndexedList {
     @NotNull
     private final Set<UnsignedByteArray> elements;
     @NotNull

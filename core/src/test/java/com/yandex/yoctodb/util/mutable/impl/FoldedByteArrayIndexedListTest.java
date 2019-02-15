@@ -36,7 +36,7 @@ public class FoldedByteArrayIndexedListTest {
         for (int i = 0; i < 10; i++) {
             elements.add(from(Integer.toString(0)));
         }
-        long start = System.currentTimeMillis();
+
         for (int i = 10; i < size; i++) {
             elements.add(from(Integer.toString(i)));
         }
@@ -66,7 +66,8 @@ public class FoldedByteArrayIndexedListTest {
         set.writeTo(os);
 
         Buffer buf = Buffer.from(os.toByteArray());
-        System.out.println("Full buffer size in bytes: " + buf.remaining());
+        // Full buffer size in bytes: 51
+        assertEquals(51, buf.remaining());
 
         // getInt() возвращает (первый Int?) количество элементов,
         // которое мы записали в буфер
@@ -75,7 +76,9 @@ public class FoldedByteArrayIndexedListTest {
 
         final int offsetsCount = buf.getInt();
 
-//        System.out.println("Offsets count is: " + offsetsCount);
+        // Offsets count is: 4
+        assertEquals(4, offsetsCount);
+
         int sizeOfIndexOffsetValue;
         if (offsetsCount <= 127) { // one byte 2^8 - 1 = 127
             sizeOfIndexOffsetValue = 1;
@@ -85,37 +88,37 @@ public class FoldedByteArrayIndexedListTest {
             sizeOfIndexOffsetValue = 4;
         }
 
+        assertEquals(43, buf.remaining());
 
-        System.out.println("Remaining: " + buf.remaining());
         // indexes of offsets
         final Buffer indexes = buf.slice((elementsCount) * sizeOfIndexOffsetValue);
 
-//        System.out.println("Idexes remaining " + indexes.remaining());
+        assertEquals(4, indexes.remaining());
 
-//        System.out.println("remaining " + indexes.remaining());
-//        System.out.println("value 0 " + getOffsetIndex(indexes, 0, sizeOfIndexOffsetValue)); // todo в assert!
-//        System.out.println("value 1 " + getOffsetIndex(indexes, 1, sizeOfIndexOffsetValue));
-//        System.out.println("value 2 " + getOffsetIndex(indexes, 2, sizeOfIndexOffsetValue));
-//        System.out.println("remaining " + indexes.remaining());
+        assertEquals(1, getOffsetIndex(indexes, 0, sizeOfIndexOffsetValue)); // todo в assert!
+        assertEquals(2, getOffsetIndex(indexes, 1, sizeOfIndexOffsetValue));
+        assertEquals(1, getOffsetIndex(indexes, 2, sizeOfIndexOffsetValue));
 
         long shift = indexes.remaining();
 
-//        System.out.println(offsetsCount);
-
-        // then offsets of element value
-//        System.out.println("After slicing indexes shift is: " + shift);
-//        System.out.println("After slicing indexes offsets size is: " + (buf.remaining() - shift));
+        // After slicing indexes shift is: 4
+        assertEquals(4, shift);
+        // After slicing indexes offsets size is: 39
+        assertEquals(39, (buf.remaining() - shift));
 
         final Buffer offsets = buf.slice() // получаем здесь копию buf
                 .slice(shift, buf.remaining() - shift) // смещаемся до места, с которого начинаются offsets
                 .slice((offsetsCount) << 3); // отрезаем столько, сколько offsets занимают!
 
-//        System.out.println("Offset remaining " + offsets.remaining());
+        // Offset remaining = 32
+        assertEquals(32, offsets.remaining());
 
         shift = shift + offsets.remaining();
 
-//        System.out.println("After slicing indexes shift is: " + shift);
-//        System.out.println("After slicing indexes offsets size is: " + (buf.remaining() - shift));
+        // After slicing indexes shift is: 36
+        assertEquals(36, shift);
+        // After slicing indexes offsets size is: 7
+        assertEquals(7, (buf.remaining() - shift));
 
 
         // then elements value
@@ -123,13 +126,32 @@ public class FoldedByteArrayIndexedListTest {
                 .slice(shift, (long) (buf.remaining() - shift))
                 .slice();
 
-//        System.out.println("Elements remaining " + elements.remaining());
-//
-//        System.out.println("remaining " + offsets.remaining());
-//        System.out.println("value 0 " + getValueIndex(indexes, offsets, 0, sizeOfIndexOffsetValue));
-//        System.out.println("value 1 " + getValueIndex(indexes, offsets, 1, sizeOfIndexOffsetValue));
-//        System.out.println("value 2 " + getValueIndex(indexes, offsets, 2, sizeOfIndexOffsetValue));
-//        System.out.println("remaining " + offsets.remaining());
+        assertEquals(7, elements.remaining());
+
+        // value 0 0
+        assertEquals(0, getValueIndex(indexes, offsets, 0, sizeOfIndexOffsetValue));
+        // value 1 3
+        assertEquals(3, getValueIndex(indexes, offsets, 1, sizeOfIndexOffsetValue));
+        // value 2 0
+        assertEquals(0, getValueIndex(indexes, offsets, 2, sizeOfIndexOffsetValue));
+
+        // осталось 7 бит - это NEW + USED!
+        Buffer buffer;
+
+        buffer = getValue(indexes, offsets, elements, 0, sizeOfIndexOffsetValue);
+        UnsignedByteArray byteArray = UnsignedByteArrays.from(buffer);
+        String value = UnsignedByteArrays.toString(byteArray);
+        assertEquals("NEW", value);
+
+        buffer = getValue(indexes, offsets, elements, 1, sizeOfIndexOffsetValue);
+        byteArray = UnsignedByteArrays.from(buffer);
+        value = UnsignedByteArrays.toString(byteArray);
+        assertEquals("USED", value);
+
+        buffer = getValue(indexes, offsets, elements, 2, sizeOfIndexOffsetValue);
+        byteArray = UnsignedByteArrays.from(buffer);
+        value = UnsignedByteArrays.toString(byteArray);
+        assertEquals("NEW", value);
 
         assertEquals(getValueFromBuffer(getValue(indexes, offsets, elements, 0, sizeOfIndexOffsetValue)), "NEW");
         assertEquals(getValueFromBuffer(getValue(indexes, offsets, elements, 1, sizeOfIndexOffsetValue)), "USED");
