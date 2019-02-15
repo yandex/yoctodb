@@ -13,7 +13,7 @@ import java.util.function.Function;
  * @author irenkamalova
  */
 @Immutable
-public class FoldedByteArrayIndexedList implements ByteArrayIndexedList {
+public final class FoldedByteArrayIndexedList implements ByteArrayIndexedList {
     private final int elementCount;
     @NotNull
     private final Function<Integer, Integer> getOffsetIndex;
