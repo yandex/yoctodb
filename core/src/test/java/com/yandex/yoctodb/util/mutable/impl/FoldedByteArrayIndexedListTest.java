@@ -173,13 +173,11 @@ public class FoldedByteArrayIndexedListTest {
                                Buffer offsets,
                                int docId,
                                int sizeOfIndexOffsetValue) {
-        // если здесь не использовать slice - не ломается :)
         int offsetIndex = getOffsetIndex(indexes, docId, sizeOfIndexOffsetValue);
         return offsets.getLong(offsetIndex << 3);
     }
 
     private int getOffsetIndex(Buffer indexes, int docId, int sizeOfIndexOffsetValue) {
-        // если здесь не использовать slice - не ломается :)
         switch (sizeOfIndexOffsetValue) {
             case (Byte.BYTES): {
                 // write every int to one byte

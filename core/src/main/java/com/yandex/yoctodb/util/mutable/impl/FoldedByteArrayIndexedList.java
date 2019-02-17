@@ -2,6 +2,7 @@ package com.yandex.yoctodb.util.mutable.impl;
 
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
+import com.google.common.primitives.Shorts;
 import com.yandex.yoctodb.util.OutputStreamWritable;
 import com.yandex.yoctodb.util.UnsignedByteArray;
 import com.yandex.yoctodb.util.mutable.ByteArrayIndexedList;
@@ -11,7 +12,6 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -55,8 +55,8 @@ public final class FoldedByteArrayIndexedList
             final long currentElementOffset = elementOffset;
             elem.getValue().forEach(docId ->
                     docIdOffsetIndex
-                         .put(docId,
-                         offsets.indexOf(currentElementOffset)));
+                            .put(docId,
+                                    offsets.indexOf(currentElementOffset)));
             elementOffset += value.getSizeInBytes();
         }
 
@@ -90,18 +90,31 @@ public final class FoldedByteArrayIndexedList
                 elementSize; // Element array size in bytes
     }
 
+    static byte[] oneByteFromInteger(Integer data) {
+        return new byte[]{data.byteValue()};
+    }
+
+    @Override
+    public String toString() {
+        return "FoldedByteArrayIndexedList{" +
+                "elementsCount=" + docIdOffsetIndex.size() +
+                '}';
+    }
+
+    static byte[] twoBytesFromInteger(Integer data) {
+        return Shorts.toByteArray(data.shortValue());
+    }
+
     @Override
     public void writeTo(
             @NotNull final OutputStream os) throws IOException {
         // elements count
         os.write(Ints.toByteArray(databaseDocumentsCount));
 
-        // write offsets count!
-        // before writing indexes because
-        // you should to know how to deserialize it
+        // write offsets count
         os.write(Ints.toByteArray(offsets.size()));
 
-        List<Integer> offsetIndexes = new ArrayList<>();
+        final List<Integer> offsetIndexes = new ArrayList<>();
         int expectedDocument = 0;
         for (Integer docId : docIdOffsetIndex.keySet()) {
             while (expectedDocument < docId) {
@@ -153,25 +166,4 @@ public final class FoldedByteArrayIndexedList
             e.writeTo(os);
         }
     }
-
-    @Override
-    public String toString() {
-        return "FoldedByteArrayIndexedList{" +
-                "elementsCount=" + docIdOffsetIndex.size() +
-                '}';
-    }
-
-    private byte[] oneByteFromInteger(Integer data) {
-        return new byte[]{
-                (byte) ((data) & 0xff)
-        };
-    }
-
-    private byte[] twoBytesFromInteger(Integer data) {
-        return new byte[]{
-                (byte) ((data >> 8) & 0xff),
-                (byte) ((data) & 0xff)
-        };
-    }
-
 }
