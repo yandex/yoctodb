@@ -232,6 +232,70 @@ public final class FileChannelBuffer extends Buffer {
     }
 
     @Override
+    public char getChar() {
+        assert remaining()  >= Character.BYTES;
+
+        final ByteBuffer charBuf = charBufCache.get();
+        try {
+            final int c = ch.read(charBuf, this.offset + this.position);
+            assert c == Character.BYTES;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        this.position += Character.BYTES;
+
+        return charBuf.getChar(0);
+    }
+
+    @Override
+    public char getChar(final long index) {
+        assert index + Character.BYTES <= limit;
+
+        final ByteBuffer charBuf = charBufCache.get();
+        try {
+            final int c = ch.read(charBuf, this.offset + index);
+            assert c == Character.BYTES;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return charBuf.getChar(0);
+    }
+
+    @Override
+    public short getShort() {
+        assert remaining()  >= Short.BYTES;
+
+        final ByteBuffer shortBuf = shortBufCache.get();
+        try {
+            final int c = ch.read(shortBuf, this.offset + this.position);
+            assert c == Short.BYTES;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        this.position += Short.BYTES;
+
+        return shortBuf.getShort(0);
+    }
+
+    @Override
+    public short getShort(final long index) {
+        assert index + Short.BYTES <= limit;
+
+        final ByteBuffer shortBuf = shortBufCache.get();
+        try {
+            final int c = ch.read(shortBuf, this.offset + index);
+            assert c == Short.BYTES;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return shortBuf.getShort(0);
+    }
+
+    @Override
     public Buffer slice(final long from, final long size) {
         assert 0 <= from;
         assert 0 <= size;
@@ -277,6 +341,36 @@ public final class FileChannelBuffer extends Buffer {
                 @Override
                 protected ByteBuffer initialValue() {
                     return ByteBuffer.allocate(8);
+                }
+
+                @Override
+                public ByteBuffer get() {
+                    final ByteBuffer result = super.get();
+                    result.rewind();
+                    return result;
+                }
+            };
+
+    private final ThreadLocal<ByteBuffer> shortBufCache =
+            new ThreadLocal<ByteBuffer>() {
+                @Override
+                protected ByteBuffer initialValue() {
+                    return ByteBuffer.allocate(Short.BYTES);
+                }
+
+                @Override
+                public ByteBuffer get() {
+                    final ByteBuffer result = super.get();
+                    result.rewind();
+                    return result;
+                }
+            };
+
+    private final ThreadLocal<ByteBuffer> charBufCache =
+            new ThreadLocal<ByteBuffer>() {
+                @Override
+                protected ByteBuffer initialValue() {
+                    return ByteBuffer.allocate(Character.BYTES);
                 }
 
                 @Override

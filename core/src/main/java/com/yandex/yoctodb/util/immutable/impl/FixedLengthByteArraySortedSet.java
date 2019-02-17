@@ -96,6 +96,28 @@ public final class FixedLengthByteArraySortedSet
     }
 
     @Override
+    public short getShortUnsafe(final int i) {
+        assert 0 <= i && i < size;
+
+        final int res = elements.getShort(((long) i) * elementSize) ^ Short.MIN_VALUE;
+
+        assert Short.MIN_VALUE <= res && res <= Short.MAX_VALUE;
+
+        return (short) res;
+    }
+
+    @Override
+    public char getCharUnsafe(int i) {
+        assert 0 <= i && i < size;
+
+        final int res = elements.getChar(((long) i) * elementSize) ^ Character.MIN_VALUE;
+
+        assert Character.MIN_VALUE <= res && res <= Character.MAX_VALUE;
+
+        return (char) res;
+    }
+
+    @Override
     public String toString() {
         return "FixedLengthByteArraySortedSet{" +
                "elementSize=" + elementSize +

@@ -77,6 +77,30 @@ public class FixedLengthByteArrayIndexedList
     }
 
     @Override
+    public short getShortUnsafe(final int i) {
+        assert 0 <= i && i < elementCount;
+        assert elementSize == Short.BYTES;
+
+        final int res = elements.getShort() ^ Short.MIN_VALUE;
+
+        assert res >= Short.MIN_VALUE && res <= Short.MAX_VALUE;
+
+        return (short) res;
+    }
+
+    @Override
+    public char getCharUnsafe(final int i) {
+        assert 0 <= i && i < elementCount;
+        assert elementSize == Character.BYTES;
+
+        final int res = elements.getChar() ^ Character.MIN_VALUE;
+
+        assert res >= Character.MIN_VALUE && res <= Character.MAX_VALUE;
+
+        return (char) res;
+    }
+
+    @Override
     public int size() {
         return elementCount;
     }

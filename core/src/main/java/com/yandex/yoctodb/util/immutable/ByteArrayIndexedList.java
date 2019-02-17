@@ -28,5 +28,9 @@ public interface ByteArrayIndexedList {
 
     int getIntUnsafe(int i);
 
+    short getShortUnsafe(int i);
+
+    char getCharUnsafe(int i);
+
     int size();
 }

@@ -120,6 +120,14 @@ public abstract class Buffer implements Comparable<Buffer> {
 
     public abstract long getLong(long index);
 
+    public abstract char getChar();
+
+    public abstract char getChar(long index);
+
+    public abstract short getShort();
+
+    public abstract short getShort(long index);
+
     public Buffer slice() {
         return slice(remaining());
     }
