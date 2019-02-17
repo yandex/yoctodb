@@ -134,7 +134,7 @@
                 <configuration>
                     <source>${javac.target}</source>
                     <target>${javac.target}</target>
-                    <showDeprecation>false</showDeprecation>
+                    <showDeprecation>true</showDeprecation>
                     <showWarnings>true</showWarnings>
                     <fork>true</fork>
                 </configuration>

@@ -85,8 +85,7 @@ public abstract class AbstractDocumentBuilder
     @Override
     public DocumentBuilder withField(
             @NotNull
-            final
-            String name,
+            final String name,
             final long value,
             @NotNull
             final IndexOption index) {
@@ -95,8 +94,7 @@ public abstract class AbstractDocumentBuilder
 
     public DocumentBuilder withField(
             @NotNull
-            final
-            String name,
+            final String name,
             final char value,
             @NotNull
             final IndexOption index

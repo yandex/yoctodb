@@ -36,7 +36,7 @@ public interface DocumentProvider {
     /**
      * Get {@code document} document {@code fieldName} field value.
      *
-     * The field must be sortable, stored or full
+     * The field must be sortable, stored or full.
      *
      * @see com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption#SORTABLE
      * @see com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption#FULL
@@ -54,7 +54,7 @@ public interface DocumentProvider {
     /**
      * Get {@code document} document {@code fieldName} field value as long.
      *
-     * The field must be sortable, stored or full
+     * The field must be sortable, stored or full.
      *
      * @see com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption#SORTABLE
      * @see com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption#FULL
@@ -71,7 +71,7 @@ public interface DocumentProvider {
     /**
      * Get {@code document} document {@code fieldName} field value as int.
      *
-     * The field must be sortable, stored or full
+     * The field must be sortable, stored or full.
      *
      * @see com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption#SORTABLE
      * @see com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption#FULL
@@ -88,7 +88,7 @@ public interface DocumentProvider {
     /**
      * Get {@code document} document @{code fieldName} field value as short.
      *
-     * The field must be sortable, stored or full
+     * The field must be sortable, stored or full.
      *
      * @param document document index
      * @param fieldName field name
@@ -103,7 +103,7 @@ public interface DocumentProvider {
     /**
      * Get {@code document} document {@code fieldName} field value as char.
      *
-     * The field must be sortable, stored or full
+     * The field must be sortable, stored or full.
      *
      * @see com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption#SORTABLE
      * @see com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption#FULL
