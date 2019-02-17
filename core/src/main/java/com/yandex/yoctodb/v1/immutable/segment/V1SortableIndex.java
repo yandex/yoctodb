@@ -93,6 +93,16 @@ public final class V1SortableIndex
         return values.getIntUnsafe(document);
     }
 
+    @Override
+    public short getShortValue(int document) {
+        return values.getShortUnsafe(document);
+    }
+
+    @Override
+    public char getCharValue(int document) {
+        return values.getCharUnsafe(document);
+    }
+
     @NotNull
     @Override
     public Iterator<IntToIntArray> ascending(

@@ -128,9 +128,29 @@ public final class V1Database implements IndexedDatabase {
             final int document,
             @NotNull
             final String fieldName) {
-        assert  storers.containsKey(fieldName);
+        assert storers.containsKey(fieldName);
 
         return storers.get(fieldName).getIntValue(document);
+    }
+
+    @Override
+    public short getShortValue(
+            final int document,
+            @NotNull
+            final String fieldName) {
+        assert storers.containsKey(fieldName);
+
+        return storers.get(fieldName).getShortValue(document);
+    }
+
+    @Override
+    public char getCharValue(
+            int document,
+            @NotNull
+            final String fieldName) {
+        assert storers.containsKey(fieldName);
+
+        return storers.get(fieldName).getCharValue(document);
     }
 
     @Override

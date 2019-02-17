@@ -157,6 +157,16 @@ public final class V1FullIndex
         return sortableDelegate.getIntValue(document);
     }
 
+    @Override
+    public short getShortValue(int document) {
+        return sortableDelegate.getShortValue(document);
+    }
+
+    @Override
+    public char getCharValue(int document) {
+        return sortableDelegate.getCharValue(document);
+    }
+
     @NotNull
     @Override
     public Iterator<IntToIntArray> ascending(
