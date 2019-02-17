@@ -31,6 +31,8 @@ public class FieldValueExtractionTest {
     private static final String FIELD_NAME = "id";
     private static final String INT_FIELD_NAME = "int_id";
     private static final String LONG_FIELD_NAME = "long_id";
+    private static final String SHORT_FIELD_NAME = "short_id";
+    private static final String CHAR_FIELD_NAME = "char_id";
 
     private DocumentProvider build(
             final IndexOption indexOption) throws IOException {
@@ -47,6 +49,8 @@ public class FieldValueExtractionTest {
                                 indexOption)
                         .withField(INT_FIELD_NAME, 25, indexOption)
                         .withField(LONG_FIELD_NAME, 25L, indexOption)
+                        .withField(SHORT_FIELD_NAME, (short) 25, indexOption)
+                        .withField(CHAR_FIELD_NAME, 'a', indexOption)
                         .withPayload("payload".getBytes())
         );
 
@@ -90,6 +94,22 @@ public class FieldValueExtractionTest {
         final DocumentProvider db = build(IndexOption.STORED);
         final long storedValue = from(25).toByteBuffer().getInt() ^ Integer.MIN_VALUE;
         assertEquals(storedValue, db.getIntValue(0, INT_FIELD_NAME));
+    }
+
+    @Test
+    public void extractStoredShort() throws IOException {
+        final DocumentProvider db = build(IndexOption.STORED);
+        final short sv = 25;
+        final long storedValue = from(sv).toByteBuffer().getShort() ^ Short.MIN_VALUE;
+        assertEquals(storedValue, db.getShortValue(0, SHORT_FIELD_NAME));
+    }
+
+    @Test
+    public void extractStoredChar() throws IOException {
+        final DocumentProvider db = build(IndexOption.STORED);
+        final char cv = 'a';
+        final long storedValue = from(cv).toByteBuffer().getChar() ^ Character.MIN_VALUE;
+        assertEquals(storedValue, db.getCharValue(0, CHAR_FIELD_NAME));
     }
 
     @Test(expected = AssertionError.class)

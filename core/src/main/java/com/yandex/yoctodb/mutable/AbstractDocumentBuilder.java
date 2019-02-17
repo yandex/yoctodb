@@ -93,6 +93,17 @@ public abstract class AbstractDocumentBuilder
         return withField(name, UnsignedByteArrays.from(value), index, LengthOption.FIXED);
     }
 
+    public DocumentBuilder withField(
+            @NotNull
+            final
+            String name,
+            final char value,
+            @NotNull
+            final IndexOption index
+    ) {
+        return withField(name, UnsignedByteArrays.from(value), index, LengthOption.FIXED);
+    }
+
     @NotNull
     @Override
     public DocumentBuilder withField(

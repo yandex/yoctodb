@@ -74,6 +74,8 @@ public class CompositeFileDatabaseTest {
                             .withField("relevance", -i, SORTABLE)
                             .withField("stored_long_value", Long.valueOf(i), STORED)
                             .withField("stored_int_value", i, STORED)
+                            .withField("stored_short_value", (short) i, STORED)
+                            .withField("stored_char_value", (char) i, STORED)
                             .withPayload(("payload1=" + i).getBytes())
             );
         }
@@ -617,6 +619,28 @@ public class CompositeFileDatabaseTest {
             assertEquals(
                     puttedValue,
                     db.getIntValue(id, "stored_int_value"));
+        }
+    }
+
+    @Test
+    public void extractFieldValuesAsShort() {
+        for (int i = 0; i < 2 * DOCS; i++) {
+            final int id = i % DOCS;
+            final long puttedValue = from((short) id).toByteBuffer().getShort() ^ Short.MIN_VALUE;
+            assertEquals(
+                    puttedValue,
+                    db.getShortValue(id, "stored_short_value"));
+        }
+    }
+
+    @Test
+    public void extractFieldValueAsChar() {
+        for (int i = 0; i < 2 * DOCS; i++) {
+            final int id = i % DOCS;
+            final long puttedValue = from((char) id).toByteBuffer().getChar() ^ Character.MIN_VALUE;
+            assertEquals(
+                    puttedValue,
+                    db.getCharValue(id, "stored_char_value"));
         }
     }
 }
