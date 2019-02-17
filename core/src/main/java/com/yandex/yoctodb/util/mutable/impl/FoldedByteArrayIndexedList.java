@@ -32,14 +32,12 @@ public final class FoldedByteArrayIndexedList
     private final List<Long> offsets;
     @NotNull
     private final SortedMap<Integer, Integer> docIdOffsetIndex;
-    private final int sizeOfIndexOffsetValue; // how many bites
+    private final int sizeOfIndexOffsetValue; // how many bytes
     private final int databaseDocumentsCount;
 
-
     public FoldedByteArrayIndexedList(
-            @NotNull final Map<UnsignedByteArray, LinkedList<Integer>> elements,
-            int databaseDocumentsCount) {
-
+            @NotNull final Map<UnsignedByteArray, List<Integer>> elements,
+            final int databaseDocumentsCount) {
         this.databaseDocumentsCount = databaseDocumentsCount;
         this.docIdOffsetIndex = new TreeMap<>();
         this.offsets = new ArrayList<>();
@@ -49,13 +47,13 @@ public final class FoldedByteArrayIndexedList
         // reserve first value for empty documents
         offsets.add(-1L);
 
-        for (Map.Entry<UnsignedByteArray, LinkedList<Integer>> elem :
+        for (Map.Entry<UnsignedByteArray, List<Integer>> elem :
                 elements.entrySet()) {
             UnsignedByteArray value = elem.getKey();
             offsets.add(elementOffset);
 
             final long currentElementOffset = elementOffset;
-            elem.getValue().forEach( docId ->
+            elem.getValue().forEach(docId ->
                     docIdOffsetIndex
                          .put(docId,
                          offsets.indexOf(currentElementOffset)));

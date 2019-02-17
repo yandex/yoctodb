@@ -6,6 +6,7 @@ import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
+
 /**
  * {@link com.yandex.yoctodb.util.immutable.ByteArrayIndexedList} with fixed size
  * elements
@@ -45,9 +46,10 @@ public final class FoldedByteArrayIndexedList implements ByteArrayIndexedList {
         long shift = indexes.remaining();
 
         // then offsets of element value
+        long offsetsSizeBytes = offsetsCount * Long.BYTES;
+
         final Buffer offsets = buf.slice()
-                .slice(shift, buf.remaining() - shift)
-                .slice((offsetsCount) << 3);
+                .slice(shift, offsetsSizeBytes);
 
         shift = shift + offsets.remaining();
 
@@ -58,23 +60,23 @@ public final class FoldedByteArrayIndexedList implements ByteArrayIndexedList {
         return new FoldedByteArrayIndexedList(
                 elementsCount,
                 sizeOfIndexOffsetValue,
+                indexes,
                 offsets,
-                elements,
-                indexes);
+                elements);
     }
 
     private FoldedByteArrayIndexedList(
             final int elementCount,
             final int sizeOfIndexOffsetValue,
+            @NotNull final Buffer indexes,
             @NotNull final Buffer offsets,
-            @NotNull final Buffer elements,
-            @NotNull final Buffer indexes) {
+            @NotNull final Buffer elements) {
         assert elementCount >= 0 : "Negative element count";
 
         this.elementCount = elementCount;
+        this.indexes = indexes;
         this.elements = elements;
         this.offsets = offsets;
-        this.indexes = indexes;
 
         if (sizeOfIndexOffsetValue == Byte.BYTES) {
             this.getOffsetIndex = this::oneByteToInt;
@@ -90,9 +92,9 @@ public final class FoldedByteArrayIndexedList implements ByteArrayIndexedList {
     public Buffer get(final int docId) {
         assert 0 <= docId && docId < elementCount;
 
-        int offsetIndex = getOffsetIndex.apply(docId);
-        long start = offsets.getLong(offsetIndex << 3);
-        long end = offsets.getLong((offsetIndex + 1) << 3);
+        final long offsetIndex = getOffsetIndex.apply(docId) * Long.BYTES;
+        long start = offsets.getLong(offsetIndex);
+        long end = offsets.getLong(offsetIndex + Long.BYTES);
         return elements.slice(start, end - start);
     }
 

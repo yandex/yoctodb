@@ -24,7 +24,7 @@ public class V1StoredIndex
         implements IndexSegment {
     @NotNull
     private final byte[] fieldName;
-    private Map<UnsignedByteArray, LinkedList<Integer>> valueDocId = new LinkedHashMap<>();
+    private Map<UnsignedByteArray, List<Integer>> valueDocId = new LinkedHashMap<>();
     private int databaseDocumentsCount = -1;
     private boolean uniqueValues = true;
     private int segmentTypeCode;
@@ -73,9 +73,6 @@ public class V1StoredIndex
 
         assert databaseDocumentsCount > 0;
 
-        // Padding
-
-
         // Building the index
         final OutputStreamWritable valueIndex =
                 getWritable();
@@ -113,12 +110,11 @@ public class V1StoredIndex
 
     private OutputStreamWritable getWritable() {
         if (uniqueValues) {
-
             final Collection<UnsignedByteArray> padded =
                     new ArrayList<>(databaseDocumentsCount);
             int expectedDocument = 0;
             final UnsignedByteArray empty = UnsignedByteArrays.from(new byte[]{});
-            for (Map.Entry<UnsignedByteArray, LinkedList<Integer>> e : valueDocId.entrySet()) {
+            for (Map.Entry<UnsignedByteArray, List<Integer>> e : valueDocId.entrySet()) {
                 while (expectedDocument < e.getValue().iterator().next()) {
                     padded.add(empty);
                     expectedDocument++;

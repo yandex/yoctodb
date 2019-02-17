@@ -34,37 +34,22 @@ public class ManyUniqueValuesTest {
     private void testDB(final int size) throws IOException {
         final DatabaseBuilder dbBuilder =
                 DatabaseFormat.getCurrent().newDatabaseBuilder();
-        long start = System.currentTimeMillis();
         for (int i = 0; i < size; i++) {
             dbBuilder.merge(buildTestDocument(Integer.toString((i))));
         }
-        long end = System.currentTimeMillis();
-        System.out.println("Write " + size +
-                " values in " +
-                (end - start) + " ms");
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
         dbBuilder.buildWritable().writeTo(os);
 
-        start = System.currentTimeMillis();
         final Database db =
                 DatabaseFormat.getCurrent()
                         .getDatabaseReader()
                         .from(Buffer.from(os.toByteArray()));
-        end = System.currentTimeMillis();
-        System.out.println("Read database in " + (end - start) + " ms");
 
-
-
-        start = System.currentTimeMillis();
         for (int i = 0; i < 100; i++) {
             assertEquals(Integer.toString((i)),
                     UnsignedByteArrays.toString(
                             UnsignedByteArrays.from(db.getFieldValue(i, fieldName))));
         }
-        end = System.currentTimeMillis();
-        System.out.println("Read " + size + " values in " +
-                (end - start) + " ms");
-
     }
 
     private DocumentBuilder buildTestDocument(String value) {

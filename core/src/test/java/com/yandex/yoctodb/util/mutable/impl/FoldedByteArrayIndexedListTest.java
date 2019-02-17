@@ -40,7 +40,7 @@ public class FoldedByteArrayIndexedListTest {
         for (int i = 10; i < size; i++) {
             elements.add(from(Integer.toString(i)));
         }
-        Map<UnsignedByteArray, LinkedList<Integer>> data = initData(elements);
+        Map<UnsignedByteArray, List<Integer>> data = initData(elements);
 
         final FoldedByteArrayIndexedList set =
                 new FoldedByteArrayIndexedList(data, elements.size());
@@ -59,7 +59,7 @@ public class FoldedByteArrayIndexedListTest {
     @Test
     public void checkOutputStream() throws IOException {
         final List<UnsignedByteArray> strings = initString();
-        Map<UnsignedByteArray, LinkedList<Integer>> data = initData(strings);
+        Map<UnsignedByteArray, List<Integer>> data = initData(strings);
         final FoldedByteArrayIndexedList set =
                 new FoldedByteArrayIndexedList(data, strings.size());
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -69,8 +69,6 @@ public class FoldedByteArrayIndexedListTest {
         // Full buffer size in bytes: 51
         assertEquals(51, buf.remaining());
 
-        // getInt() возвращает (первый Int?) количество элементов,
-        // которое мы записали в буфер
         final int elementsCount = buf.getInt();
         assertEquals(elementsCount, strings.size());
 
@@ -106,9 +104,8 @@ public class FoldedByteArrayIndexedListTest {
         // After slicing indexes offsets size is: 39
         assertEquals(39, (buf.remaining() - shift));
 
-        final Buffer offsets = buf.slice() // получаем здесь копию buf
-                .slice(shift, buf.remaining() - shift) // смещаемся до места, с которого начинаются offsets
-                .slice((offsetsCount) << 3); // отрезаем столько, сколько offsets занимают!
+        final Buffer offsets = buf.slice()
+                .slice(shift, (offsetsCount) << 3);
 
         // Offset remaining = 32
         assertEquals(32, offsets.remaining());
@@ -120,11 +117,8 @@ public class FoldedByteArrayIndexedListTest {
         // After slicing indexes offsets size is: 7
         assertEquals(7, (buf.remaining() - shift));
 
-
-        // then elements value
         final Buffer elements = buf.slice()
-                .slice(shift, (long) (buf.remaining() - shift))
-                .slice();
+                .slice(shift, (buf.remaining() - shift));
 
         assertEquals(7, elements.remaining());
 
@@ -135,7 +129,6 @@ public class FoldedByteArrayIndexedListTest {
         // value 2 0
         assertEquals(0, getValueIndex(indexes, offsets, 2, sizeOfIndexOffsetValue));
 
-        // осталось 7 бит - это NEW + USED!
         Buffer buffer;
 
         buffer = getValue(indexes, offsets, elements, 0, sizeOfIndexOffsetValue);
@@ -241,9 +234,9 @@ public class FoldedByteArrayIndexedListTest {
         return elements;
     }
 
-    private final Map<UnsignedByteArray, LinkedList<Integer>> initData(List<UnsignedByteArray> elements) {
+    private final Map<UnsignedByteArray, List<Integer>> initData(List<UnsignedByteArray> elements) {
 
-        Map<UnsignedByteArray, LinkedList<Integer>> values = new LinkedHashMap<>();
+        Map<UnsignedByteArray, List<Integer>> values = new LinkedHashMap<>();
         for (int i = 0; i < elements.size(); i++) {
             int documentId = i;
             UnsignedByteArray val = elements.get(documentId);
