@@ -233,7 +233,7 @@ public final class FileChannelBuffer extends Buffer {
 
     @Override
     public char getChar() {
-        assert remaining()  >= Character.BYTES;
+        assert remaining() >= Character.BYTES;
 
         final ByteBuffer charBuf = charBufCache.get();
         try {
@@ -265,7 +265,7 @@ public final class FileChannelBuffer extends Buffer {
 
     @Override
     public short getShort() {
-        assert remaining()  >= Short.BYTES;
+        assert remaining() >= Short.BYTES;
 
         final ByteBuffer shortBuf = shortBufCache.get();
         try {

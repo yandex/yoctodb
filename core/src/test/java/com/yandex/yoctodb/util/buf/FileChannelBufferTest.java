@@ -152,4 +152,40 @@ public class FileChannelBufferTest extends BufferTest {
                 .thenThrow(new IOException("Test"));
         new FileChannelBuffer(broken).getLong(0L);
     }
+
+    @Test(expected = RuntimeException.class)
+    public void getShort() throws IOException {
+        final FileChannel broken = mock(FileChannel.class);
+        when(broken.size()).thenReturn(1024L);
+        when(broken.read(any(ByteBuffer.class), anyLong()))
+                .thenThrow(new IOException("Test"));
+        new FileChannelBuffer(broken).getShort();
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void getShortByIndex() throws IOException {
+        final FileChannel broken = mock(FileChannel.class);
+        when(broken.size()).thenReturn(1024L);
+        when(broken.read(any(ByteBuffer.class), anyLong()))
+                .thenThrow(new IOException("Test"));
+        new FileChannelBuffer(broken).getShort(0L);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void getChar() throws IOException {
+        final FileChannel broken = mock(FileChannel.class);
+        when(broken.size()).thenReturn(1024L);
+        when(broken.read(any(ByteBuffer.class), anyLong()))
+                .thenThrow(new IOException("Test"));
+        new FileChannelBuffer(broken).getChar();
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void getCharByIndex() throws IOException {
+        final FileChannel broken = mock(FileChannel.class);
+        when(broken.size()).thenReturn(1024L);
+        when(broken.read(any(ByteBuffer.class), anyLong()))
+                .thenThrow(new IOException("Test"));
+        new FileChannelBuffer(broken).getChar(0L);
+    }
 }

@@ -101,6 +101,54 @@ public class ByteArrayIndexedListTest {
         }
     }
 
+    @Test
+    public void buildingFromFixedLengthByteArrayIndexedListTestShortUnsafe()
+            throws IOException {
+        //elements
+        final List<UnsignedByteArray> elements = new ArrayList<>();
+        elements.add(UnsignedByteArrays.from((short) 0));
+        elements.add(UnsignedByteArrays.from((short) 1));
+        elements.add(UnsignedByteArrays.from((short) 2));
+        elements.add(UnsignedByteArrays.from((short) 3));
+        elements.add(UnsignedByteArrays.from((short) 4));
+
+        final Buffer bb =
+                prepareDataFromFixedLengthByteArrayIndexedList(elements);
+        final ByteArrayIndexedList list =
+                FixedLengthByteArrayIndexedList.from(bb);
+
+        Assert.assertEquals(elements.size(), list.size());
+
+        for (int i = 0; i < elements.size(); ++i) {
+            final long puttedValue = elements.get(i).toByteBuffer().getShort() ^ Short.MIN_VALUE;
+            Assert.assertEquals(puttedValue, list.getShortUnsafe(i));
+        }
+    }
+
+    @Test
+    public void buildingFromFixedLengthByteArrayIndexedListTestCharUnsafe()
+            throws IOException {
+        //elements
+        final List<UnsignedByteArray> elements = new ArrayList<>();
+        elements.add(UnsignedByteArrays.from('a'));
+        elements.add(UnsignedByteArrays.from('b'));
+        elements.add(UnsignedByteArrays.from('c'));
+        elements.add(UnsignedByteArrays.from('d'));
+        elements.add(UnsignedByteArrays.from('e'));
+
+        final Buffer bb =
+                prepareDataFromFixedLengthByteArrayIndexedList(elements);
+        final ByteArrayIndexedList list =
+                FixedLengthByteArrayIndexedList.from(bb);
+
+        Assert.assertEquals(elements.size(), list.size());
+
+        for (int i = 0; i < elements.size(); ++i) {
+            final long puttedValue = elements.get(i).toByteBuffer().getChar() ^ Character.MIN_VALUE;
+            Assert.assertEquals(puttedValue, list.getCharUnsafe(i));
+        }
+    }
+
     private Buffer prepareDataFromFixedLengthByteArrayIndexedList(
             final Collection<UnsignedByteArray> elements) throws IOException {
         final com.yandex.yoctodb.util.mutable.impl.FixedLengthByteArrayIndexedList fixedLengthByteArrayIndexedList =

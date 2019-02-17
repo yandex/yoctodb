@@ -456,6 +456,12 @@ public class SimpleDatabaseTest {
                         .withField("int_full", 16, FULL)
                         .withField("long_sortable", 15L, SORTABLE)
                         .withField("int_sortable", 16, SORTABLE)
+                        .withField("short_stored", (short) 15, STORED)
+                        .withField("char_stored", 'a', STORED)
+                        .withField("short_full", (short) 15, FULL)
+                        .withField("char_full", 'a', FULL)
+                        .withField("short_sortable", (short) 15, SORTABLE)
+                        .withField("char_sortable", 'a', SORTABLE)
                         .withPayload(("payload1").getBytes())
         );
 
@@ -503,6 +509,24 @@ public class SimpleDatabaseTest {
 
         final int puttedIntValueSortable = from(16).toByteBuffer().getInt() ^ Integer.MIN_VALUE;
         assertEquals(puttedIntValueSortable, db.getIntValue(0, "int_sortable"));
+
+        final long puttedShortValueStored = from((short) 15).toByteBuffer().getShort() ^ Short.MIN_VALUE;
+        assertEquals(puttedShortValueStored, db.getShortValue(0, "short_stored"));
+
+        final int puttedCharValueStored = from('a').toByteBuffer().getChar() ^ Character.MIN_VALUE;
+        assertEquals(puttedCharValueStored, db.getCharValue(0, "char_stored"));
+
+        final long puttedShortValueFull = from((short) 15).toByteBuffer().getShort() ^ Short.MIN_VALUE;
+        assertEquals(puttedShortValueFull, db.getShortValue(0, "short_full"));
+
+        final int puttedCharValueFull = from('a').toByteBuffer().getChar() ^ Character.MIN_VALUE;
+        assertEquals(puttedCharValueFull, db.getCharValue(0, "char_full"));
+
+        final long puttedShortValueSortable = from((short) 15).toByteBuffer().getShort() ^ Short.MIN_VALUE;
+        assertEquals(puttedShortValueSortable, db.getShortValue(0, "short_sortable"));
+
+        final int puttedCharValueSortable = from('a').toByteBuffer().getChar() ^ Character.MIN_VALUE;
+        assertEquals(puttedCharValueSortable, db.getCharValue(0, "char_sortable"));
 
         // Document 2
 
