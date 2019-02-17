@@ -60,6 +60,16 @@ public class IdScoredDocumentTest {
                 }
 
                 @Override
+                public short getShortValue(int document, @NotNull String fieldName) {
+                    throw new IllegalArgumentException();
+                }
+
+                @Override
+                public char getCharValue(int document, @NotNull String fieldName) {
+                    throw new IllegalArgumentException();
+                }
+
+                @Override
                 public void execute(
                         @NotNull
                         final Query query,
