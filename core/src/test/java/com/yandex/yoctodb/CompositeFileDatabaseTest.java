@@ -101,6 +101,8 @@ public class CompositeFileDatabaseTest {
                             .withField("relevance", i, SORTABLE)
                             .withField("stored_long_value", Long.valueOf(i), STORED)
                             .withField("stored_int_value", i, STORED)
+                            .withField("stored_short_value", (short) i, STORED)
+                            .withField("stored_char_value", (char) i, STORED)
                             .withPayload(("payload2=" + i).getBytes())
             );
         }

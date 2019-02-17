@@ -107,7 +107,7 @@ public final class FixedLengthByteArraySortedSet
     }
 
     @Override
-    public char getCharUnsafe(int i) {
+    public char getCharUnsafe(final int i) {
         assert 0 <= i && i < size;
 
         final int res = elements.getChar(((long) i) * elementSize) ^ Character.MIN_VALUE;
