@@ -124,7 +124,7 @@ public final class VariableLengthByteArraySortedSet
     }
 
     @Override
-    public short getShortUnsafe(int i) {
+    public short getShortUnsafe(final int i) {
         assert 0 <= i && i < size;
 
         final long base = ((long) i) << 3;
@@ -139,7 +139,7 @@ public final class VariableLengthByteArraySortedSet
     }
 
     @Override
-    public char getCharUnsafe(int i) {
+    public char getCharUnsafe(final int i) {
         assert 0 <= i && i < size;
 
         final long base = ((long) i) << 3;

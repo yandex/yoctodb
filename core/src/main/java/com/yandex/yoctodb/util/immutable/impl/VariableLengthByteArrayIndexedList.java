@@ -91,7 +91,7 @@ public class VariableLengthByteArrayIndexedList
     }
 
     @Override
-    public short getShortUnsafe(int i) {
+    public short getShortUnsafe(final int i) {
         assert 0 <= i && i < elementCount;
 
         final long base = ((long) i) << 3;
@@ -106,7 +106,7 @@ public class VariableLengthByteArrayIndexedList
     }
 
     @Override
-    public char getCharUnsafe(int i) {
+    public char getCharUnsafe(final int i) {
         assert 0 <= i && i < elementCount;
 
         final long base = ((long) i) << 3;

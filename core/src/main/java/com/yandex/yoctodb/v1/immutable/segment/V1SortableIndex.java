@@ -84,22 +84,22 @@ public final class V1SortableIndex
     }
 
     @Override
-    public long getLongValue(int document) {
+    public long getLongValue(final int document) {
         return values.getLongUnsafe(document);
     }
 
     @Override
-    public int getIntValue(int document) {
+    public int getIntValue(final int document) {
         return values.getIntUnsafe(document);
     }
 
     @Override
-    public short getShortValue(int document) {
+    public short getShortValue(final int document) {
         return values.getShortUnsafe(document);
     }
 
     @Override
-    public char getCharValue(int document) {
+    public char getCharValue(final int document) {
         return values.getCharUnsafe(document);
     }
 

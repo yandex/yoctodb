@@ -158,12 +158,12 @@ public final class V1FullIndex
     }
 
     @Override
-    public short getShortValue(int document) {
+    public short getShortValue(final int document) {
         return sortableDelegate.getShortValue(document);
     }
 
     @Override
-    public char getCharValue(int document) {
+    public char getCharValue(final int document) {
         return sortableDelegate.getCharValue(document);
     }
 
