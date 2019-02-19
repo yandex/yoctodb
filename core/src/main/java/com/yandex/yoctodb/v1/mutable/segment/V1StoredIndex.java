@@ -79,7 +79,6 @@ public class V1StoredIndex
         // Building the index
         final OutputStreamWritable valueIndex =
                 getWritable();
-
         // Free memory
         valueDocId = null;
 
@@ -91,7 +90,6 @@ public class V1StoredIndex
                         Long.BYTES + // Values
                         valueIndex.getSizeInBytes();
             }
-
             @Override
             public void writeTo(
                     @NotNull final OutputStream os) throws IOException {
@@ -125,7 +123,6 @@ public class V1StoredIndex
                 padded.add(e.getKey());
                 expectedDocument++;
             }
-
             while (expectedDocument < databaseDocumentsCount) {
                 padded.add(empty);
                 expectedDocument++;
@@ -134,9 +131,7 @@ public class V1StoredIndex
                     .SegmentType
                     .VARIABLE_LENGTH_STORED_INDEX
                     .getCode();
-
             return new VariableLengthByteArrayIndexedList(padded);
-
         } else {
             segmentTypeCode = V1DatabaseFormat
                     .SegmentType
