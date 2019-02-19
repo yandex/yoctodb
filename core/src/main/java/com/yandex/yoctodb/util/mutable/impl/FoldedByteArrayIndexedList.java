@@ -111,18 +111,18 @@ public final class FoldedByteArrayIndexedList
         // write offsets count
         os.write(Ints.toByteArray(offsets.size()));
 
-        final List<Integer> offsetIndexes = new ArrayList<>();
+        int[] offsetIndexes = new int[databaseDocumentsCount];
         int expectedDocument = 0;
         for (int docId = 0; docId < docIdOffsetIndex.length; docId++) {
             while (expectedDocument < docId) {
-                offsetIndexes.add(0);
+                offsetIndexes[expectedDocument] = 0;
                 expectedDocument++;
             }
-            offsetIndexes.add(docIdOffsetIndex[docId]);
+            offsetIndexes[expectedDocument] = docIdOffsetIndex[docId];
             expectedDocument++;
         }
         while (expectedDocument < databaseDocumentsCount) {
-            offsetIndexes.add(0);
+            offsetIndexes[expectedDocument] = (0);
             expectedDocument++;
         }
         // indexes of offsets - in correct Order
