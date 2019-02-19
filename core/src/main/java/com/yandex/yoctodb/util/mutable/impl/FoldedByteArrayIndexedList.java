@@ -47,7 +47,7 @@ public final class FoldedByteArrayIndexedList
         int currentIndex = 1;
         for (Map.Entry<UnsignedByteArray, List<Integer>> elem :
                 elements.entrySet()) {
-            UnsignedByteArray value = elem.getKey();
+            final UnsignedByteArray value = elem.getKey();
             offsets.add(elementOffset);
 
             final int currentElementOffsetIndex = currentIndex;

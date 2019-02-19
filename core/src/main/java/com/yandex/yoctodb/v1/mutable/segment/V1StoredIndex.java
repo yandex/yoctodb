@@ -12,7 +12,12 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Index supporting extracting stored field value by document ID
@@ -49,10 +54,11 @@ public class V1StoredIndex
         final UnsignedByteArray value = values.iterator().next();
 
         this.valueDocId.putIfAbsent(value, new LinkedList<>());
-        if (this.valueDocId.get(value).size() != 0) {
+        List<Integer> docIds = this.valueDocId.get(value);
+        if (docIds.size() != 0) {
             uniqueValues = false;
         }
-        this.valueDocId.get(value).add(documentId);
+        docIds.add(documentId);
 
         return this;
     }
