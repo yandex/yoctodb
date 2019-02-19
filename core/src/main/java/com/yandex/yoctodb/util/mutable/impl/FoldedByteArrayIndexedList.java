@@ -15,8 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 /**
  * {@link ByteArrayIndexedList} with variable sized elements
@@ -31,15 +29,15 @@ public final class FoldedByteArrayIndexedList
     @NotNull
     private final List<Long> offsets;
     @NotNull
-    private final SortedMap<Integer, Integer> docIdOffsetIndex;
-    private final int sizeOfIndexOffsetValue; // how many bytes
+    private final int[] docIdOffsetIndex;
+    private final int sizeOfIndexOffsetValue;
     private final int databaseDocumentsCount;
 
     public FoldedByteArrayIndexedList(
             @NotNull final Map<UnsignedByteArray, List<Integer>> elements,
             final int databaseDocumentsCount) {
         this.databaseDocumentsCount = databaseDocumentsCount;
-        this.docIdOffsetIndex = new TreeMap<>();
+        this.docIdOffsetIndex = new int[databaseDocumentsCount];
         this.offsets = new ArrayList<>();
         this.elements = elements.keySet();
 
@@ -53,9 +51,8 @@ public final class FoldedByteArrayIndexedList
 
             final long currentElementOffset = elementOffset;
             elem.getValue().forEach(docId ->
-                    docIdOffsetIndex
-                            .put(docId,
-                                    offsets.indexOf(currentElementOffset)));
+                    docIdOffsetIndex[docId] =
+                            offsets.indexOf(currentElementOffset));
             elementOffset += value.getSizeInBytes();
         }
 
@@ -85,7 +82,7 @@ public final class FoldedByteArrayIndexedList
     @Override
     public String toString() {
         return "FoldedByteArrayIndexedList{" +
-                "elementsCount=" + docIdOffsetIndex.size() +
+                "elementsCount=" + docIdOffsetIndex.length +
                 '}';
     }
 
@@ -115,12 +112,12 @@ public final class FoldedByteArrayIndexedList
 
         final List<Integer> offsetIndexes = new ArrayList<>();
         int expectedDocument = 0;
-        for (Integer docId : docIdOffsetIndex.keySet()) {
+        for (int docId = 0; docId < docIdOffsetIndex.length; docId++) {
             while (expectedDocument < docId) {
                 offsetIndexes.add(0);
                 expectedDocument++;
             }
-            offsetIndexes.add(docIdOffsetIndex.get(docId));
+            offsetIndexes.add(docIdOffsetIndex[docId]);
             expectedDocument++;
         }
         while (expectedDocument < databaseDocumentsCount) {
