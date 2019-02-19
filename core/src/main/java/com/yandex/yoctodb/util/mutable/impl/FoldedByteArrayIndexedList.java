@@ -46,7 +46,6 @@ public final class FoldedByteArrayIndexedList
         long elementOffset = 0;
         // reserve first value for empty documents
         offsets.add(-1L);
-
         for (Map.Entry<UnsignedByteArray, List<Integer>> elem :
                 elements.entrySet()) {
             UnsignedByteArray value = elem.getKey();
@@ -62,7 +61,6 @@ public final class FoldedByteArrayIndexedList
 
         offsets.add(elementOffset);
         offsets.set(0, 0L);
-
         // analyze result of offsets
         final int offsetCount = offsets.size();
         if (offsetCount < (1 << Byte.SIZE)) {
@@ -72,26 +70,16 @@ public final class FoldedByteArrayIndexedList
         } else {
             sizeOfIndexOffsetValue = Integer.BYTES;
         }
-
     }
 
-    @Override
-    public long getSizeInBytes() {
-        long elementSize = 0;
-        for (UnsignedByteArray element : elements) {
-            elementSize += element.length();
-        }
-
-        return Integer.BYTES + // Element count in bytes
-                Integer.BYTES + // offsets count in bytes
-                sizeOfIndexOffsetValue *
-                        databaseDocumentsCount + // indexes offsets in bytes
-                Long.BYTES * offsets.size() + // offsets array size in bytes
-                elementSize; // Element array size in bytes
-    }
-
-    static byte[] oneByteFromInteger(Integer data) {
+    private static byte[] oneByteFromInteger(Integer data) {
+        assert data < (1 << Byte.SIZE);
         return new byte[]{data.byteValue()};
+    }
+
+    private static byte[] twoBytesFromInteger(Integer data) {
+        assert data < (1 << Short.SIZE);
+        return Shorts.toByteArray(data.shortValue());
     }
 
     @Override
@@ -101,8 +89,19 @@ public final class FoldedByteArrayIndexedList
                 '}';
     }
 
-    static byte[] twoBytesFromInteger(Integer data) {
-        return Shorts.toByteArray(data.shortValue());
+    @Override
+    public long getSizeInBytes() {
+        final long elementSize =
+                elements.stream()
+                        .mapToInt(UnsignedByteArray::length)
+                        .sum();
+
+        return Integer.BYTES + // Element count in bytes
+                Integer.BYTES + // offsets count in bytes
+                sizeOfIndexOffsetValue *
+                        databaseDocumentsCount + // indexes offsets in bytes
+                Long.BYTES * offsets.size() + // offsets array size in bytes
+                elementSize; // Element array size in bytes
     }
 
     @Override
@@ -128,7 +127,6 @@ public final class FoldedByteArrayIndexedList
             offsetIndexes.add(0);
             expectedDocument++;
         }
-
         // indexes of offsets - in correct Order
         switch (sizeOfIndexOffsetValue) {
             case (Byte.BYTES): {
@@ -155,12 +153,10 @@ public final class FoldedByteArrayIndexedList
                 break;
             }
         }
-
         // offsets
         for (Long offset : offsets) {
             os.write(Longs.toByteArray(offset));
         }
-
         // elements
         for (OutputStreamWritable e : elements) {
             e.writeTo(os);
