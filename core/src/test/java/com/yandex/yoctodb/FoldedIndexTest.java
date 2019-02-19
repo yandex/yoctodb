@@ -13,7 +13,6 @@ import java.io.IOException;
 import static com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption.STORED;
 import static org.junit.Assert.assertEquals;
 
-
 public class FoldedIndexTest {
 
     @Test
@@ -55,5 +54,4 @@ public class FoldedIndexTest {
         UnsignedByteArray byteArray = UnsignedByteArrays.from(buffer);
         return UnsignedByteArrays.toString(byteArray);
     }
-
 }

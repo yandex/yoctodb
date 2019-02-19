@@ -21,42 +21,6 @@ import static org.junit.Assert.assertTrue;
 public class FoldedByteArrayIndexedListTest {
 
     @Test
-    public void testTwoBytesFolding() {
-        testManyValues(1000);
-    }
-
-    @Test
-    public void testFourBytesFolding() {
-        testManyValues(70000);
-    }
-
-
-    public void testManyValues(int size) {
-        final List<UnsignedByteArray> elements = new LinkedList<>();
-        for (int i = 0; i < 10; i++) {
-            elements.add(from(Integer.toString(0)));
-        }
-
-        for (int i = 10; i < size; i++) {
-            elements.add(from(Integer.toString(i)));
-        }
-        Map<UnsignedByteArray, List<Integer>> data = initData(elements);
-
-        final FoldedByteArrayIndexedList set =
-                new FoldedByteArrayIndexedList(data, elements.size());
-        final ByteArrayOutputStream os = new ByteArrayOutputStream();
-        try {
-            set.writeTo(os);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        Buffer buf = Buffer.from(os.toByteArray());
-        final int elementsCount = buf.getInt();
-        assertEquals(elementsCount, elements.size());
-    }
-
-    @Test
     public void checkOutputStream() throws IOException {
         final List<UnsignedByteArray> strings = initString();
         Map<UnsignedByteArray, List<Integer>> data = initData(strings);
@@ -233,7 +197,6 @@ public class FoldedByteArrayIndexedListTest {
     }
 
     private final Map<UnsignedByteArray, List<Integer>> initData(List<UnsignedByteArray> elements) {
-
         Map<UnsignedByteArray, List<Integer>> values = new LinkedHashMap<>();
         for (int i = 0; i < elements.size(); i++) {
             int documentId = i;

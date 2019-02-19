@@ -53,13 +53,10 @@ public class V1StoredIndex
 
         final UnsignedByteArray value = values.iterator().next();
 
-        this.valueDocId.putIfAbsent(value, new LinkedList<>());
-        List<Integer> docIds = this.valueDocId.get(value);
-        if (docIds.size() != 0) {
+        this.valueDocId.computeIfAbsent(value, v -> new LinkedList<>()).add(documentId);
+        if (this.valueDocId.get(value).size() > 1) {
             uniqueValues = false;
         }
-        docIds.add(documentId);
-
         return this;
     }
 

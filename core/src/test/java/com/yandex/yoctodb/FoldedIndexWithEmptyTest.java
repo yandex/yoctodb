@@ -15,7 +15,6 @@ import static org.junit.Assert.assertEquals;
 
 public class FoldedIndexWithEmptyTest {
 
-
     @Test
     public void buildDatabase() throws IOException {
         final DatabaseBuilder dbBuilder =
@@ -67,7 +66,6 @@ public class FoldedIndexWithEmptyTest {
         assertEquals("NEW",getValueFromBuffer(db.getFieldValue(2, "state")));
         assertEquals("1",getValueFromBuffer(db.getFieldValue(3, "region")));
         assertEquals("USED",getValueFromBuffer(db.getFieldValue(4, "state")));
-
     }
 
     private String getValueFromBuffer(Buffer buffer) {
