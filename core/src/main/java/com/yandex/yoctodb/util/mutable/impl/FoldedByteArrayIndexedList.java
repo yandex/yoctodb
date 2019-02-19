@@ -44,15 +44,16 @@ public final class FoldedByteArrayIndexedList
         long elementOffset = 0;
         // reserve first value for empty documents
         offsets.add(-1L);
+        int currentIndex = 1;
         for (Map.Entry<UnsignedByteArray, List<Integer>> elem :
                 elements.entrySet()) {
             UnsignedByteArray value = elem.getKey();
             offsets.add(elementOffset);
 
-            final long currentElementOffset = elementOffset;
+            final int currentElementOffsetIndex = currentIndex;
             elem.getValue().forEach(docId ->
-                    docIdOffsetIndex[docId] =
-                            offsets.indexOf(currentElementOffset));
+                    docIdOffsetIndex[docId] = currentElementOffsetIndex);
+            currentIndex++;
             elementOffset += value.getSizeInBytes();
         }
 
