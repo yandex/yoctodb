@@ -39,23 +39,17 @@ public final class FoldedByteArrayIndexedList implements ByteArrayIndexedList {
         } else {
             sizeOfIndexOffsetValue = Integer.BYTES;
         }
-
         // indexes of offsets
         final Buffer indexes = buf.slice((elementsCount) * sizeOfIndexOffsetValue);
-
-        long shift = indexes.remaining();
+        buf.position(buf.position() + indexes.remaining());
 
         // then offsets of element value
-        long offsetsSizeBytes = offsetsCount * Long.BYTES;
-
-        final Buffer offsets = buf.slice()
-                .slice(shift, offsetsSizeBytes);
-
-        shift = shift + offsets.remaining();
+        final long offsetsSizeBytes = offsetsCount * Long.BYTES;
+        final Buffer offsets = buf.slice(offsetsSizeBytes);
+        buf.position(buf.position() + offsets.remaining());
 
         // then elements value
-        final Buffer elements = buf.slice()
-                .slice(shift, buf.remaining() - shift);
+        final Buffer elements = buf.slice();
 
         return new FoldedByteArrayIndexedList(
                 elementsCount,
