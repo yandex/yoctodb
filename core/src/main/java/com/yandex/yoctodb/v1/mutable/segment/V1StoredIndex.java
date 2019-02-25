@@ -86,9 +86,9 @@ public class V1StoredIndex
             @Override
             public long getSizeInBytes() {
                 return Integer.BYTES + // Field name
-                        fieldName.length +
-                        Long.BYTES + // Values
-                        valueIndex.getSizeInBytes();
+                       fieldName.length +
+                       Long.BYTES + // Values
+                       valueIndex.getSizeInBytes();
             }
             @Override
             public void writeTo(
