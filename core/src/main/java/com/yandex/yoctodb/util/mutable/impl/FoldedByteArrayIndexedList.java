@@ -111,41 +111,26 @@ public final class FoldedByteArrayIndexedList
         // write offsets count
         os.write(Ints.toByteArray(offsets.size()));
 
-        int[] offsetIndexes = new int[databaseDocumentsCount];
-        int expectedDocument = 0;
-        for (int docId = 0; docId < docIdOffsetIndex.length; docId++) {
-            while (expectedDocument < docId) {
-                offsetIndexes[expectedDocument] = 0;
-                expectedDocument++;
-            }
-            offsetIndexes[expectedDocument] = docIdOffsetIndex[docId];
-            expectedDocument++;
-        }
-        while (expectedDocument < databaseDocumentsCount) {
-            offsetIndexes[expectedDocument] = (0);
-            expectedDocument++;
-        }
-        // indexes of offsets - in correct Order
         switch (sizeOfIndexOffsetValue) {
             case (Byte.BYTES): {
                 // write every int to one byte
                 // The collection's iterator returns the elements
                 // in ascending order of the corresponding keys.
-                for (Integer offsetIndex : offsetIndexes) {
+                for (Integer offsetIndex : docIdOffsetIndex) {
                     os.write(oneByteFromInteger(offsetIndex));
                 }
                 break;
             }
             case (Short.BYTES): {
                 // write every int to two bytes
-                for (Integer offsetIndex : offsetIndexes) {
+                for (Integer offsetIndex : docIdOffsetIndex) {
                     os.write(twoBytesFromInteger(offsetIndex));
                 }
                 break;
             }
             case (Integer.BYTES): {
                 // write every int to four bytes
-                for (Integer offsetIndex : offsetIndexes) {
+                for (Integer offsetIndex : docIdOffsetIndex) {
                     os.write(Ints.toByteArray(offsetIndex));
                 }
                 break;
