@@ -59,11 +59,10 @@ public class BufferBitSet {
     }
 
     /**
-     * Counts bits from 0 until {@code bitIndex}
      * @param buf buffer with array of long, representing bit set
      * @param bufferOffset offset in buffer where array starts
      * @param bitIndex index of desired bit
-     * @return
+     * @return number of set bits from 0 until {@code bitIndex}
      */
     public static int cardinalityTo(@NotNull final Buffer buf,
                                     final long bufferOffset,

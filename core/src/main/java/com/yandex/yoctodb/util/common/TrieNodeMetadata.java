@@ -10,9 +10,6 @@
 
 package com.yandex.yoctodb.util.common;
 
-/**
- *
- */
 public final class TrieNodeMetadata {
     public static final int PREFIX_FLAG       = 0b0001; // there is a prefix that must be consumed
     public static final int VALUE_FLAG        = 0b0010; // there is a value in this node
