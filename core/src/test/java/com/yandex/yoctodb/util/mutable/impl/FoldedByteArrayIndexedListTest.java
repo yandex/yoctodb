@@ -17,7 +17,12 @@ import static com.yandex.yoctodb.util.UnsignedByteArrays.from;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-
+/**
+ * {@link com.yandex.yoctodb.util.immutable.ByteArrayIndexedList} with fixed size
+ * elements
+ *
+ * @author irenkamalova
+ */
 public class FoldedByteArrayIndexedListTest {
 
     @Test

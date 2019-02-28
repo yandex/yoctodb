@@ -10,10 +10,15 @@ import org.junit.Test;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import static com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption.FILTERABLE;
 import static com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption.STORED;
 import static org.junit.Assert.assertEquals;
 
+/**
+ * {@link com.yandex.yoctodb.util.immutable.ByteArrayIndexedList} with fixed size
+ * elements
+ *
+ * @author irenkamalova
+ */
 public class StoredIndexWithEmptyTest {
 
     @Test

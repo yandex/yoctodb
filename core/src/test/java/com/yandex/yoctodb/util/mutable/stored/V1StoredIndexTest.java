@@ -13,6 +13,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * {@link com.yandex.yoctodb.util.immutable.ByteArrayIndexedList} with fixed size
+ * elements
+ *
+ * @author irenkamalova
+ */
 public class V1StoredIndexTest {
 
     @Test

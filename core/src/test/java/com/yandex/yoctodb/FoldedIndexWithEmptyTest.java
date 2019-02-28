@@ -15,6 +15,12 @@ import static com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption.FILTERABLE;
 
 import static org.junit.Assert.assertEquals;
 
+/**
+ * {@link com.yandex.yoctodb.util.immutable.ByteArrayIndexedList} with fixed size
+ * elements
+ *
+ * @author irenkamalova
+ */
 public class FoldedIndexWithEmptyTest {
 
     @Test

@@ -13,6 +13,12 @@ import java.io.IOException;
 import static com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption.STORED;
 import static org.junit.Assert.assertEquals;
 
+/**
+ * {@link com.yandex.yoctodb.util.immutable.ByteArrayIndexedList} with fixed size
+ * elements
+ *
+ * @author irenkamalova
+ */
 public class FoldedIndexTest {
 
     @Test
