@@ -147,7 +147,7 @@ public final class VariableLengthByteArraySortedSet
         final long end = offsets.getLong(base + 8L);
 
         assert end - start == Character.BYTES;
-        final int res = elements.getShort(start) ^ Character.MIN_VALUE;
+        final int res = elements.getChar(start) ^ Character.MIN_VALUE;
         assert Character.MIN_VALUE <= res && res <= Character.MAX_VALUE;
 
         return (char) res;
