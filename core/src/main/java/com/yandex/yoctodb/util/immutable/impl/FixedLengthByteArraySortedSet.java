@@ -10,6 +10,9 @@
 
 package com.yandex.yoctodb.util.immutable.impl;
 
+import com.google.common.primitives.Chars;
+import com.google.common.primitives.Ints;
+import com.google.common.primitives.Shorts;
 import com.yandex.yoctodb.util.buf.Buffer;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
@@ -85,36 +88,40 @@ public final class FixedLengthByteArraySortedSet
     public long getLongUnsafe(final int i) {
         assert 0 <= i && i < size;
 
-        return elements.getLong(((long) i) * elementSize) ^ Long.MIN_VALUE;
+        assert elementSize == Long.BYTES;
+
+        return elements.getLong(((long) i) << 3) ^ Long.MIN_VALUE;
     }
 
     @Override
     public int getIntUnsafe(final int i) {
         assert 0 <= i && i < size;
 
-        return elements.getInt(((long) i) * elementSize) ^ Integer.MIN_VALUE;
+        assert elementSize == Integer.BYTES;
+
+        return elements.getInt(((long) i) << 2) ^ Integer.MIN_VALUE;
     }
 
     @Override
     public short getShortUnsafe(final int i) {
         assert 0 <= i && i < size;
 
-        final int res = elements.getShort(((long) i) * elementSize) ^ Short.MIN_VALUE;
+        assert elementSize == Short.BYTES;
 
-        assert Short.MIN_VALUE <= res && res <= Short.MAX_VALUE;
+        final int res = elements.getShort(((long) i) << 1) ^ Short.MIN_VALUE;
 
-        return (short) res;
+        return Shorts.checkedCast(res);
     }
 
     @Override
     public char getCharUnsafe(final int i) {
         assert 0 <= i && i < size;
 
-        final int res = elements.getChar(((long) i) * elementSize) ^ Character.MIN_VALUE;
+        assert elementSize == Chars.BYTES;
 
-        assert Character.MIN_VALUE <= res && res <= Character.MAX_VALUE;
+        final int res = elements.getChar(((long) i) << 1) ^ Character.MIN_VALUE;
 
-        return (char) res;
+        return Chars.checkedCast(res);
     }
 
     @Override

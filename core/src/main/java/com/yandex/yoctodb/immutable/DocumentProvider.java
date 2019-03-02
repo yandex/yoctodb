@@ -86,7 +86,7 @@ public interface DocumentProvider {
             String fieldName);
 
     /**
-     * Get {@code document} document @{code fieldName} field value as short.
+     * Get {@code document} document {@code fieldName} field value as short.
      *
      * The field must be sortable, stored or full.
      *

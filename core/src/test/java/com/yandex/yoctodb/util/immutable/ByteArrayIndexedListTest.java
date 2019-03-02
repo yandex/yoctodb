@@ -163,7 +163,6 @@ public class ByteArrayIndexedListTest {
         return Buffer.from(os.toByteArray());
     }
 
-
     @Test
     public void buildingFromVariableLengthByteArrayIndexedListTest()
             throws IOException {

@@ -40,6 +40,7 @@ public interface StoredIndex extends Index {
 
     /**
      * Get stored value as int by document ID
+     *
      * @param document document ID
      * @return stored value as int
      */
@@ -47,6 +48,7 @@ public interface StoredIndex extends Index {
 
     /**
      * Get stored value as short by document ID
+     *
      * @param document document ID
      * @return stored value as short
      */
@@ -54,6 +56,7 @@ public interface StoredIndex extends Index {
 
     /**
      * Get stored value as char by document ID
+     *
      * @param document document ID
      * @return stored value as char
      */

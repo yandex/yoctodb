@@ -57,6 +57,26 @@ import static org.junit.Assert.assertTrue;
 public class SimpleDatabaseTest {
     private final int DOCS = 128;
 
+    private final String LONG_STORED_FIELD_NAME = "long_stored";
+    private final String LONG_FULL_FIELD_NAME = "long_full";
+    private final String LONG_SORTABLE_FIELD_NAME = "long_sortable";
+    private final long LONG_FIELD_VALUE = 25L;
+
+    private final String INT_STORED_FIELD_NAME = "int_stored";
+    private final String INT_FULL_FIELD_NAME = "int_full";
+    private final String INT_SORTABLE_FIELD_NAME = "int_sortable";
+    private final int INT_FIELD_VALUE = 15;
+
+    private final String SHORT_STORED_FIELD_NAME = "short_stored";
+    private final String SHORT_FULL_FIELD_NAME = "short_full";
+    private final String SHORT_SORTABLE_FIELD_NAME = "short_sortable";
+    private final short SHORT_FIELD_VALUE = 13;
+
+    private final String CHAR_STORED_FIELD_NAME = "char_stored";
+    private final String CHAR_FULL_FIELD_NAME = "char_full";
+    private final String CHAR_SORTABLE_FIELD_NAME = "char_sortable";
+    private final char CHAR_FIELD_VALUE = 'a';
+
     @Test
     public void buildDatabase() throws IOException {
         final DatabaseBuilder dbBuilder =
@@ -450,18 +470,23 @@ public class SimpleDatabaseTest {
                         .withField("sorted", 12, SORTABLE)
                         .withField("stored", 13, STORED)
                         .withField("first", 14, STORED)
-                        .withField("long_stored", 15L, STORED)
-                        .withField("int_stored", 16, STORED)
-                        .withField("long_full", 15L, FULL)
-                        .withField("int_full", 16, FULL)
-                        .withField("long_sortable", 15L, SORTABLE)
-                        .withField("int_sortable", 16, SORTABLE)
-                        .withField("short_stored", (short) 15, STORED)
-                        .withField("char_stored", 'a', STORED)
-                        .withField("short_full", (short) 15, FULL)
-                        .withField("char_full", 'a', FULL)
-                        .withField("short_sortable", (short) 15, SORTABLE)
-                        .withField("char_sortable", 'a', SORTABLE)
+
+                        .withField(LONG_STORED_FIELD_NAME, LONG_FIELD_VALUE, STORED)
+                        .withField(LONG_FULL_FIELD_NAME, LONG_FIELD_VALUE, FULL)
+                        .withField(LONG_SORTABLE_FIELD_NAME, LONG_FIELD_VALUE, SORTABLE)
+
+                        .withField(INT_STORED_FIELD_NAME, INT_FIELD_VALUE, STORED)
+                        .withField(INT_FULL_FIELD_NAME, INT_FIELD_VALUE, FULL)
+                        .withField(INT_SORTABLE_FIELD_NAME, INT_FIELD_VALUE, SORTABLE)
+
+                        .withField(SHORT_STORED_FIELD_NAME, SHORT_FIELD_VALUE, STORED)
+                        .withField(SHORT_FULL_FIELD_NAME, SHORT_FIELD_VALUE, FULL)
+                        .withField(SHORT_SORTABLE_FIELD_NAME, SHORT_FIELD_VALUE, SORTABLE)
+
+                        .withField(CHAR_STORED_FIELD_NAME, CHAR_FIELD_VALUE, STORED)
+                        .withField(CHAR_FULL_FIELD_NAME, CHAR_FIELD_VALUE, FULL)
+                        .withField(CHAR_SORTABLE_FIELD_NAME, CHAR_FIELD_VALUE, SORTABLE)
+
                         .withPayload(("payload1").getBytes())
         );
 
@@ -492,41 +517,21 @@ public class SimpleDatabaseTest {
         assertEquals(from("payload1").toByteBuffer(), db.getDocument(0));
         assertFalse(db.getFieldValue(0, "second").hasRemaining());
 
-        final long puttedLongValueStored = from(15L).toByteBuffer().getLong() ^ Long.MIN_VALUE;
-        assertEquals(puttedLongValueStored, db.getLongValue(0, "long_stored"));
+        assertEquals(LONG_FIELD_VALUE, db.getLongValue(0, LONG_STORED_FIELD_NAME));
+        assertEquals(LONG_FIELD_VALUE, db.getLongValue(0, LONG_FULL_FIELD_NAME));
+        assertEquals(LONG_FIELD_VALUE, db.getLongValue(0, LONG_SORTABLE_FIELD_NAME));
 
-        final int puttedIntValueStored = from(16).toByteBuffer().getInt() ^ Integer.MIN_VALUE;
-        assertEquals(puttedIntValueStored, db.getIntValue(0, "int_stored"));
+        assertEquals(INT_FIELD_VALUE, db.getIntValue(0, INT_STORED_FIELD_NAME));
+        assertEquals(INT_FIELD_VALUE, db.getIntValue(0, INT_FULL_FIELD_NAME));
+        assertEquals(INT_FIELD_VALUE, db.getIntValue(0, INT_SORTABLE_FIELD_NAME));
 
-        final long puttedLongValueFull = from(15L).toByteBuffer().getLong() ^ Long.MIN_VALUE;
-        assertEquals(puttedLongValueFull, db.getLongValue(0, "long_full"));
+        assertEquals(SHORT_FIELD_VALUE, db.getShortValue(0, SHORT_STORED_FIELD_NAME));
+        assertEquals(SHORT_FIELD_VALUE, db.getShortValue(0, SHORT_FULL_FIELD_NAME));
+        assertEquals(SHORT_FIELD_VALUE, db.getShortValue(0, SHORT_SORTABLE_FIELD_NAME));
 
-        final int puttedIntValueFull = from(16).toByteBuffer().getInt() ^ Integer.MIN_VALUE;
-        assertEquals(puttedIntValueFull, db.getIntValue(0, "int_full"));
-
-        final long puttedLongValueSortable = from(15L).toByteBuffer().getLong() ^ Long.MIN_VALUE;
-        assertEquals(puttedLongValueSortable, db.getLongValue(0, "long_sortable"));
-
-        final int puttedIntValueSortable = from(16).toByteBuffer().getInt() ^ Integer.MIN_VALUE;
-        assertEquals(puttedIntValueSortable, db.getIntValue(0, "int_sortable"));
-
-        final long puttedShortValueStored = from((short) 15).toByteBuffer().getShort() ^ Short.MIN_VALUE;
-        assertEquals(puttedShortValueStored, db.getShortValue(0, "short_stored"));
-
-        final int puttedCharValueStored = from('a').toByteBuffer().getChar() ^ Character.MIN_VALUE;
-        assertEquals(puttedCharValueStored, db.getCharValue(0, "char_stored"));
-
-        final long puttedShortValueFull = from((short) 15).toByteBuffer().getShort() ^ Short.MIN_VALUE;
-        assertEquals(puttedShortValueFull, db.getShortValue(0, "short_full"));
-
-        final int puttedCharValueFull = from('a').toByteBuffer().getChar() ^ Character.MIN_VALUE;
-        assertEquals(puttedCharValueFull, db.getCharValue(0, "char_full"));
-
-        final long puttedShortValueSortable = from((short) 15).toByteBuffer().getShort() ^ Short.MIN_VALUE;
-        assertEquals(puttedShortValueSortable, db.getShortValue(0, "short_sortable"));
-
-        final int puttedCharValueSortable = from('a').toByteBuffer().getChar() ^ Character.MIN_VALUE;
-        assertEquals(puttedCharValueSortable, db.getCharValue(0, "char_sortable"));
+        assertEquals(CHAR_FIELD_VALUE, db.getCharValue(0, CHAR_STORED_FIELD_NAME));
+        assertEquals(CHAR_FIELD_VALUE, db.getCharValue(0, CHAR_FULL_FIELD_NAME));
+        assertEquals(CHAR_FIELD_VALUE, db.getCharValue(0, CHAR_SORTABLE_FIELD_NAME));
 
         // Document 2
 
