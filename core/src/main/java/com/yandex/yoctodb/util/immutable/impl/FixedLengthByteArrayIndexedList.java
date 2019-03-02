@@ -10,6 +10,8 @@
 
 package com.yandex.yoctodb.util.immutable.impl;
 
+import com.google.common.primitives.Chars;
+import com.google.common.primitives.Shorts;
 import com.yandex.yoctodb.util.buf.Buffer;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
@@ -83,9 +85,7 @@ public class FixedLengthByteArrayIndexedList
 
         final int res = elements.getShort() ^ Short.MIN_VALUE;
 
-        assert res >= Short.MIN_VALUE && res <= Short.MAX_VALUE;
-
-        return (short) res;
+        return Shorts.checkedCast(res);
     }
 
     @Override
@@ -95,9 +95,7 @@ public class FixedLengthByteArrayIndexedList
 
         final int res = elements.getChar() ^ Character.MIN_VALUE;
 
-        assert res >= Character.MIN_VALUE && res <= Character.MAX_VALUE;
-
-        return (char) res;
+        return Chars.checkedCast(res);
     }
 
     @Override
