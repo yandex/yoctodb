@@ -87,8 +87,8 @@ public final class FoldedByteArrayIndexedList implements ByteArrayIndexedList {
         assert 0 <= docId && docId < elementCount;
 
         final long offsetIndex = getOffsetIndex.apply(docId) * Long.BYTES;
-        long start = offsets.getLong(offsetIndex);
-        long end = offsets.getLong(offsetIndex + Long.BYTES);
+        final long start = offsets.getLong(offsetIndex);
+        final long end = offsets.getLong(offsetIndex + Long.BYTES);
         return elements.slice(start, end - start);
     }
 
