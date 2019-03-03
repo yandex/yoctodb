@@ -46,7 +46,7 @@ public final class LongArrayBitSet implements ArrayBitSet {
     }
 
     static int arraySize(final int size) {
-        return (size >>> 6) + 1;
+        return (size >>> 6) + ((size & 0x3f) != 0 ? 1 : 0);
     }
 
     @NotNull
@@ -75,7 +75,9 @@ public final class LongArrayBitSet implements ArrayBitSet {
         final int last = result.usedWords - 1;
         Arrays.fill(result.words, 0, last, -1L);
         final int shift = size & 0x3f;
-        if (shift != 0) {
+        if (shift == 0) {
+            result.words[last] = -1L;
+        } else {
             result.words[last] = ~(-1L << shift);
         }
 
@@ -139,11 +141,16 @@ public final class LongArrayBitSet implements ArrayBitSet {
 
         // Fix bits in last word
         final int shift = size & 0x3f;
-        if (shift != 0) {
-            words[last] = ~words[last] & ~(-1L << shift);
-
-            if (words[last] != 0)
+        if (shift == 0) {
+            words[last] = ~words[last];
+            if (words[last] != 0) {
                 notEmpty = true;
+            }
+        } else {
+            words[last] = ~words[last] & ~(-1L << shift);
+            if (words[last] != 0) {
+                notEmpty = true;
+            }
         }
 
         return notEmpty;
@@ -154,7 +161,9 @@ public final class LongArrayBitSet implements ArrayBitSet {
         final int last = usedWords - 1;
         Arrays.fill(words, 0, last, -1L);
         final int shift = size & 0x3f;
-        if (shift != 0) {
+        if (shift == 0) {
+            words[last] = -1L;
+        } else {
             words[last] = ~(-1L << shift);
         }
     }

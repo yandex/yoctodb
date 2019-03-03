@@ -31,7 +31,7 @@ public final class V1DocumentBuilder extends AbstractDocumentBuilder {
     final TreeMultimap<String, UnsignedByteArray> fields =
             TreeMultimap.create();
     final Map<String, IndexOption> index = new HashMap<>();
-    final Map<String, LengthOption> length = new HashMap<>();
+    final Map<String, IndexType> length = new HashMap<>();
 
     @NotNull
     @Override
@@ -44,7 +44,7 @@ public final class V1DocumentBuilder extends AbstractDocumentBuilder {
                 PAYLOAD,
                 UnsignedByteArrays.from(payload),
                 IndexOption.STORED,
-                LengthOption.VARIABLE);
+                IndexType.VARIABLE_LENGTH);
     }
 
     @NotNull
@@ -57,7 +57,7 @@ public final class V1DocumentBuilder extends AbstractDocumentBuilder {
             @NotNull
             final IndexOption index,
             @NotNull
-            final LengthOption length) {
+            final IndexType length) {
         if (name.equals(PAYLOAD))
             throw new IllegalArgumentException("Reserved field name <" + PAYLOAD + ">");
 
@@ -73,7 +73,7 @@ public final class V1DocumentBuilder extends AbstractDocumentBuilder {
             @NotNull
             final IndexOption index,
             @NotNull
-            final LengthOption length) {
+            final IndexType length) {
         checkNotFrozen();
 
         this.fields.put(name, value);
@@ -84,7 +84,7 @@ public final class V1DocumentBuilder extends AbstractDocumentBuilder {
                     "Current index <" + index + "> for name <" + name +
                             "> differs from <" + previousIndex + ">");
 
-        final LengthOption previousLength = this.length.put(name, length);
+        final IndexType previousLength = this.length.put(name, length);
         if (previousLength != null && previousLength != length)
             throw new IllegalArgumentException(
                     "Current length <" + length + "> for name <" + name +

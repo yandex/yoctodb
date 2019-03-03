@@ -30,9 +30,10 @@ public interface DocumentBuilder {
         UNSUPPORTED
     }
 
-    enum LengthOption {
-        FIXED,
-        VARIABLE
+    enum IndexType {
+        FIXED_LENGTH,
+        VARIABLE_LENGTH,
+        TRIE
     }
 
     @Deprecated
@@ -61,7 +62,7 @@ public interface DocumentBuilder {
             @NotNull
             IndexOption index,
             @NotNull
-            LengthOption length);
+            IndexType length);
 
     @NotNull
     DocumentBuilder withField(
