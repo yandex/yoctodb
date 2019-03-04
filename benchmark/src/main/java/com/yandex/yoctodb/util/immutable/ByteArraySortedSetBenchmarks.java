@@ -1,15 +1,13 @@
 package com.yandex.yoctodb.util.immutable;
 
-import com.yandex.yoctodb.util.UnsignedByteArray;
-import com.yandex.yoctodb.util.UnsignedByteArrays;
 import com.yandex.yoctodb.util.buf.Buffer;
-import com.yandex.yoctodb.util.immutable.impl.FixedLengthByteArraySortedSet;
-import com.yandex.yoctodb.util.immutable.impl.VariableLengthByteArraySortedSet;
+import org.jetbrains.annotations.NotNull;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.infra.Blackhole;
 
-import java.io.*;
-import java.util.*;
+import java.util.Collection;
+
+import static com.yandex.yoctodb.util.immutable.ByteArraySortedSetBenchmarkData.*;
 
 /**
  * Benchmarks for {@link ByteArraySortedSet} implementations
@@ -17,86 +15,55 @@ import java.util.*;
  * @author incubos
  */
 public class ByteArraySortedSetBenchmarks {
-    private static final int SIZE = 8;
-    private static final int ELEMENTS = 64 * 1024;
-
-    private static final ByteArraySortedSet fixed;
-    private static final ByteArraySortedSet variable;
-    private static final List<Buffer> elements;
-
-    private static Buffer persist(
-            final com.yandex.yoctodb.util.mutable.ByteArraySortedSet mutable) {
-        final File file;
-        try {
-            file = File.createTempFile("fixed", ".yoctodb");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        file.deleteOnExit();
-
-        try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file))) {
-            mutable.writeTo(os);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        try {
-            return Buffer.mmap(file);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    static {
-        // Random
-        final Random rnd = new Random();
-
-        // Building elements
-        final SortedSet<UnsignedByteArray> set = new TreeSet<>();
-        for (int i = 0; i < ELEMENTS; i++) {
-            final byte[] element = new byte[SIZE];
-            rnd.nextBytes(element);
-            set.add(UnsignedByteArrays.from(element));
-        }
-
-        // Building fixed
-        fixed =
-                FixedLengthByteArraySortedSet.from(
-                        persist(
-                                new com.yandex.yoctodb.util.mutable.impl.FixedLengthByteArraySortedSet(
-                                        set)));
-
-        // Building variable
-        variable =
-                VariableLengthByteArraySortedSet.from(
-                        persist(
-                                new com.yandex.yoctodb.util.mutable.impl.VariableLengthByteArraySortedSet(
-                                        set)));
-
-        // Preparing queries
-
-        elements = new ArrayList<>(set.size());
-        for (UnsignedByteArray e : set) {
-            elements.add(e.toByteBuffer());
-        }
-
-        Collections.shuffle(new ArrayList<>(elements), rnd);
-    }
-
-    private long measure(final ByteArraySortedSet set) {
+    private long measure(@NotNull final ByteArraySortedSet set, @NotNull final Collection<Buffer> queries) {
         long res = 0;
-        for (Buffer b : elements)
+        for (Buffer b : queries)
             res += set.indexOf(b);
         return res;
     }
 
     @Benchmark
-    public void fixed(final Blackhole bh) {
-        bh.consume(measure(fixed));
+    public void random_8bytes_64K_fixed(final Blackhole bh) {
+        bh.consume(measure(RANDOM_8B_64K.fixedIndex(), RANDOM_8B_64K.queries()));
     }
 
     @Benchmark
-    public void variable(final Blackhole bh) {
-        bh.consume(measure(variable));
+    public void random_8bytes_64K_variable(final Blackhole bh) {
+        bh.consume(measure(RANDOM_8B_64K.variableIndex(), RANDOM_8B_64K.queries()));
+    }
+
+    @Benchmark
+    public void random_8bytes_64K_trie(final Blackhole bh) {
+        bh.consume(measure(RANDOM_8B_64K.trieIndex(), RANDOM_8B_64K.queries()));
+    }
+
+    @Benchmark
+    public void random_prefixed_string_100K_fixed(final Blackhole bh) {
+        bh.consume(measure(RANDOM_STRING_WITH_PREFIX_25B_100K.fixedIndex(), RANDOM_STRING_WITH_PREFIX_25B_100K.queries()));
+    }
+
+    @Benchmark
+    public void random_prefixed_string_100K_variable(final Blackhole bh) {
+        bh.consume(measure(RANDOM_STRING_WITH_PREFIX_25B_100K.variableIndex(), RANDOM_STRING_WITH_PREFIX_25B_100K.queries()));
+    }
+
+    @Benchmark
+    public void random_prefixed_string_100K_trie(final Blackhole bh) {
+        bh.consume(measure(RANDOM_STRING_WITH_PREFIX_25B_100K.trieIndex(), RANDOM_STRING_WITH_PREFIX_25B_100K.queries()));
+    }
+
+    @Benchmark
+    public void price_fixed(final Blackhole bh) {
+        bh.consume(measure(PRICES_4B.fixedIndex(), PRICES_4B.queries()));
+    }
+
+    @Benchmark
+    public void price_variable(final Blackhole bh) {
+        bh.consume(measure(PRICES_4B.variableIndex(), PRICES_4B.queries()));
+    }
+
+    @Benchmark
+    public void price_trie(final Blackhole bh) {
+        bh.consume(measure(PRICES_4B.trieIndex(), PRICES_4B.queries()));
     }
 }

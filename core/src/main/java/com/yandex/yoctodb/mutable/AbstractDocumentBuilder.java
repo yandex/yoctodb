@@ -34,7 +34,7 @@ public abstract class AbstractDocumentBuilder
             final UnsignedByteArray value,
             @NotNull
             final IndexOption index) {
-        return withField(name, value, index, LengthOption.VARIABLE);
+        return withField(name, value, index, IndexType.VARIABLE_LENGTH);
     }
 
     @NotNull
@@ -45,7 +45,7 @@ public abstract class AbstractDocumentBuilder
             final boolean value,
             @NotNull
             final IndexOption index) {
-        return withField(name, UnsignedByteArrays.from(value), index, LengthOption.FIXED);
+        return withField(name, UnsignedByteArrays.from(value), index, IndexType.FIXED_LENGTH);
     }
 
     @NotNull
@@ -56,7 +56,7 @@ public abstract class AbstractDocumentBuilder
             final byte value,
             @NotNull
             final IndexOption index) {
-        return withField(name, UnsignedByteArrays.from(value), index, LengthOption.FIXED);
+        return withField(name, UnsignedByteArrays.from(value), index, IndexType.FIXED_LENGTH);
     }
 
     @NotNull
@@ -67,7 +67,7 @@ public abstract class AbstractDocumentBuilder
             final short value,
             @NotNull
             final IndexOption index) {
-        return withField(name, UnsignedByteArrays.from(value), index, LengthOption.FIXED);
+        return withField(name, UnsignedByteArrays.from(value), index, IndexType.FIXED_LENGTH);
     }
 
     @NotNull
@@ -78,7 +78,7 @@ public abstract class AbstractDocumentBuilder
             final int value,
             @NotNull
             final IndexOption index) {
-        return withField(name, UnsignedByteArrays.from(value), index, LengthOption.FIXED);
+        return withField(name, UnsignedByteArrays.from(value), index, IndexType.FIXED_LENGTH);
     }
 
     @NotNull
@@ -90,7 +90,7 @@ public abstract class AbstractDocumentBuilder
             final long value,
             @NotNull
             final IndexOption index) {
-        return withField(name, UnsignedByteArrays.from(value), index, LengthOption.FIXED);
+        return withField(name, UnsignedByteArrays.from(value), index, IndexType.FIXED_LENGTH);
     }
 
     @NotNull
@@ -102,6 +102,6 @@ public abstract class AbstractDocumentBuilder
             final String value,
             @NotNull
             final IndexOption index) {
-        return withField(name, UnsignedByteArrays.from(value), index, LengthOption.VARIABLE);
+        return withField(name, UnsignedByteArrays.from(value), index, IndexType.VARIABLE_LENGTH);
     }
 }

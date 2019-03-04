@@ -35,7 +35,8 @@ public class V1DatabaseReader extends DatabaseReader {
     private static final int DIGEST_BUF_SIZE = 4096;
     public static final V1DatabaseFormat.Feature[] SUPPORTED_FEATURES = {
         Feature.LEGACY,
-        Feature.ASCENDING_BIT_SET_INDEX
+        Feature.ASCENDING_BIT_SET_INDEX,
+        Feature.TRIE_BYTE_ARRAY_SORTED_SET
     };
 
 
