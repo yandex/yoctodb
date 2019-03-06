@@ -60,6 +60,11 @@ public class V1StoredIndex implements StoredIndex, Segment {
         return values.getCharUnsafe(document);
     }
 
+    @Override
+    public byte getByteValue(int document) {
+        return values.getByteUnsafe(document);
+    }
+
     static void registerReader() {
         SegmentRegistry.register(
                 V1DatabaseFormat.SegmentType

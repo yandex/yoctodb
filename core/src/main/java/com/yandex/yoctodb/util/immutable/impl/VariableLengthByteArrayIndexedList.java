@@ -120,6 +120,19 @@ public class VariableLengthByteArrayIndexedList
     }
 
     @Override
+    public byte getByteUnsafe(final int i) {
+        assert 0 <= i && i < elementCount;
+
+        final long base = ((long) i) << 3;
+        final long start = offsets.getLong(base);
+        final long end = offsets.getLong(base + 8L);
+
+        assert end - start == Byte.BYTES;
+
+        return elements.get(start);
+    }
+
+    @Override
     public int size() {
         return elementCount;
     }

@@ -153,6 +153,19 @@ public final class V1CompositeDatabase implements Database {
     }
 
     @Override
+    public byte getByteValue(
+            final int document,
+            @NotNull
+            final String fieldName) {
+        final int dbIndex = databaseByDocIndex(document);
+        return databases.get(dbIndex)
+                .getByteValue(
+                        document - documentOffsets[dbIndex],
+                        fieldName
+                );
+    }
+
+    @Override
     public void execute(
             @NotNull
             final Query query,

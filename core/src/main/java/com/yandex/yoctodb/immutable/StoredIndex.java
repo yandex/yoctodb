@@ -61,4 +61,12 @@ public interface StoredIndex extends Index {
      * @return stored value as char
      */
     char getCharValue(int document);
+
+    /**
+     * Get stored value as char by document ID
+     *
+     * @param document document ID
+     * @return stored value as char
+     */
+    byte getByteValue(int document);
 }

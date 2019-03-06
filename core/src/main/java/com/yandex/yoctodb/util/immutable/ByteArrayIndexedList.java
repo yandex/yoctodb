@@ -32,5 +32,7 @@ public interface ByteArrayIndexedList {
 
     char getCharUnsafe(int i);
 
+    byte getByteUnsafe(int i);
+
     int size();
 }

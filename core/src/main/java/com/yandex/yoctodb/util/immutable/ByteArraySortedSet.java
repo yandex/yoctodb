@@ -34,6 +34,8 @@ public interface ByteArraySortedSet {
 
     char getCharUnsafe(int i);
 
+    byte getByteUnsafe(int i);
+
     /**
      * Get index of the element
      *

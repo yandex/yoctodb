@@ -145,12 +145,22 @@ public final class V1Database implements IndexedDatabase {
 
     @Override
     public char getCharValue(
-            int document,
+            final int document,
             @NotNull
             final String fieldName) {
         assert storers.containsKey(fieldName);
 
         return storers.get(fieldName).getCharValue(document);
+    }
+
+    @Override
+    public byte getByteValue(
+            final int document,
+            @NotNull
+            final String fieldName) {
+        assert storers.containsKey(fieldName);
+
+        return storers.get(fieldName).getByteValue(document);
     }
 
     @Override

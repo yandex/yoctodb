@@ -11,13 +11,11 @@
 package com.yandex.yoctodb.util.immutable.impl;
 
 import com.google.common.primitives.Chars;
-import com.google.common.primitives.Ints;
 import com.google.common.primitives.Shorts;
+import com.yandex.yoctodb.util.UnsignedByteArrays;
 import com.yandex.yoctodb.util.buf.Buffer;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
-import com.yandex.yoctodb.util.UnsignedByteArrays;
-import com.yandex.yoctodb.util.immutable.ByteArraySortedSet;
 
 /**
  * {@link com.yandex.yoctodb.util.immutable.ByteArraySortedSet} with fixed size
@@ -120,6 +118,15 @@ public final class FixedLengthByteArraySortedSet
         assert elementSize == Chars.BYTES;
 
         return elements.getChar(((long) i) << 1);
+    }
+
+    @Override
+    public byte getByteUnsafe(final int i) {
+        assert 0 <= i && i < size;
+
+        assert elementSize == Byte.BYTES;
+
+        return elements.get(((long) i) << 1);
     }
 
     @Override

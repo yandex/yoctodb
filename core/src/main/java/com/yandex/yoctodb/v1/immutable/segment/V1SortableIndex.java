@@ -103,6 +103,11 @@ public final class V1SortableIndex
         return values.getCharUnsafe(document);
     }
 
+    @Override
+    public byte getByteValue(final int document) {
+        return values.getByteUnsafe(document);
+    }
+
     @NotNull
     @Override
     public Iterator<IntToIntArray> ascending(

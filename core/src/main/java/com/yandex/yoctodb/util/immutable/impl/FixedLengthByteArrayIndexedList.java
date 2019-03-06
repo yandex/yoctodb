@@ -10,6 +10,7 @@
 
 package com.yandex.yoctodb.util.immutable.impl;
 
+import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Chars;
 import com.google.common.primitives.Shorts;
 import com.yandex.yoctodb.util.buf.Buffer;
@@ -94,6 +95,14 @@ public class FixedLengthByteArrayIndexedList
         assert elementSize == Character.BYTES;
 
         return elements.getChar();
+    }
+
+    @Override
+    public byte getByteUnsafe(final int i) {
+        assert 0 <= i && i < elementCount;
+        assert elementSize == Byte.BYTES;
+
+        return elements.get();
     }
 
     @Override

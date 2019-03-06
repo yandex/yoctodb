@@ -117,4 +117,22 @@ public interface DocumentProvider {
             @NotNull
             String fieldName
     );
+
+    /**
+     * Get {@code document} document {@code fieldName} field value as byte.
+     *
+     * The field must be sortable, stored or full.
+     *
+     * @see com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption#SORTABLE
+     * @see com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption#FULL
+     * @see com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption#STORED
+     * @param document document index
+     * @param fieldName field name
+     * @return document field value as byte
+     */
+    byte getByteValue(
+            int document,
+            @NotNull
+            String fieldName
+    );
 }

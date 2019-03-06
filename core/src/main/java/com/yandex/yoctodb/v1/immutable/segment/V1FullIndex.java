@@ -167,6 +167,11 @@ public final class V1FullIndex
         return sortableDelegate.getCharValue(document);
     }
 
+    @Override
+    public byte getByteValue(final int document) {
+        return sortableDelegate.getByteValue(document);
+    }
+
     @NotNull
     @Override
     public Iterator<IntToIntArray> ascending(
