@@ -84,7 +84,7 @@ public class UnsignedByteArrays {
 
     @NotNull
     public static UnsignedByteArray from(final char c) {
-        return from(Chars.toByteArray(Chars.checkedCast(c)));
+        return from(Chars.toByteArray(c));
     }
 
     public static int toInt(

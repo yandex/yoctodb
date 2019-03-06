@@ -121,7 +121,7 @@ public final class FixedLengthByteArraySortedSet
 
         final int res = elements.getChar(((long) i) << 1);
 
-        return Chars.checkedCast(res);
+        return (char) res;
     }
 
     @Override

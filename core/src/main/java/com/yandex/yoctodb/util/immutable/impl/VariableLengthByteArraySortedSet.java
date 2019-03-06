@@ -151,7 +151,7 @@ public final class VariableLengthByteArraySortedSet
         assert end - start == Character.BYTES;
         final int res = elements.getChar(start);
 
-        return Chars.checkedCast(res);
+        return (char) res;
     }
 
     @Override
