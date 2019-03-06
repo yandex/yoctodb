@@ -10,13 +10,11 @@
 
 package com.yandex.yoctodb.util.immutable.impl;
 
-import com.google.common.primitives.Bytes;
-import com.google.common.primitives.Chars;
 import com.google.common.primitives.Shorts;
 import com.yandex.yoctodb.util.buf.Buffer;
+import com.yandex.yoctodb.util.immutable.ByteArrayIndexedList;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
-import com.yandex.yoctodb.util.immutable.ByteArrayIndexedList;
 
 /**
  * Fixed length immutable implementation of {@link ByteArrayIndexedList}
