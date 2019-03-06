@@ -149,9 +149,8 @@ public final class VariableLengthByteArraySortedSet
         final long end = offsets.getLong(base + 8L);
 
         assert end - start == Character.BYTES;
-        final int res = elements.getChar(start);
 
-        return (char) res;
+        return elements.getChar(start);
     }
 
     @Override

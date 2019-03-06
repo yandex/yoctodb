@@ -119,9 +119,7 @@ public final class FixedLengthByteArraySortedSet
 
         assert elementSize == Chars.BYTES;
 
-        final int res = elements.getChar(((long) i) << 1);
-
-        return (char) res;
+        return elements.getChar(((long) i) << 1);
     }
 
     @Override
