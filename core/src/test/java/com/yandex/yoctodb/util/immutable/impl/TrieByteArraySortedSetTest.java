@@ -156,6 +156,26 @@ public class TrieByteArraySortedSetTest {
         trieSet.get(0);
     }
 
+    @Test(expected = UnsupportedOperationException.class)
+    public void getLongUnsafe() {
+        trieSet.getLongUnsafe(0);
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void getIntUnsafe() {
+        trieSet.getIntUnsafe(0);
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void getShortUnsafe() {
+        trieSet.getShortUnsafe(0);
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void getCharUnsafe() {
+        trieSet.getCharUnsafe(0);
+    }
+
     @Test
     public void indexOfMutable() {
         for (String q : keys) {
