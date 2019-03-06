@@ -100,7 +100,11 @@ public class FixedLengthByteArrayIndexedList
         assert 0 <= i && i < elementCount;
         assert elementSize == Byte.BYTES;
 
-        return elements.get();
+        final int res = elements.get() ^ Byte.MIN_VALUE;
+
+        assert Byte.MIN_VALUE <= res && res <= Byte.MAX_VALUE;
+
+        return (byte) res;
     }
 
     @Override

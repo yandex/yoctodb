@@ -77,6 +77,11 @@ public class SimpleDatabaseTest {
     private final String CHAR_SORTABLE_FIELD_NAME = "char_sortable";
     private final char CHAR_FIELD_VALUE = 'a';
 
+    private final String BYTE_STORED_FIELD_NAME = "byte_stored";
+    private final String BYTE_FULL_FIELD_NAME = "byte_full";
+    private final String BYTE_SORTABLE_FIELD_NAME = "byte_sortable";
+    private final byte BYTE_FIELD_VALUE = -128;
+
     @Test
     public void buildDatabase() throws IOException {
         final DatabaseBuilder dbBuilder =
@@ -487,6 +492,10 @@ public class SimpleDatabaseTest {
                         .withField(CHAR_FULL_FIELD_NAME, CHAR_FIELD_VALUE, FULL)
                         .withField(CHAR_SORTABLE_FIELD_NAME, CHAR_FIELD_VALUE, SORTABLE)
 
+                        .withField(BYTE_STORED_FIELD_NAME, BYTE_FIELD_VALUE, STORED)
+                        .withField(BYTE_FULL_FIELD_NAME, BYTE_FIELD_VALUE, FULL)
+                        .withField(BYTE_SORTABLE_FIELD_NAME, BYTE_FIELD_VALUE, SORTABLE)
+
                         .withPayload(("payload1").getBytes())
         );
 
@@ -532,6 +541,10 @@ public class SimpleDatabaseTest {
         assertEquals(CHAR_FIELD_VALUE, db.getCharValue(0, CHAR_STORED_FIELD_NAME));
         assertEquals(CHAR_FIELD_VALUE, db.getCharValue(0, CHAR_FULL_FIELD_NAME));
         assertEquals(CHAR_FIELD_VALUE, db.getCharValue(0, CHAR_SORTABLE_FIELD_NAME));
+
+        assertEquals(BYTE_FIELD_VALUE, db.getByteValue(0, BYTE_STORED_FIELD_NAME));
+        assertEquals(BYTE_FIELD_VALUE, db.getByteValue(0, BYTE_FULL_FIELD_NAME));
+        assertEquals(BYTE_FIELD_VALUE, db.getByteValue(0, BYTE_SORTABLE_FIELD_NAME));
 
         // Document 2
 

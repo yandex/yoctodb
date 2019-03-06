@@ -49,6 +49,7 @@ public class CompositeFileDatabaseTest {
     private static final String INT_STORED_FILED_NAME = "stored_int_value";
     private static final String SHORT_STORED_FILED_NAME = "stored_short_value";
     private static final String CHAR_STORED_FILED_NAME = "stored_char_value";
+    private static final String BYTE_STORED_FIELD_NAME = "stored_byte_value";
 
     static {
         try {
@@ -82,6 +83,7 @@ public class CompositeFileDatabaseTest {
                             .withField(INT_STORED_FILED_NAME, i, STORED)
                             .withField(SHORT_STORED_FILED_NAME, (short) i, STORED)
                             .withField(CHAR_STORED_FILED_NAME, (char) i, STORED)
+                            .withField(BYTE_STORED_FIELD_NAME, (byte) i, STORED)
                             .withPayload(("payload1=" + i).getBytes())
             );
         }
@@ -109,6 +111,7 @@ public class CompositeFileDatabaseTest {
                             .withField(INT_STORED_FILED_NAME, i, STORED)
                             .withField(SHORT_STORED_FILED_NAME, (short) i, STORED)
                             .withField(CHAR_STORED_FILED_NAME, (char) i, STORED)
+                            .withField(BYTE_STORED_FIELD_NAME, (byte) i, STORED)
                             .withPayload(("payload2=" + i).getBytes())
             );
         }
@@ -645,6 +648,16 @@ public class CompositeFileDatabaseTest {
             assertEquals(
                     id,
                     db.getCharValue(id, CHAR_STORED_FILED_NAME));
+        }
+    }
+
+    @Test
+    public void extractFieldValueAsByte() {
+        for (int i = 0; i < 2 * DOCS; i++) {
+            final int id = i % DOCS;
+            assertEquals(
+                    id,
+                    db.getByteValue((byte) id, BYTE_STORED_FIELD_NAME));
         }
     }
 }

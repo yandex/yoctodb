@@ -70,6 +70,11 @@ public class IdScoredDocumentTest {
                 }
 
                 @Override
+                public byte getByteValue(int document, @NotNull String fieldName) {
+                    throw new IllegalArgumentException();
+                }
+
+                @Override
                 public void execute(
                         @NotNull
                         final Query query,

@@ -126,7 +126,11 @@ public final class FixedLengthByteArraySortedSet
 
         assert elementSize == Byte.BYTES;
 
-        return elements.get(((long) i) << 1);
+        final int res = elements.get(((long) i)) ^ Byte.MIN_VALUE;
+
+        assert Byte.MIN_VALUE <= res && res <= Byte.MAX_VALUE;
+
+        return (byte) res;
     }
 
     @Override

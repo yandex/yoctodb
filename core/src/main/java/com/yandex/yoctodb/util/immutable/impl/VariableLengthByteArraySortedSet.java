@@ -10,14 +10,11 @@
 
 package com.yandex.yoctodb.util.immutable.impl;
 
-import com.google.common.primitives.Chars;
-import com.google.common.primitives.Ints;
 import com.google.common.primitives.Shorts;
+import com.yandex.yoctodb.util.UnsignedByteArrays;
 import com.yandex.yoctodb.util.buf.Buffer;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
-import com.yandex.yoctodb.util.UnsignedByteArrays;
-import com.yandex.yoctodb.util.immutable.ByteArraySortedSet;
 
 /**
  * {@link com.yandex.yoctodb.util.immutable.ByteArraySortedSet} with variable
@@ -161,9 +158,10 @@ public final class VariableLengthByteArraySortedSet
         final long start = offsets.getLong(base);
         final long end = offsets.getLong(base + 8L);
 
-        assert end - start == Character.BYTES;
+        assert end - start == Byte.BYTES;
 
-        return elements.get(start);
+        final int res = elements.get(start) ^ Byte.MIN_VALUE;
+        return (byte) res;
     }
 
     @Override

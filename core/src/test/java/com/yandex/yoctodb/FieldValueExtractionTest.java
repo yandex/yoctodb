@@ -33,11 +33,13 @@ public class FieldValueExtractionTest {
     private static final String LONG_FIELD_NAME = "long_id";
     private static final String SHORT_FIELD_NAME = "short_id";
     private static final String CHAR_FIELD_NAME = "char_id";
+    private static final String BYTE_FIELD_NAME = "byte_is";
 
     private static final int INT_FIELD_VALUE = 25;
     private static final long LONG_FIELD_VALUE = 25L;
     private static final short SHORT_FIELD_VALUE = 25;
     private static final char CHAR_FIELD_VALUE = 'a';
+    private static final byte BYTE_FIELD_VALUE = 23;
 
 
     private DocumentProvider build(
@@ -57,6 +59,7 @@ public class FieldValueExtractionTest {
                         .withField(LONG_FIELD_NAME, LONG_FIELD_VALUE, indexOption)
                         .withField(SHORT_FIELD_NAME, SHORT_FIELD_VALUE, indexOption)
                         .withField(CHAR_FIELD_NAME, CHAR_FIELD_VALUE, indexOption)
+                        .withField(BYTE_FIELD_NAME, BYTE_FIELD_VALUE, indexOption)
                         .withPayload("payload".getBytes())
         );
 
@@ -114,6 +117,13 @@ public class FieldValueExtractionTest {
         final DocumentProvider db = build(IndexOption.STORED);
         final char storedValue = db.getCharValue(0, CHAR_FIELD_NAME);
         assertEquals(CHAR_FIELD_VALUE, storedValue);
+    }
+
+    @Test
+    public void extractStoredByte() throws IOException {
+        final DocumentProvider db = build(IndexOption.STORED);
+        final byte storedValue = db.getByteValue(0, BYTE_FIELD_NAME);
+        assertEquals(BYTE_FIELD_VALUE, storedValue);
     }
 
     @Test(expected = AssertionError.class)

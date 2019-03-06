@@ -166,6 +166,33 @@ public class ByteArraySortedSetTest {
         }
     }
 
+    @Test
+    public void buildingFromFixedLengthByteArraySortedSetTestByteUnsafe()
+            throws IOException {
+        //unsorted elements
+        final List<UnsignedByteArray> elements = new ArrayList<>();
+        elements.add(UnsignedByteArrays.from((byte) -128));
+        elements.add(UnsignedByteArrays.from((byte) 123));
+        elements.add(UnsignedByteArrays.from((byte) 2));
+        elements.add(UnsignedByteArrays.from((byte) 3));
+        elements.add(UnsignedByteArrays.from((byte) 127));
+
+        final Buffer bb =
+                prepareDataFromFixedLengthByteArraySortedSet(elements);
+        final ByteArraySortedSet ss =
+                FixedLengthByteArraySortedSet.from(bb);
+
+        assertEquals(elements.size(), ss.size());
+
+        //sorting to compare
+        Collections.sort(elements);
+
+        for (int i = 0; i < elements.size(); i++) {
+            final long puttedValue = elements.get(i).toByteBuffer().get() ^ Byte.MIN_VALUE;
+            assertEquals(puttedValue, ss.getByteUnsafe(i));
+        }
+    }
+
     private Buffer prepareDataFromFixedLengthByteArraySortedSet(
             final Collection<UnsignedByteArray> items) throws IOException {
         final SortedSet<UnsignedByteArray> elements =
@@ -318,6 +345,33 @@ public class ByteArraySortedSetTest {
         for (int i = 0; i < elements.size(); i++) {
             final long puttedValue = elements.get(i).toByteBuffer().getChar();
             assertEquals(puttedValue, ss.getCharUnsafe(i));
+        }
+    }
+
+    @Test
+    public void buildingFromVariableLengthByteArraySortedSetTestByteUnsafe()
+            throws IOException {
+        //elements
+        final List<UnsignedByteArray> elements = new ArrayList<>();
+        elements.add(UnsignedByteArrays.from((byte) 0));
+        elements.add(UnsignedByteArrays.from((byte) 1));
+        elements.add(UnsignedByteArrays.from((byte) 2));
+        elements.add(UnsignedByteArrays.from((byte) 3));
+        elements.add(UnsignedByteArrays.from((byte) 4));
+
+        final Buffer bb =
+                prepareDataFromVariableLengthByteArraySortedSet(elements);
+        final ByteArraySortedSet ss =
+                VariableLengthByteArraySortedSet.from(bb);
+
+        assertEquals(elements.size(), ss.size());
+
+        //sorting to compare
+        Collections.sort(elements);
+
+        for (int i = 0; i < elements.size(); i++) {
+            final long puttedValue = elements.get(i).toByteBuffer().get() ^ Byte.MIN_VALUE;
+            assertEquals(puttedValue, ss.getByteUnsafe(i));
         }
     }
 

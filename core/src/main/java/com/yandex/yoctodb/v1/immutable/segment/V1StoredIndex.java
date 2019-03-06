@@ -61,7 +61,7 @@ public class V1StoredIndex implements StoredIndex, Segment {
     }
 
     @Override
-    public byte getByteValue(int document) {
+    public byte getByteValue(final int document) {
         return values.getByteUnsafe(document);
     }
 

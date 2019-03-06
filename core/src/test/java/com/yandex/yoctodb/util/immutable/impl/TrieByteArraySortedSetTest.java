@@ -176,6 +176,11 @@ public class TrieByteArraySortedSetTest {
         trieSet.getCharUnsafe(0);
     }
 
+    @Test(expected = UnsupportedOperationException.class)
+    public void getByteUnsafe() {
+        trieSet.getByteUnsafe(0);
+    }
+
     @Test
     public void indexOfMutable() {
         for (String q : keys) {
