@@ -161,7 +161,7 @@ public class ByteArraySortedSetTest {
         Collections.sort(elements);
 
         for (int i = 0; i < elements.size(); i++) {
-            final long puttedValue = elements.get(i).toByteBuffer().getChar() ^ Character.MIN_VALUE;
+            final long puttedValue = elements.get(i).toByteBuffer().getChar();
             assertEquals(puttedValue, ss.getCharUnsafe(i));
         }
     }
@@ -316,7 +316,7 @@ public class ByteArraySortedSetTest {
         Collections.sort(elements);
 
         for (int i = 0; i < elements.size(); i++) {
-            final long puttedValue = elements.get(i).toByteBuffer().getChar() ^ Character.MIN_VALUE;
+            final long puttedValue = elements.get(i).toByteBuffer().getChar();
             assertEquals(puttedValue, ss.getCharUnsafe(i));
         }
     }

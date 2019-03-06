@@ -11,6 +11,7 @@
 package com.yandex.yoctodb.util.immutable.impl;
 
 import com.google.common.primitives.Chars;
+import com.google.common.primitives.Ints;
 import com.google.common.primitives.Shorts;
 import com.yandex.yoctodb.util.buf.Buffer;
 import net.jcip.annotations.Immutable;
@@ -135,7 +136,6 @@ public final class VariableLengthByteArraySortedSet
 
         assert end - start == Short.BYTES;
         final int res = elements.getShort(start) ^ Short.MIN_VALUE;
-        assert Short.MIN_VALUE <= res && res <= Short.MAX_VALUE;
 
         return Shorts.checkedCast(res);
     }
@@ -149,7 +149,7 @@ public final class VariableLengthByteArraySortedSet
         final long end = offsets.getLong(base + 8L);
 
         assert end - start == Character.BYTES;
-        final int res = elements.getChar(start) ^ Character.MIN_VALUE;
+        final int res = elements.getChar(start);
 
         return Chars.checkedCast(res);
     }

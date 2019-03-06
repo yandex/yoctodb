@@ -115,9 +115,9 @@ public class VariableLengthByteArrayIndexedList
         final long end = offsets.getLong(base + 8L);
 
         assert end - start == Character.BYTES;
-        final int res = elements.getShort(start) ^ Character.MIN_VALUE;
+        final int res = elements.getChar(start);
 
-        return Chars.checkedCast(res);
+        return (char) res;
     }
 
     @Override

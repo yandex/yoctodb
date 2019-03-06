@@ -141,7 +141,7 @@ public final class FileChannelBuffer extends Buffer {
         final ByteBuffer byteBuf = byteBufCache.get();
         try {
             final int c = ch.read(byteBuf, this.offset + this.position);
-            assert c == 1;
+            assert c == Byte.BYTES;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -158,7 +158,7 @@ public final class FileChannelBuffer extends Buffer {
         final ByteBuffer byteBuf = byteBufCache.get();
         try {
             final int c = ch.read(byteBuf, this.offset + index);
-            assert c == 1;
+            assert c == Byte.BYTES;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -168,30 +168,30 @@ public final class FileChannelBuffer extends Buffer {
 
     @Override
     public int getInt() {
-        assert remaining() >= 4;
+        assert remaining() >= Integer.BYTES;;
 
         final ByteBuffer intBuf = intBufCache.get();
         intBuf.rewind();
         try {
             final int c = ch.read(intBuf, this.offset + this.position);
-            assert c == 4;
+            assert c == Integer.BYTES;;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-        this.position += 4;
+        this.position += Integer.BYTES;
 
         return intBuf.getInt(0);
     }
 
     @Override
     public int getInt(final long index) {
-        assert index + 4 <= limit;
+        assert index + Integer.BYTES <= limit;
 
         final ByteBuffer intBuf = intBufCache.get();
         try {
             final int c = ch.read(intBuf, this.offset + index);
-            assert c == 4;
+            assert c == Integer.BYTES;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -201,17 +201,17 @@ public final class FileChannelBuffer extends Buffer {
 
     @Override
     public long getLong() {
-        assert remaining() >= 8;
+        assert remaining() >= Long.BYTES;
 
         final ByteBuffer longBuf = longBufCache.get();
         try {
             final int c = ch.read(longBuf, this.offset + this.position);
-            assert c == 8;
+            assert c == Long.BYTES;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-        this.position += 8;
+        this.position += Long.BYTES;
 
         return longBuf.getLong(0);
     }
@@ -223,7 +223,7 @@ public final class FileChannelBuffer extends Buffer {
         final ByteBuffer longBuf = longBufCache.get();
         try {
             final int c = ch.read(longBuf, this.offset + index);
-            assert c == 8;
+            assert c == Long.BYTES;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

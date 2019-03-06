@@ -144,7 +144,7 @@ public class ByteArrayIndexedListTest {
         Assert.assertEquals(elements.size(), list.size());
 
         for (int i = 0; i < elements.size(); ++i) {
-            final long puttedValue = elements.get(i).toByteBuffer().getChar() ^ Character.MIN_VALUE;
+            final long puttedValue = elements.get(i).toByteBuffer().getChar();
             Assert.assertEquals(puttedValue, list.getCharUnsafe(i));
         }
     }
@@ -269,7 +269,7 @@ public class ByteArrayIndexedListTest {
                 VariableLengthByteArrayIndexedList.from(bb);
 
         for (int i = 0; i < elements.size(); i++) {
-            final long puttedValue = elements.get(i).toByteBuffer().getChar() ^ Character.MIN_VALUE;
+            final long puttedValue = elements.get(i).toByteBuffer().getChar();
             Assert.assertEquals(puttedValue, list.getCharUnsafe(i));
         }
     }

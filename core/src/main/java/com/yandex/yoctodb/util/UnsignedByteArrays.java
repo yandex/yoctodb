@@ -84,8 +84,7 @@ public class UnsignedByteArrays {
 
     @NotNull
     public static UnsignedByteArray from(final char c) {
-        final int ci = c ^ Character.MIN_VALUE;
-        return from(Chars.toByteArray(Chars.checkedCast(ci)));
+        return from(Chars.toByteArray(Chars.checkedCast(c)));
     }
 
     public static int toInt(

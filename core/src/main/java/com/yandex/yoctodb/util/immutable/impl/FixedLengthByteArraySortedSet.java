@@ -119,7 +119,7 @@ public final class FixedLengthByteArraySortedSet
 
         assert elementSize == Chars.BYTES;
 
-        final int res = elements.getChar(((long) i) << 1) ^ Character.MIN_VALUE;
+        final int res = elements.getChar(((long) i) << 1);
 
         return Chars.checkedCast(res);
     }

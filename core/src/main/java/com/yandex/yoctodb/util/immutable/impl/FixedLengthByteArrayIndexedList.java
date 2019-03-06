@@ -93,9 +93,9 @@ public class FixedLengthByteArrayIndexedList
         assert 0 <= i && i < elementCount;
         assert elementSize == Character.BYTES;
 
-        final int res = elements.getChar() ^ Character.MIN_VALUE;
+        final int res = elements.getChar();
 
-        return Chars.checkedCast(res);
+        return (char) res;
     }
 
     @Override
