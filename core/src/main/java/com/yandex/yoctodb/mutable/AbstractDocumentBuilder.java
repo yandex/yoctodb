@@ -98,7 +98,7 @@ public abstract class AbstractDocumentBuilder
             final char value,
             @NotNull
             final IndexOption index) {
-        return withField(name, UnsignedByteArrays.from(value), index, LengthOption.FIXED);
+        return withField(name, UnsignedByteArrays.from(value), index, IndexType.FIXED_LENGTH);
     }
 
     @NotNull
