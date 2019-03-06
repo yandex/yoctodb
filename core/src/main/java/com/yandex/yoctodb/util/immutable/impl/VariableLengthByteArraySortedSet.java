@@ -34,7 +34,7 @@ public final class VariableLengthByteArraySortedSet
     @NotNull
     private final Buffer elements;
 
-    public static ByteArraySortedSet from(
+    public static VariableLengthByteArraySortedSet from(
             @NotNull
             final Buffer buffer) {
         final int size = buffer.getInt();

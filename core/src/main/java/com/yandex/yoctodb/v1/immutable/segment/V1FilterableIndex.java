@@ -16,6 +16,7 @@ import com.yandex.yoctodb.util.immutable.ByteArraySortedSet;
 import com.yandex.yoctodb.util.immutable.IndexToIndexMultiMap;
 import com.yandex.yoctodb.util.immutable.impl.FixedLengthByteArraySortedSet;
 import com.yandex.yoctodb.util.immutable.impl.IndexToIndexMultiMapReader;
+import com.yandex.yoctodb.util.immutable.impl.TrieByteArraySortedSet;
 import com.yandex.yoctodb.util.immutable.impl.VariableLengthByteArraySortedSet;
 import com.yandex.yoctodb.util.mutable.BitSet;
 import com.yandex.yoctodb.v1.V1DatabaseFormat;
@@ -183,6 +184,33 @@ public final class V1FilterableIndex implements FilterableIndex, Segment {
 
                         final ByteArraySortedSet values =
                                 VariableLengthByteArraySortedSet.from(
+                                        Segments.extract(buffer));
+
+                        final IndexToIndexMultiMap valueToDocuments =
+                                IndexToIndexMultiMapReader.from(
+                                        Segments.extract(buffer));
+
+                        return new V1FilterableIndex(
+                                fieldName,
+                                values,
+                                valueToDocuments);
+                    }
+
+                }
+        );
+
+        SegmentRegistry.register(
+                V1DatabaseFormat.SegmentType.TRIE_FILTER.getCode(),
+                new SegmentReader() {
+                    @NotNull
+                    @Override
+                    public Segment read(
+                            @NotNull
+                            final Buffer buffer) {
+                        final String fieldName = Segments.extractString(buffer);
+
+                        final ByteArraySortedSet values =
+                                TrieByteArraySortedSet.from(
                                         Segments.extract(buffer));
 
                         final IndexToIndexMultiMap valueToDocuments =

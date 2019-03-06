@@ -29,8 +29,6 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 @ThreadSafe
 public final class V1DatabaseFormat extends DatabaseFormat {
-    public final static int FORMAT = 7;
-
     private final static DatabaseReader DATABASE_READER = new V1DatabaseReader();
 
     private final static AtomicReference<String> messageDigestAlgorithm =
@@ -69,7 +67,8 @@ public final class V1DatabaseFormat extends DatabaseFormat {
 
     public enum Feature {
         LEGACY(6), // 0b110
-        ASCENDING_BIT_SET_INDEX(1 << 3);
+        ASCENDING_BIT_SET_INDEX(1 << 3),
+        TRIE_BYTE_ARRAY_SORTED_SET(1 << 4);
 
         private final int code;
 
@@ -102,7 +101,8 @@ public final class V1DatabaseFormat extends DatabaseFormat {
         VARIABLE_LENGTH_SORTABLE_INDEX(4000),
         FIXED_LENGTH_FULL_INDEX(5000),
         VARIABLE_LENGTH_FULL_INDEX(6000),
-        VARIABLE_LENGTH_STORED_INDEX(8000);
+        VARIABLE_LENGTH_STORED_INDEX(8000),
+        TRIE_FILTER(9000);
 
         private final int code;
 

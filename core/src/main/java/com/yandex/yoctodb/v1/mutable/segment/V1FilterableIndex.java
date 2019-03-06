@@ -18,6 +18,7 @@ import com.yandex.yoctodb.util.UnsignedByteArray;
 import com.yandex.yoctodb.util.mutable.IndexToIndexMultiMap;
 import com.yandex.yoctodb.util.mutable.impl.FixedLengthByteArraySortedSet;
 import com.yandex.yoctodb.util.mutable.impl.IndexToIndexMultiMapFactory;
+import com.yandex.yoctodb.util.mutable.impl.TrieByteArraySortedSet;
 import com.yandex.yoctodb.util.mutable.impl.VariableLengthByteArraySortedSet;
 import com.yandex.yoctodb.v1.V1DatabaseFormat;
 import net.jcip.annotations.NotThreadSafe;
@@ -41,14 +42,24 @@ public final class V1FilterableIndex
     private TreeMultimap<UnsignedByteArray, Integer> valueToDocuments =
             TreeMultimap.create();
     private final boolean fixedLength;
+    private final boolean useTrie;
     private int databaseDocumentsCount = -1;
 
     public V1FilterableIndex(
             @NotNull
             final String fieldName,
             final boolean fixedLength) {
+        this(fieldName, fixedLength, false);
+    }
+
+    public V1FilterableIndex(
+            @NotNull
+            final String fieldName,
+            final boolean fixedLength,
+            final boolean useTrie) {
         this.fieldName = fieldName.getBytes();
         this.fixedLength = fixedLength;
+        this.useTrie = useTrie;
     }
 
     @NotNull
@@ -92,7 +103,11 @@ public final class V1FilterableIndex
                         databaseDocumentsCount);
 
         final OutputStreamWritable values;
-        if (fixedLength) {
+        if (useTrie) {
+            values =
+                    new TrieByteArraySortedSet(
+                            valueToDocuments.keySet());
+        } else if (fixedLength) {
             values =
                     new FixedLengthByteArraySortedSet(
                             valueToDocuments.keySet());
@@ -122,16 +137,19 @@ public final class V1FilterableIndex
                     final OutputStream os) throws IOException {
                 os.write(Longs.toByteArray(getSizeInBytes()));
 
+                final V1DatabaseFormat.SegmentType segmentType;
+                if (useTrie) {
+                    segmentType = V1DatabaseFormat.SegmentType.TRIE_FILTER;
+                } else if (fixedLength) {
+                    segmentType = V1DatabaseFormat.SegmentType.FIXED_LENGTH_FILTER;
+                } else {
+                    segmentType = V1DatabaseFormat.SegmentType.VARIABLE_LENGTH_FILTER;
+                }
+
                 // Payload segment type
                 os.write(
                         Ints.toByteArray(
-                                fixedLength ?
-                                        V1DatabaseFormat.SegmentType
-                                                .FIXED_LENGTH_FILTER
-                                                .getCode() :
-                                        V1DatabaseFormat.SegmentType
-                                                .VARIABLE_LENGTH_FILTER
-                                                .getCode()
+                                segmentType.getCode()
                         )
                 );
 
