@@ -22,17 +22,17 @@ import org.jetbrains.annotations.NotNull;
 @ThreadSafe
 public interface ByteArrayIndexedList {
     @NotNull
-    Buffer get(int i);
+    Buffer get(final int docId);
 
-    long getLongUnsafe(int i);
+    long getLongUnsafe(final int docId);
 
-    int getIntUnsafe(int i);
+    int getIntUnsafe(final int docId);
 
-    short getShortUnsafe(int i);
+    short getShortUnsafe(final int docId);
 
-    char getCharUnsafe(int i);
+    char getCharUnsafe(final int docId);
 
-    byte getByteUnsafe(int i);
+    byte getByteUnsafe(final int docId);
 
     int size();
 }

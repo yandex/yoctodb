@@ -1,3 +1,13 @@
+/*
+ * (C) YANDEX LLC, 2014-2019
+ *
+ * The Source Code called "YoctoDB" available at
+ * https://github.com/yandex/yoctodb is subject to the terms of the
+ * Mozilla Public License, v. 2.0 (hereinafter referred to as the "License").
+ *
+ * A copy of the License is also available at http://mozilla.org/MPL/2.0/.
+ */
+
 package com.yandex.yoctodb.util.immutable.impl;
 
 import com.yandex.yoctodb.util.buf.Buffer;
@@ -90,6 +100,56 @@ public final class FoldedByteArrayIndexedList implements ByteArrayIndexedList {
         final long start = offsets.getLong(offsetIndex);
         final long end = offsets.getLong(offsetIndex + Long.BYTES);
         return elements.slice(start, end - start);
+    }
+
+    @Override
+    public long getLongUnsafe(final int docId) {
+        assert 0 <= docId && docId < elementCount;
+
+        final long offsetIndex = getOffsetIndex.apply(docId) * Long.BYTES;
+        final long start = offsets.getLong(offsetIndex);
+
+        return elements.getLong(start) ^ Long.MIN_VALUE;
+    }
+
+    @Override
+    public int getIntUnsafe(final int docId) {
+        assert 0 <= docId && docId < elementCount;
+
+        final long offsetIndex = getOffsetIndex.apply(docId) * Long.BYTES;
+        final long start = offsets.getLong(offsetIndex);
+
+        return elements.getInt(start) ^ Integer.MIN_VALUE;
+    }
+
+    @Override
+    public short getShortUnsafe(final int docId) {
+        assert 0 <= docId && docId < elementCount;
+
+        final long offsetIndex = getOffsetIndex.apply(docId) * Long.BYTES;
+        final long start = offsets.getLong(offsetIndex);
+
+        return (short) (elements.getShort(start) ^ Short.MIN_VALUE);
+    }
+
+    @Override
+    public char getCharUnsafe(final int docId) {
+        assert 0 <= docId && docId < elementCount;
+
+        final long offsetIndex = getOffsetIndex.apply(docId) * Long.BYTES;
+        final long start = offsets.getLong(offsetIndex);
+
+        return elements.getChar(start);
+    }
+
+    @Override
+    public byte getByteUnsafe(final int docId) {
+        assert 0 <= docId && docId < elementCount;
+
+        final long offsetIndex = getOffsetIndex.apply(docId) * Long.BYTES;
+        final long start = offsets.getLong(offsetIndex);
+
+        return (byte) (elements.get(start) ^ Byte.MIN_VALUE);
     }
 
     @Override

@@ -56,7 +56,7 @@ public class FoldedByteArrayIndexedListTest {
     }
 
     @Test
-    public void tesShortFolding() throws IOException {
+    public void testShortFolding() throws IOException {
         assertTrue(build(1000).toString().contains(Integer.toString(1000)));
     }
 

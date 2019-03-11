@@ -167,39 +167,6 @@ public final class FileChannelBuffer extends Buffer {
     }
 
     @Override
-    public short getShort() {
-        assert remaining() >= Short.BYTES;
-
-        final ByteBuffer shortBuf = shortBufCache.get();
-        shortBuf.rewind();
-        try {
-            final int c = ch.read(shortBuf, this.offset + this.position);
-            assert c == Short.BYTES;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        this.position += Short.BYTES;
-
-        return shortBuf.getShort(0);
-    }
-
-    @Override
-    public short getShort(long index) {
-        assert index + Short.BYTES <= limit;
-
-        final ByteBuffer shortBuf = shortBufCache.get();
-        try {
-            final int c = ch.read(shortBuf, this.offset + index);
-            assert c == Short.BYTES;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        return shortBuf.getShort(0);
-    }
-
-    @Override
     public int getInt() {
         assert remaining() >= Integer.BYTES;;
 
@@ -391,21 +358,6 @@ public final class FileChannelBuffer extends Buffer {
                 @Override
                 protected ByteBuffer initialValue() {
                     return ByteBuffer.allocate(8);
-                }
-
-                @Override
-                public ByteBuffer get() {
-                    final ByteBuffer result = super.get();
-                    result.rewind();
-                    return result;
-                }
-            };
-
-    private final ThreadLocal<ByteBuffer> shortBufCache =
-            new ThreadLocal<ByteBuffer>() {
-                @Override
-                protected ByteBuffer initialValue() {
-                    return ByteBuffer.allocate(Short.BYTES);
                 }
 
                 @Override
