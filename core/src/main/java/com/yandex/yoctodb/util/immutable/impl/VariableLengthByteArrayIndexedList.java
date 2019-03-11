@@ -31,6 +31,15 @@ public class VariableLengthByteArrayIndexedList
     @NotNull
     private final Buffer offsets;
 
+    /**
+     * Create instance of VariableLengthByteArrayIndexedList
+     * shift bytes by 3 is defined because of offset in long format, that means
+     * that to get a size in bytes you to multiply elementCount by 8
+     * Also, there extra (last) offset to define the size of last element,
+     * that's why you need slice (elementsCount + 1)
+     * @param buf all values for the filed in bytes
+     * @return new instance of VariableLengthByteArrayIndexedList
+     */
     @NotNull
     public static ByteArrayIndexedList from(
             @NotNull

@@ -11,11 +11,15 @@
 package com.yandex.yoctodb.util.buf;
 
 import com.google.common.base.Charsets;
+import com.google.common.primitives.Shorts;
 import org.junit.Test;
 
 import java.nio.ByteBuffer;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests for {@link com.yandex.yoctodb.util.buf.Buffer}
@@ -105,6 +109,24 @@ public abstract class BufferTest {
         assertEquals(
                 ByteBuffer.wrap(ALPHABET_BYTES, 0, 10),
                 ByteBuffer.wrap(bytes, 128, 10));
+    }
+
+    @Test
+    public void testGetShort() {
+        short data = 32765;
+        byte[] bytes = Shorts.toByteArray(data);
+        final Buffer buf = Buffer.from(bytes);
+        short result = buf.getShort();
+        assertEquals(data, result);
+    }
+
+    @Test
+    public void testGetShortWithIndex() {
+        short data = 32765;
+        byte[] bytes = Shorts.toByteArray(data);
+        final Buffer buf = Buffer.from(bytes);
+        short result = buf.getShort(0);
+        assertEquals(data, result);
     }
 
     @Test

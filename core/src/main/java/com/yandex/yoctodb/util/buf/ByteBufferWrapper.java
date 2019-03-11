@@ -135,7 +135,7 @@ public final class ByteBufferWrapper extends Buffer {
     }
 
     @Override
-    public short getShort(long index) {
+    public short getShort(final long index) {
         assert index <= Integer.MAX_VALUE;
 
         return delegate.getShort((int) index);
