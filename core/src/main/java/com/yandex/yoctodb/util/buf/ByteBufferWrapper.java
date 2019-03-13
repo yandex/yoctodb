@@ -118,6 +118,18 @@ public final class ByteBufferWrapper extends Buffer {
     }
 
     @Override
+    public char getChar() {
+        return delegate.getChar();
+    }
+
+    @Override
+    public char getChar(long index) {
+        assert index <= Integer.MAX_VALUE;
+
+        return delegate.getChar((int) index);
+    }
+
+    @Override
     public short getShort() {
         return delegate.getShort();
     }

@@ -70,6 +70,66 @@ public class TrieByteArraySortedSet implements ByteArraySortedSet {
     }
 
     /**
+     * We unable to provide getLongUnsafe() implementation since
+     * there is no continuous buffer with key value.
+     *
+     * @param i index of key
+     * @throws UnsupportedOperationException
+     */
+    @Override
+    public long getLongUnsafe(int i) {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * We unable to provide getIntUnsafe() implementation since
+     * there is no continuous buffer with key value.
+     *
+     * @param i index of key
+     * @throws UnsupportedOperationException
+     */
+    @Override
+    public int getIntUnsafe(int i) {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * We unable to provide getShortUnsafe() implementation since
+     * there is no continuous buffer with key value.
+     *
+     * @param i index of key
+     * @throws UnsupportedOperationException
+     */
+    @Override
+    public short getShortUnsafe(int i) {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * We unable to provide getCharUnsafe() implementation since
+     * there is no continuous buffer with key value.
+     *
+     * @param i index of key
+     * @throws UnsupportedOperationException
+     */
+    @Override
+    public char getCharUnsafe(int i) {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * We unable to provide getByteUnsafe() implementation since
+     * there is no continuous buffer with key value.
+     *
+     * @param i index of key
+     * @throws UnsupportedOperationException
+     */
+    @Override
+    public byte getByteUnsafe(int i) {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
      * Look up for key in trie.
      * Complexity: O(|key|)
      *

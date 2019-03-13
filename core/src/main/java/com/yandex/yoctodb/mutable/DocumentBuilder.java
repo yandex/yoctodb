@@ -117,6 +117,15 @@ public interface DocumentBuilder {
     DocumentBuilder withField(
             @NotNull
             String name,
+            char c,
+            @NotNull
+            IndexOption index
+    );
+
+    @NotNull
+    DocumentBuilder withField(
+            @NotNull
+            String name,
             @NotNull
             String value,
             @NotNull

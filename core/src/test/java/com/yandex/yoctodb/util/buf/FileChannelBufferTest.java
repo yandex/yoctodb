@@ -10,6 +10,8 @@
 
 package com.yandex.yoctodb.util.buf;
 
+import com.google.common.primitives.Chars;
+import com.google.common.primitives.Shorts;
 import org.junit.Test;
 
 import java.io.File;
@@ -194,7 +196,7 @@ public class FileChannelBufferTest extends BufferTest {
     }
 
     @Test(expected = RuntimeException.class)
-    public void getShort() throws IOException {
+    public void getShortBroken() throws IOException {
         final FileChannel broken = mock(FileChannel.class);
         when(broken.size()).thenReturn(1024L);
         when(broken.read(any(ByteBuffer.class), anyLong()))
@@ -203,11 +205,85 @@ public class FileChannelBufferTest extends BufferTest {
     }
 
     @Test(expected = RuntimeException.class)
-    public void getShortByIndex() throws IOException {
+    public void getShortByIndexBroken() throws IOException {
         final FileChannel broken = mock(FileChannel.class);
         when(broken.size()).thenReturn(1024L);
         when(broken.read(any(ByteBuffer.class), anyLong()))
                 .thenThrow(new IOException("Test"));
         new FileChannelBuffer(broken).getShort(0L);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void getCharBroken() throws IOException {
+        final FileChannel broken = mock(FileChannel.class);
+        when(broken.size()).thenReturn(1024L);
+        when(broken.read(any(ByteBuffer.class), anyLong()))
+                .thenThrow(new IOException("Test"));
+        new FileChannelBuffer(broken).getChar();
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void getCharByIndexBroken() throws IOException {
+        final FileChannel broken = mock(FileChannel.class);
+        when(broken.size()).thenReturn(1024L);
+        when(broken.read(any(ByteBuffer.class), anyLong()))
+                .thenThrow(new IOException("Test"));
+        new FileChannelBuffer(broken).getChar(0L);
+    }
+
+    @Test
+    public void getShort() throws IOException {
+        final short snum = 123;
+        final byte[] bytes = Shorts.toByteArray(snum);
+        final Path path = nextTempFile(bytes);
+        final FileChannel read = FileChannel.open(
+                path,
+                StandardOpenOption.READ,
+                StandardOpenOption.DELETE_ON_CLOSE);
+        final Buffer buf = Buffer.from(read);
+
+        assertEquals(snum, buf.getShort());
+    }
+
+    @Test
+    public void getShortByIndex() throws IOException {
+        final short snum = 123;
+        final byte[] bytes = Shorts.toByteArray(snum);
+        final Path path = nextTempFile(bytes);
+        final FileChannel read = FileChannel.open(
+                path,
+                StandardOpenOption.READ,
+                StandardOpenOption.DELETE_ON_CLOSE);
+        final Buffer buf = Buffer.from(read);
+
+        assertEquals(snum, buf.getShort(0));
+    }
+
+    @Test
+    public void getChar() throws IOException {
+        final char ch = 'a';
+        final byte[] bytes = Chars.toByteArray(ch);
+        final Path path = nextTempFile(bytes);
+        final FileChannel read = FileChannel.open(
+                path,
+                StandardOpenOption.READ,
+                StandardOpenOption.DELETE_ON_CLOSE);
+        final Buffer buf = Buffer.from(read);
+
+        assertEquals(ch, buf.getChar());
+    }
+
+    @Test
+    public void getCharByIndex() throws IOException {
+        final char ch = 'a';
+        final byte[] bytes = Chars.toByteArray(ch);
+        final Path path = nextTempFile(bytes);
+        final FileChannel read = FileChannel.open(
+                path,
+                StandardOpenOption.READ,
+                StandardOpenOption.DELETE_ON_CLOSE);
+        final Buffer buf = Buffer.from(read);
+
+        assertEquals(ch, buf.getChar(0));
     }
 }

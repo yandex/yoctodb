@@ -10,25 +10,40 @@
 
 package com.yandex.yoctodb;
 
-import com.google.common.primitives.Ints;
 import com.yandex.yoctodb.immutable.Database;
 import com.yandex.yoctodb.mutable.DatabaseBuilder;
 import com.yandex.yoctodb.query.DocumentProcessor;
 import com.yandex.yoctodb.query.Query;
 import com.yandex.yoctodb.query.simple.SimpleDescendingOrder;
 import com.yandex.yoctodb.query.simple.SimpleRangeCondition;
-import com.yandex.yoctodb.util.UnsignedByteArrays;
 import com.yandex.yoctodb.util.buf.Buffer;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption.*;
-import static com.yandex.yoctodb.query.QueryBuilder.*;
+import static com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption.FILTERABLE;
+import static com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption.FULL;
+import static com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption.SORTABLE;
+import static com.yandex.yoctodb.mutable.DocumentBuilder.IndexOption.STORED;
+import static com.yandex.yoctodb.query.QueryBuilder.asc;
+import static com.yandex.yoctodb.query.QueryBuilder.desc;
+import static com.yandex.yoctodb.query.QueryBuilder.eq;
+import static com.yandex.yoctodb.query.QueryBuilder.gt;
+import static com.yandex.yoctodb.query.QueryBuilder.gte;
+import static com.yandex.yoctodb.query.QueryBuilder.in;
+import static com.yandex.yoctodb.query.QueryBuilder.lt;
+import static com.yandex.yoctodb.query.QueryBuilder.lte;
+import static com.yandex.yoctodb.query.QueryBuilder.not;
+import static com.yandex.yoctodb.query.QueryBuilder.or;
+import static com.yandex.yoctodb.query.QueryBuilder.select;
 import static com.yandex.yoctodb.util.UnsignedByteArrays.from;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -41,6 +56,31 @@ import static org.junit.Assert.assertTrue;
  */
 public class SimpleDatabaseTest {
     private final int DOCS = 128;
+
+    private final String LONG_STORED_FIELD_NAME = "long_stored";
+    private final String LONG_FULL_FIELD_NAME = "long_full";
+    private final String LONG_SORTABLE_FIELD_NAME = "long_sortable";
+    private final long LONG_FIELD_VALUE = 25L;
+
+    private final String INT_STORED_FIELD_NAME = "int_stored";
+    private final String INT_FULL_FIELD_NAME = "int_full";
+    private final String INT_SORTABLE_FIELD_NAME = "int_sortable";
+    private final int INT_FIELD_VALUE = 15;
+
+    private final String SHORT_STORED_FIELD_NAME = "short_stored";
+    private final String SHORT_FULL_FIELD_NAME = "short_full";
+    private final String SHORT_SORTABLE_FIELD_NAME = "short_sortable";
+    private final short SHORT_FIELD_VALUE = 13;
+
+    private final String CHAR_STORED_FIELD_NAME = "char_stored";
+    private final String CHAR_FULL_FIELD_NAME = "char_full";
+    private final String CHAR_SORTABLE_FIELD_NAME = "char_sortable";
+    private final char CHAR_FIELD_VALUE = 'a';
+
+    private final String BYTE_STORED_FIELD_NAME = "byte_stored";
+    private final String BYTE_FULL_FIELD_NAME = "byte_full";
+    private final String BYTE_SORTABLE_FIELD_NAME = "byte_sortable";
+    private final byte BYTE_FIELD_VALUE = -128;
 
     @Test
     public void buildDatabase() throws IOException {
@@ -435,6 +475,27 @@ public class SimpleDatabaseTest {
                         .withField("sorted", 12, SORTABLE)
                         .withField("stored", 13, STORED)
                         .withField("first", 14, STORED)
+
+                        .withField(LONG_STORED_FIELD_NAME, LONG_FIELD_VALUE, STORED)
+                        .withField(LONG_FULL_FIELD_NAME, LONG_FIELD_VALUE, FULL)
+                        .withField(LONG_SORTABLE_FIELD_NAME, LONG_FIELD_VALUE, SORTABLE)
+
+                        .withField(INT_STORED_FIELD_NAME, INT_FIELD_VALUE, STORED)
+                        .withField(INT_FULL_FIELD_NAME, INT_FIELD_VALUE, FULL)
+                        .withField(INT_SORTABLE_FIELD_NAME, INT_FIELD_VALUE, SORTABLE)
+
+                        .withField(SHORT_STORED_FIELD_NAME, SHORT_FIELD_VALUE, STORED)
+                        .withField(SHORT_FULL_FIELD_NAME, SHORT_FIELD_VALUE, FULL)
+                        .withField(SHORT_SORTABLE_FIELD_NAME, SHORT_FIELD_VALUE, SORTABLE)
+
+                        .withField(CHAR_STORED_FIELD_NAME, CHAR_FIELD_VALUE, STORED)
+                        .withField(CHAR_FULL_FIELD_NAME, CHAR_FIELD_VALUE, FULL)
+                        .withField(CHAR_SORTABLE_FIELD_NAME, CHAR_FIELD_VALUE, SORTABLE)
+
+                        .withField(BYTE_STORED_FIELD_NAME, BYTE_FIELD_VALUE, STORED)
+                        .withField(BYTE_FULL_FIELD_NAME, BYTE_FIELD_VALUE, FULL)
+                        .withField(BYTE_SORTABLE_FIELD_NAME, BYTE_FIELD_VALUE, SORTABLE)
+
                         .withPayload(("payload1").getBytes())
         );
 
@@ -464,6 +525,26 @@ public class SimpleDatabaseTest {
         assertEquals(from(14).toByteBuffer(), db.getFieldValue(0, "first"));
         assertEquals(from("payload1").toByteBuffer(), db.getDocument(0));
         assertFalse(db.getFieldValue(0, "second").hasRemaining());
+
+        assertEquals(LONG_FIELD_VALUE, db.getLongValue(0, LONG_STORED_FIELD_NAME));
+        assertEquals(LONG_FIELD_VALUE, db.getLongValue(0, LONG_FULL_FIELD_NAME));
+        assertEquals(LONG_FIELD_VALUE, db.getLongValue(0, LONG_SORTABLE_FIELD_NAME));
+
+        assertEquals(INT_FIELD_VALUE, db.getIntValue(0, INT_STORED_FIELD_NAME));
+        assertEquals(INT_FIELD_VALUE, db.getIntValue(0, INT_FULL_FIELD_NAME));
+        assertEquals(INT_FIELD_VALUE, db.getIntValue(0, INT_SORTABLE_FIELD_NAME));
+
+        assertEquals(SHORT_FIELD_VALUE, db.getShortValue(0, SHORT_STORED_FIELD_NAME));
+        assertEquals(SHORT_FIELD_VALUE, db.getShortValue(0, SHORT_FULL_FIELD_NAME));
+        assertEquals(SHORT_FIELD_VALUE, db.getShortValue(0, SHORT_SORTABLE_FIELD_NAME));
+
+        assertEquals(CHAR_FIELD_VALUE, db.getCharValue(0, CHAR_STORED_FIELD_NAME));
+        assertEquals(CHAR_FIELD_VALUE, db.getCharValue(0, CHAR_FULL_FIELD_NAME));
+        assertEquals(CHAR_FIELD_VALUE, db.getCharValue(0, CHAR_SORTABLE_FIELD_NAME));
+
+        assertEquals(BYTE_FIELD_VALUE, db.getByteValue(0, BYTE_STORED_FIELD_NAME));
+        assertEquals(BYTE_FIELD_VALUE, db.getByteValue(0, BYTE_FULL_FIELD_NAME));
+        assertEquals(BYTE_FIELD_VALUE, db.getByteValue(0, BYTE_SORTABLE_FIELD_NAME));
 
         // Document 2
 

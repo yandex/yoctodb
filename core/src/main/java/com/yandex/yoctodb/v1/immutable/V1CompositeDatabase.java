@@ -102,6 +102,70 @@ public final class V1CompositeDatabase implements Database {
     }
 
     @Override
+    public long getLongValue(
+            final int document,
+            @NotNull
+            final String fieldName) {
+        final int dbIndex = databaseByDocIndex(document);
+        return databases.get(dbIndex)
+                .getLongValue(
+                        document - documentOffsets[dbIndex],
+                        fieldName);
+    }
+
+    @Override
+    public int getIntValue(
+            final int document,
+            @NotNull
+            final String fieldName) {
+        final int dbIndex = databaseByDocIndex(document);
+        return databases.get(dbIndex)
+                .getIntValue(
+                        document - documentOffsets[dbIndex],
+                        fieldName
+                );
+    }
+
+    @Override
+    public short getShortValue(
+            final int document,
+            @NotNull
+            final String fieldName) {
+        final int dbIndex = databaseByDocIndex(document);
+        return databases.get(dbIndex)
+                .getShortValue(
+                        document - documentOffsets[dbIndex],
+                        fieldName
+                );
+    }
+
+    @Override
+    public char getCharValue(
+            final int document,
+            @NotNull
+            final String fieldName) {
+        final int dbIndex = databaseByDocIndex(document);
+        return databases.get(dbIndex)
+                .getCharValue(
+                        document - documentOffsets[dbIndex],
+                        fieldName
+                );
+    }
+
+    @Override
+    public byte getByteValue(
+            final int document,
+            @NotNull
+            final String fieldName) {
+        final int dbIndex = databaseByDocIndex(document);
+        return databases.get(dbIndex)
+                .getByteValue(
+                        document - documentOffsets[dbIndex],
+                        fieldName
+                );
+    }
+
+    @Override
     public void execute(
             @NotNull
             final Query query,

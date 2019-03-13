@@ -82,6 +82,11 @@ public class UnsignedByteArrays {
         return from(Ints.toByteArray(i ^ Integer.MIN_VALUE));
     }
 
+    @NotNull
+    public static UnsignedByteArray from(final char c) {
+        return from(Chars.toByteArray(c));
+    }
+
     public static int toInt(
             @NotNull
             final UnsignedByteArray bytes) {

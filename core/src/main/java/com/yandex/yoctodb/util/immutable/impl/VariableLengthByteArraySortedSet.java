@@ -10,11 +10,11 @@
 
 package com.yandex.yoctodb.util.immutable.impl;
 
+import com.google.common.primitives.Shorts;
+import com.yandex.yoctodb.util.UnsignedByteArrays;
 import com.yandex.yoctodb.util.buf.Buffer;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
-import com.yandex.yoctodb.util.UnsignedByteArrays;
-import com.yandex.yoctodb.util.immutable.ByteArraySortedSet;
 
 /**
  * {@link com.yandex.yoctodb.util.immutable.ByteArraySortedSet} with variable
@@ -95,6 +95,73 @@ public final class VariableLengthByteArraySortedSet
         assert start < end;
 
         return elements.slice(start, end - start);
+    }
+
+    @Override
+    public long getLongUnsafe(final int i) {
+        assert 0 <= i && i < size;
+
+        final long base = ((long) i) << 3;
+        final long start = offsets.getLong(base);
+        final long end = offsets.getLong(base + 8L);
+
+        assert end - start == Long.BYTES;
+
+        return elements.getLong(start) ^ Long.MIN_VALUE;
+    }
+
+    @Override
+    public int getIntUnsafe(final int i) {
+        assert 0 <= i && i < size;
+
+        final long base = ((long) i) << 3;
+        final long start = offsets.getLong(base);
+        final long end = offsets.getLong(base + 8L);
+
+        assert end - start == Integer.BYTES;
+
+        return elements.getInt(start) ^ Integer.MIN_VALUE;
+    }
+
+    @Override
+    public short getShortUnsafe(final int i) {
+        assert 0 <= i && i < size;
+
+        final long base = ((long) i) << 3;
+        final long start = offsets.getLong(base);
+        final long end = offsets.getLong(base + 8L);
+
+        assert end - start == Short.BYTES;
+        final int res = elements.getShort(start) ^ Short.MIN_VALUE;
+
+        return Shorts.checkedCast(res);
+    }
+
+    @Override
+    public char getCharUnsafe(final int i) {
+        assert 0 <= i && i < size;
+
+        final long base = ((long) i) << 3;
+        final long start = offsets.getLong(base);
+        final long end = offsets.getLong(base + 8L);
+
+        assert end - start == Character.BYTES;
+
+        return elements.getChar(start);
+    }
+
+    @Override
+    public byte getByteUnsafe(final int i) {
+        assert 0 <= i && i < size;
+
+        final long base = ((long) i) << 3;
+        final long start = offsets.getLong(base);
+        final long end = offsets.getLong(base + 8L);
+
+        assert end - start == Byte.BYTES;
+
+        final int res = elements.get(start) ^ Byte.MIN_VALUE;
+        return (byte) res;
     }
 
     @Override

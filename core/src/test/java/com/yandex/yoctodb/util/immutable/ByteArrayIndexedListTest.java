@@ -53,6 +53,126 @@ public class ByteArrayIndexedListTest {
         }
     }
 
+    @Test
+    public void buildingFromFixedLengthByteArrayIndexedListTestLongUnsafe()
+            throws IOException {
+        //elements
+        final List<UnsignedByteArray> elements = new ArrayList<>();
+        elements.add(UnsignedByteArrays.from(0L));
+        elements.add(UnsignedByteArrays.from(1L));
+        elements.add(UnsignedByteArrays.from(2L));
+        elements.add(UnsignedByteArrays.from(3L));
+        elements.add(UnsignedByteArrays.from(4L));
+
+        final Buffer bb =
+                prepareDataFromFixedLengthByteArrayIndexedList(elements);
+        final ByteArrayIndexedList list =
+                FixedLengthByteArrayIndexedList.from(bb);
+
+        Assert.assertEquals(elements.size(), list.size());
+
+        for (int i = 0; i < elements.size(); ++i) {
+            final long puttedValue = elements.get(i).toByteBuffer().getLong() ^ Long.MIN_VALUE;
+            Assert.assertEquals(puttedValue, list.getLongUnsafe(i));
+        }
+    }
+
+    @Test
+    public void buildingFromFixedLengthByteArrayIndexedListTestIntUnsafe()
+            throws IOException {
+        //elements
+        final List<UnsignedByteArray> elements = new ArrayList<>();
+        elements.add(UnsignedByteArrays.from(0));
+        elements.add(UnsignedByteArrays.from(1));
+        elements.add(UnsignedByteArrays.from(2));
+        elements.add(UnsignedByteArrays.from(3));
+        elements.add(UnsignedByteArrays.from(4));
+
+        final Buffer bb =
+                prepareDataFromFixedLengthByteArrayIndexedList(elements);
+        final ByteArrayIndexedList list =
+                FixedLengthByteArrayIndexedList.from(bb);
+
+        Assert.assertEquals(elements.size(), list.size());
+
+        for (int i = 0; i < elements.size(); ++i) {
+            final long puttedValue = elements.get(i).toByteBuffer().getInt() ^ Integer.MIN_VALUE;
+            Assert.assertEquals(puttedValue, list.getIntUnsafe(i));
+        }
+    }
+
+    @Test
+    public void buildingFromFixedLengthByteArrayIndexedListTestShortUnsafe()
+            throws IOException {
+        //elements
+        final List<UnsignedByteArray> elements = new ArrayList<>();
+        elements.add(UnsignedByteArrays.from((short) 0));
+        elements.add(UnsignedByteArrays.from((short) 1));
+        elements.add(UnsignedByteArrays.from((short) 2));
+        elements.add(UnsignedByteArrays.from((short) 3));
+        elements.add(UnsignedByteArrays.from((short) 4));
+
+        final Buffer bb =
+                prepareDataFromFixedLengthByteArrayIndexedList(elements);
+        final ByteArrayIndexedList list =
+                FixedLengthByteArrayIndexedList.from(bb);
+
+        Assert.assertEquals(elements.size(), list.size());
+
+        for (int i = 0; i < elements.size(); ++i) {
+            final long puttedValue = elements.get(i).toByteBuffer().getShort() ^ Short.MIN_VALUE;
+            Assert.assertEquals(puttedValue, list.getShortUnsafe(i));
+        }
+    }
+
+    @Test
+    public void buildingFromFixedLengthByteArrayIndexedListTestCharUnsafe()
+            throws IOException {
+        //elements
+        final List<UnsignedByteArray> elements = new ArrayList<>();
+        elements.add(UnsignedByteArrays.from('a'));
+        elements.add(UnsignedByteArrays.from('b'));
+        elements.add(UnsignedByteArrays.from('c'));
+        elements.add(UnsignedByteArrays.from('d'));
+        elements.add(UnsignedByteArrays.from('e'));
+
+        final Buffer bb =
+                prepareDataFromFixedLengthByteArrayIndexedList(elements);
+        final ByteArrayIndexedList list =
+                FixedLengthByteArrayIndexedList.from(bb);
+
+        Assert.assertEquals(elements.size(), list.size());
+
+        for (int i = 0; i < elements.size(); ++i) {
+            final long puttedValue = elements.get(i).toByteBuffer().getChar();
+            Assert.assertEquals(puttedValue, list.getCharUnsafe(i));
+        }
+    }
+
+    @Test
+    public void buildingFromFixedLengthByteArrayIndexedListTestByteUnsafe()
+            throws IOException {
+        //elements
+        final List<UnsignedByteArray> elements = new ArrayList<>();
+        elements.add(UnsignedByteArrays.from((byte) 0));
+        elements.add(UnsignedByteArrays.from((byte) 1));
+        elements.add(UnsignedByteArrays.from((byte) 2));
+        elements.add(UnsignedByteArrays.from((byte) 3));
+        elements.add(UnsignedByteArrays.from((byte) 4));
+
+        final Buffer bb =
+                prepareDataFromFixedLengthByteArrayIndexedList(elements);
+        final ByteArrayIndexedList list =
+                FixedLengthByteArrayIndexedList.from(bb);
+
+        Assert.assertEquals(elements.size(), list.size());
+
+        for (int i = 0; i < elements.size(); ++i) {
+            final long puttedValue = elements.get(i).toByteBuffer().get() ^ Byte.MIN_VALUE;
+            Assert.assertEquals(puttedValue, list.getByteUnsafe(i));
+        }
+    }
+
     private Buffer prepareDataFromFixedLengthByteArrayIndexedList(
             final Collection<UnsignedByteArray> elements) throws IOException {
         final com.yandex.yoctodb.util.mutable.impl.FixedLengthByteArrayIndexedList fixedLengthByteArrayIndexedList =
@@ -87,6 +207,116 @@ public class ByteArrayIndexedListTest {
             Assert.assertEquals(
                     elements.get(i).toByteBuffer(),
                     list.get(i));
+        }
+    }
+
+    @Test
+    public void buildingFromVariableLengthByteArrayIndexedListTestLongUnsafe()
+            throws IOException {
+        //elements
+        final List<UnsignedByteArray> elements = new ArrayList<>();
+        elements.add(UnsignedByteArrays.from(0L));
+        elements.add(UnsignedByteArrays.from(1L));
+        elements.add(UnsignedByteArrays.from(2L));
+        elements.add(UnsignedByteArrays.from(3L));
+        elements.add(UnsignedByteArrays.from(4L));
+
+        final Buffer bb =
+                prepareDataFromVariableLengthByteArrayIndexedLength(elements);
+        final ByteArrayIndexedList list =
+                VariableLengthByteArrayIndexedList.from(bb);
+
+        for (int i = 0; i < elements.size(); i++) {
+            final long puttedValue = elements.get(i).toByteBuffer().getLong() ^ Long.MIN_VALUE;
+            Assert.assertEquals(puttedValue, list.getLongUnsafe(i));
+        }
+    }
+
+    @Test
+    public void buildingFromVariableLengthByteArrayIndexedListTestIntUnsafe()
+            throws IOException {
+        //elements
+        final List<UnsignedByteArray> elements = new ArrayList<>();
+        elements.add(UnsignedByteArrays.from(0));
+        elements.add(UnsignedByteArrays.from(1));
+        elements.add(UnsignedByteArrays.from(2));
+        elements.add(UnsignedByteArrays.from(3));
+        elements.add(UnsignedByteArrays.from(4));
+
+        final Buffer bb =
+                prepareDataFromVariableLengthByteArrayIndexedLength(elements);
+        final ByteArrayIndexedList list =
+                VariableLengthByteArrayIndexedList.from(bb);
+
+        for (int i = 0; i < elements.size(); i++) {
+            final long puttedValue = elements.get(i).toByteBuffer().getInt() ^ Integer.MIN_VALUE;
+            Assert.assertEquals(puttedValue, list.getIntUnsafe(i));
+        }
+    }
+
+    @Test
+    public void buildingFromVariableLengthByteArrayIndexedListTestShortUnsafe()
+            throws IOException {
+        //elements
+        final List<UnsignedByteArray> elements = new ArrayList<>();
+        elements.add(UnsignedByteArrays.from((short) 0));
+        elements.add(UnsignedByteArrays.from((short) 1));
+        elements.add(UnsignedByteArrays.from((short) 2));
+        elements.add(UnsignedByteArrays.from((short) 3));
+        elements.add(UnsignedByteArrays.from((short) 4));
+
+        final Buffer bb =
+                prepareDataFromVariableLengthByteArrayIndexedLength(elements);
+        final ByteArrayIndexedList list =
+                VariableLengthByteArrayIndexedList.from(bb);
+
+        for (int i = 0; i < elements.size(); i++) {
+            final long puttedValue = elements.get(i).toByteBuffer().getShort() ^ Short.MIN_VALUE;
+            Assert.assertEquals(puttedValue, list.getShortUnsafe(i));
+        }
+    }
+
+    @Test
+    public void buildingFromVariableLengthByteArrayIndexedListTestCharUnsafe()
+            throws IOException {
+        //elements
+        final List<UnsignedByteArray> elements = new ArrayList<>();
+        elements.add(UnsignedByteArrays.from('a'));
+        elements.add(UnsignedByteArrays.from('b'));
+        elements.add(UnsignedByteArrays.from('c'));
+        elements.add(UnsignedByteArrays.from('d'));
+        elements.add(UnsignedByteArrays.from('e'));
+
+        final Buffer bb =
+                prepareDataFromVariableLengthByteArrayIndexedLength(elements);
+        final ByteArrayIndexedList list =
+                VariableLengthByteArrayIndexedList.from(bb);
+
+        for (int i = 0; i < elements.size(); i++) {
+            final long puttedValue = elements.get(i).toByteBuffer().getChar();
+            Assert.assertEquals(puttedValue, list.getCharUnsafe(i));
+        }
+    }
+
+    @Test
+    public void buildingFromVariableLengthByteArrayIndexedListTestByteUnsafe()
+            throws IOException {
+        //elements
+        final List<UnsignedByteArray> elements = new ArrayList<>();
+        elements.add(UnsignedByteArrays.from((byte) 0));
+        elements.add(UnsignedByteArrays.from((byte) -2));
+        elements.add(UnsignedByteArrays.from((byte) 34));
+        elements.add(UnsignedByteArrays.from((byte) 21));
+        elements.add(UnsignedByteArrays.from((byte) 13));
+
+        final Buffer bb =
+                prepareDataFromVariableLengthByteArrayIndexedLength(elements);
+        final ByteArrayIndexedList list =
+                VariableLengthByteArrayIndexedList.from(bb);
+
+        for (int i = 0; i < elements.size(); i++) {
+            final long puttedValue = elements.get(i).toByteBuffer().get() ^ Byte.MIN_VALUE;
+            Assert.assertEquals(puttedValue, list.getByteUnsafe(i));
         }
     }
 

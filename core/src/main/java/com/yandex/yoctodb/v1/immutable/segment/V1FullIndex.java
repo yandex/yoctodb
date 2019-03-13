@@ -147,6 +147,31 @@ public final class V1FullIndex
         return sortableDelegate.getStoredValue(document);
     }
 
+    @Override
+    public long getLongValue(final int document) {
+        return sortableDelegate.getLongValue(document);
+    }
+
+    @Override
+    public int getIntValue(final int document) {
+        return sortableDelegate.getIntValue(document);
+    }
+
+    @Override
+    public short getShortValue(final int document) {
+        return sortableDelegate.getShortValue(document);
+    }
+
+    @Override
+    public char getCharValue(final int document) {
+        return sortableDelegate.getCharValue(document);
+    }
+
+    @Override
+    public byte getByteValue(final int document) {
+        return sortableDelegate.getByteValue(document);
+    }
+
     @NotNull
     @Override
     public Iterator<IntToIntArray> ascending(

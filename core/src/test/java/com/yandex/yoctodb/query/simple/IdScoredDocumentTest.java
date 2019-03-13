@@ -50,6 +50,31 @@ public class IdScoredDocumentTest {
                 }
 
                 @Override
+                public long getLongValue(int document, @NotNull String fieldName) {
+                    throw new IllegalStateException();
+                }
+
+                @Override
+                public int getIntValue(int document, @NotNull String fieldName) {
+                    throw new IllegalArgumentException();
+                }
+
+                @Override
+                public short getShortValue(int document, @NotNull String fieldName) {
+                    throw new IllegalArgumentException();
+                }
+
+                @Override
+                public char getCharValue(int document, @NotNull String fieldName) {
+                    throw new IllegalArgumentException();
+                }
+
+                @Override
+                public byte getByteValue(int document, @NotNull String fieldName) {
+                    throw new IllegalArgumentException();
+                }
+
+                @Override
                 public void execute(
                         @NotNull
                         final Query query,

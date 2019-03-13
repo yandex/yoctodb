@@ -29,6 +29,18 @@ import static org.junit.Assert.assertEquals;
  */
 public class FieldValueExtractionTest {
     private static final String FIELD_NAME = "id";
+    private static final String INT_FIELD_NAME = "int_id";
+    private static final String LONG_FIELD_NAME = "long_id";
+    private static final String SHORT_FIELD_NAME = "short_id";
+    private static final String CHAR_FIELD_NAME = "char_id";
+    private static final String BYTE_FIELD_NAME = "byte_is";
+
+    private static final int INT_FIELD_VALUE = 25;
+    private static final long LONG_FIELD_VALUE = 25L;
+    private static final short SHORT_FIELD_VALUE = 25;
+    private static final char CHAR_FIELD_VALUE = 'a';
+    private static final byte BYTE_FIELD_VALUE = 23;
+
 
     private DocumentProvider build(
             final IndexOption indexOption) throws IOException {
@@ -43,6 +55,11 @@ public class FieldValueExtractionTest {
                                 FIELD_NAME,
                                 0,
                                 indexOption)
+                        .withField(INT_FIELD_NAME, INT_FIELD_VALUE, indexOption)
+                        .withField(LONG_FIELD_NAME, LONG_FIELD_VALUE, indexOption)
+                        .withField(SHORT_FIELD_NAME, SHORT_FIELD_VALUE, indexOption)
+                        .withField(CHAR_FIELD_NAME, CHAR_FIELD_VALUE, indexOption)
+                        .withField(BYTE_FIELD_NAME, BYTE_FIELD_VALUE, indexOption)
                         .withPayload("payload".getBytes())
         );
 
@@ -66,6 +83,47 @@ public class FieldValueExtractionTest {
         final DocumentProvider db = build(IndexOption.SORTABLE);
 
         assertEquals(from(0).toByteBuffer(), db.getFieldValue(0, FIELD_NAME));
+    }
+
+    @Test
+    public void extractStoredFieldValue() throws IOException {
+        final DocumentProvider db = build(IndexOption.STORED);
+        assertEquals(from(0).toByteBuffer(), db.getFieldValue(0, FIELD_NAME));
+    }
+
+    @Test
+    public void extractStoredLong() throws IOException {
+        final DocumentProvider db = build(IndexOption.STORED);
+        final long storedValue = db.getLongValue(0, LONG_FIELD_NAME);
+        assertEquals(LONG_FIELD_VALUE, storedValue);
+    }
+
+    @Test
+    public void extractStoredInt() throws IOException {
+        final DocumentProvider db = build(IndexOption.STORED);
+        final int storedValue = db.getIntValue(0, INT_FIELD_NAME);
+        assertEquals(INT_FIELD_VALUE, storedValue);
+    }
+
+    @Test
+    public void extractStoredShort() throws IOException {
+        final DocumentProvider db = build(IndexOption.STORED);
+        final short storedValue = db.getShortValue(0, SHORT_FIELD_NAME);
+        assertEquals(SHORT_FIELD_VALUE, storedValue);
+    }
+
+    @Test
+    public void extractStoredChar() throws IOException {
+        final DocumentProvider db = build(IndexOption.STORED);
+        final char storedValue = db.getCharValue(0, CHAR_FIELD_NAME);
+        assertEquals(CHAR_FIELD_VALUE, storedValue);
+    }
+
+    @Test
+    public void extractStoredByte() throws IOException {
+        final DocumentProvider db = build(IndexOption.STORED);
+        final byte storedValue = db.getByteValue(0, BYTE_FIELD_NAME);
+        assertEquals(BYTE_FIELD_VALUE, storedValue);
     }
 
     @Test(expected = AssertionError.class)

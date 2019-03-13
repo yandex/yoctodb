@@ -10,10 +10,11 @@
 
 package com.yandex.yoctodb.util.immutable.impl;
 
+import com.google.common.primitives.Shorts;
 import com.yandex.yoctodb.util.buf.Buffer;
+import com.yandex.yoctodb.util.immutable.ByteArrayIndexedList;
 import net.jcip.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
-import com.yandex.yoctodb.util.immutable.ByteArrayIndexedList;
 
 /**
  * Fixed length immutable implementation of {@link ByteArrayIndexedList}
@@ -58,6 +59,52 @@ public class FixedLengthByteArrayIndexedList
         assert 0 <= i && i < elementCount;
 
         return elements.slice(((long) i) * elementSize, elementSize);
+    }
+
+    @Override
+    public long getLongUnsafe(final int i) {
+        assert 0 <= i && i < elementCount;
+        assert elementSize == Long.BYTES;
+
+        return elements.getLong() ^ Long.MIN_VALUE;
+    }
+
+    @Override
+    public int getIntUnsafe(final int i) {
+        assert 0 <= i && i < elementCount;
+        assert elementSize == Integer.BYTES;
+
+        return elements.getInt() ^ Integer.MIN_VALUE;
+    }
+
+    @Override
+    public short getShortUnsafe(final int i) {
+        assert 0 <= i && i < elementCount;
+        assert elementSize == Short.BYTES;
+
+        final int res = elements.getShort() ^ Short.MIN_VALUE;
+
+        return Shorts.checkedCast(res);
+    }
+
+    @Override
+    public char getCharUnsafe(final int i) {
+        assert 0 <= i && i < elementCount;
+        assert elementSize == Character.BYTES;
+
+        return elements.getChar();
+    }
+
+    @Override
+    public byte getByteUnsafe(final int i) {
+        assert 0 <= i && i < elementCount;
+        assert elementSize == Byte.BYTES;
+
+        final int res = elements.get() ^ Byte.MIN_VALUE;
+
+        assert Byte.MIN_VALUE <= res && res <= Byte.MAX_VALUE;
+
+        return (byte) res;
     }
 
     @Override

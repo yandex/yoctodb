@@ -45,6 +45,12 @@ import static org.junit.Assert.assertEquals;
 public class CompositeFileDatabaseTest {
     private static final String BASE;
 
+    private static final String LONG_STORED_FILED_NAME = "stored_long_value";
+    private static final String INT_STORED_FILED_NAME = "stored_int_value";
+    private static final String SHORT_STORED_FILED_NAME = "stored_short_value";
+    private static final String CHAR_STORED_FILED_NAME = "stored_char_value";
+    private static final String BYTE_STORED_FIELD_NAME = "stored_byte_value";
+
     static {
         try {
             BASE = Files.createTempDirectory("indices").toString();
@@ -73,6 +79,11 @@ public class CompositeFileDatabaseTest {
                             .withField("field2", "2", FILTERABLE)
                             .withField("index", i, FULL)
                             .withField("relevance", -i, SORTABLE)
+                            .withField(LONG_STORED_FILED_NAME, Long.valueOf(i), STORED)
+                            .withField(INT_STORED_FILED_NAME, i, STORED)
+                            .withField(SHORT_STORED_FILED_NAME, (short) i, STORED)
+                            .withField(CHAR_STORED_FILED_NAME, (char) i, STORED)
+                            .withField(BYTE_STORED_FIELD_NAME, (byte) i, STORED)
                             .withPayload(("payload1=" + i).getBytes())
             );
         }
@@ -96,6 +107,11 @@ public class CompositeFileDatabaseTest {
                             .withField("field2", "1", FILTERABLE)
                             .withField("index", i, FULL)
                             .withField("relevance", i, SORTABLE)
+                            .withField(LONG_STORED_FILED_NAME, Long.valueOf(i), STORED)
+                            .withField(INT_STORED_FILED_NAME, i, STORED)
+                            .withField(SHORT_STORED_FILED_NAME, (short) i, STORED)
+                            .withField(CHAR_STORED_FILED_NAME, (char) i, STORED)
+                            .withField(BYTE_STORED_FIELD_NAME, (byte) i, STORED)
                             .withPayload(("payload2=" + i).getBytes())
             );
         }
@@ -530,7 +546,7 @@ public class CompositeFileDatabaseTest {
 
     @Test
     public void emptyCompositeDatabaseFieldSearch() {
-        final Database db = READER.composite(new ArrayList<IndexedDatabase>());
+        final Database db = READER.composite(new ArrayList<>());
 
         final Query query =
                 select().where(
@@ -592,6 +608,56 @@ public class CompositeFileDatabaseTest {
             assertEquals(
                     from(-id).toByteBuffer(),
                     db.getFieldValue(id, "relevance"));
+        }
+    }
+
+    @Test
+    public void extractFieldValuesAsLong() {
+        for (int i = 0; i < 2 * DOCS; i++) {
+            final int id = i % DOCS;
+            assertEquals(
+                    id,
+                    db.getLongValue(id, LONG_STORED_FILED_NAME));
+        }
+    }
+
+    @Test
+    public void extractFieldValueAsInt() {
+        for (int i = 0; i < 2 * DOCS; i++) {
+            final int id = i % DOCS;
+            assertEquals(
+                    id,
+                    db.getIntValue(id, INT_STORED_FILED_NAME));
+        }
+    }
+
+    @Test
+    public void extractFieldValuesAsShort() {
+        for (int i = 0; i < 2 * DOCS; i++) {
+            final int id = i % DOCS;
+            assertEquals(
+                    id,
+                    db.getShortValue(id, SHORT_STORED_FILED_NAME));
+        }
+    }
+
+    @Test
+    public void extractFieldValueAsChar() {
+        for (int i = 0; i < 2 * DOCS; i++) {
+            final int id = i % DOCS;
+            assertEquals(
+                    id,
+                    db.getCharValue(id, CHAR_STORED_FILED_NAME));
+        }
+    }
+
+    @Test
+    public void extractFieldValueAsByte() {
+        for (int i = 0; i < 2 * DOCS; i++) {
+            final int id = i % DOCS;
+            assertEquals(
+                    id,
+                    db.getByteValue((byte) id, BYTE_STORED_FIELD_NAME));
         }
     }
 }
