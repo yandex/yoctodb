@@ -54,7 +54,7 @@
         <javac.target>1.8</javac.target>
         <jcip-annotations.version>1.0</jcip-annotations.version>
         <jmh.version>1.21</jmh.version>
-        <junit.version>4.12</junit.version>
+        <junit.version>4.13.1</junit.version>
         <mockito.version>1.10.19</mockito.version>
 
         <!-- Maven -->
