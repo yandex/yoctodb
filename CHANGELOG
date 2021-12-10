@@ -1,3 +1,18 @@
+0.0.20
+  * ATTENTION! Incompatible format changes -- rebuild your databases
+  * Ascending bitset index by @ya-goodfella in https://github.com/yandex/yoctodb/pull/35
+  * Trie based index for key storage by @ya-goodfella in https://github.com/yandex/yoctodb/pull/36
+  * Buffer deduplication for stored fields by @irenkamalova in https://github.com/yandex/yoctodb/pull/38
+  * Reading primitives unsafe (natively through ByteBuffer API) by @sanekas in https://github.com/yandex/yoctodb/pull/43
+  * Bump junit from 4.12 to 4.13.1 by @dependabot in https://github.com/yandex/yoctodb/pull/46
+
+  ## New Contributors
+  * @ya-goodfella made their first contribution in https://github.com/yandex/yoctodb/pull/35
+  * @irenkamalova made their first contribution in https://github.com/yandex/yoctodb/pull/38
+  * @sanekas made their first contribution in https://github.com/yandex/yoctodb/pull/43
+
+  **Full Changelog**: https://github.com/yandex/yoctodb/compare/0.0.19...v0.0.20
+
 0.0.19
   * ATTENTION! Incompatible format changes -- rebuild your databases
   * #33: Support for stored field values
