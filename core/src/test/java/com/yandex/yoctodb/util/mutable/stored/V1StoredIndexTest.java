@@ -26,7 +26,7 @@ public class V1StoredIndexTest {
     public void buildV1StoredIndex() {
         final String fieldName = "testFiledName";
         V1StoredIndex index = new V1StoredIndex(fieldName);
-        final TreeMap<Integer, UnsignedByteArray> data = new TreeMap<>(initData());
+        final Map<Integer, UnsignedByteArray> data = initData();
         List<UnsignedByteArray> elements = new ArrayList<>(data.size());
         for(Map.Entry<Integer, UnsignedByteArray> entry : data.entrySet()) {
             index.addDocument(entry.getKey(), Collections.singletonList(entry.getValue()));
@@ -42,7 +42,7 @@ public class V1StoredIndexTest {
     }
 
     private Map<Integer, UnsignedByteArray> initData() {
-        Map<Integer, UnsignedByteArray> data = new HashMap<>();
+        Map<Integer, UnsignedByteArray> data = new TreeMap<>();
         data.put(0, UnsignedByteArrays.from("NEW"));
         data.put(1, UnsignedByteArrays.from("USED"));
         return data;
