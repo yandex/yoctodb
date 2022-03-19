@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * {@link com.yandex.yoctodb.util.immutable.ByteArrayIndexedList} with fixed size
@@ -25,7 +26,7 @@ public class V1StoredIndexTest {
     public void buildV1StoredIndex() {
         final String fieldName = "testFiledName";
         V1StoredIndex index = new V1StoredIndex(fieldName);
-        final Map<Integer, UnsignedByteArray> data = initData();
+        final TreeMap<Integer, UnsignedByteArray> data = new TreeMap<>(initData());
         List<UnsignedByteArray> elements = new ArrayList<>(data.size());
         for(Map.Entry<Integer, UnsignedByteArray> entry : data.entrySet()) {
             index.addDocument(entry.getKey(), Collections.singletonList(entry.getValue()));
