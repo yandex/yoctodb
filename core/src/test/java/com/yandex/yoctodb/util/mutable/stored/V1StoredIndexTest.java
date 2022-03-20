@@ -9,9 +9,9 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * {@link com.yandex.yoctodb.util.immutable.ByteArrayIndexedList} with fixed size
@@ -41,7 +41,7 @@ public class V1StoredIndexTest {
     }
 
     private Map<Integer, UnsignedByteArray> initData() {
-        Map<Integer, UnsignedByteArray> data = new HashMap<>();
+        Map<Integer, UnsignedByteArray> data = new TreeMap<>();
         data.put(0, UnsignedByteArrays.from("NEW"));
         data.put(1, UnsignedByteArrays.from("USED"));
         return data;
